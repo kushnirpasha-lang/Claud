@@ -1,0 +1,71 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [claude/setup-digitalocean-vps-4Ij39]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py"
+          target: /opt/assistant
+          strip_components: 1
+
+      - name: Run setup on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+
+            # Install dependencies
+            /opt/assistant/venv/bin/pip install -r /opt/assistant/requirements.txt -q
+
+            # Update credentials from secrets
+            grep -q "TELEGRAM_API_ID" /opt/assistant/.env || echo "TELEGRAM_API_ID=38039077" >> /opt/assistant/.env
+            grep -q "TELEGRAM_API_HASH" /opt/assistant/.env || echo "TELEGRAM_API_HASH=5dda659889e12536b8d78a4444e960ae" >> /opt/assistant/.env
+            grep -q "OPENAI_API_KEY" /opt/assistant/.env || echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> /opt/assistant/.env
+            grep -q "TRELLO_API_KEY" /opt/assistant/.env || echo "TRELLO_API_KEY=${{ secrets.TRELLO_API_KEY }}" >> /opt/assistant/.env
+            grep -q "TRELLO_TOKEN" /opt/assistant/.env || echo "TRELLO_TOKEN=${{ secrets.TRELLO_TOKEN }}" >> /opt/assistant/.env
+            # Always update bot token in case it changed
+            sed -i '/^TELEGRAM_BOT_TOKEN=/d' /opt/assistant/.env
+            echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> /opt/assistant/.env
+
+            # Authorize Telethon (only if session doesn't exist yet)
+            if [ ! -f /opt/assistant/user_session.session ]; then
+              cd /opt/assistant && export $(grep -v '^#' .env | xargs)
+              venv/bin/python3 - << 'PYEOF'
+            import asyncio
+            from telethon import TelegramClient
+            import os
+
+            async def auth():
+                c = TelegramClient(
+                    '/opt/assistant/user_session',
+                    int(os.environ['TELEGRAM_API_ID']),
+                    os.environ['TELEGRAM_API_HASH']
+                )
+                await c.connect()
+                print("Session created, waiting for manual auth")
+                await c.disconnect()
+
+            asyncio.run(auth())
+            PYEOF
+            fi
+
+            # Restart service
+            systemctl restart assistant
+            sleep 3
+            systemctl status assistant --no-pager

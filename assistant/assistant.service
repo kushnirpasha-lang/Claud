@@ -1,0 +1,18 @@
+[Unit]
+Description=Personal AI Assistant (Telegram + Web)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/assistant
+EnvironmentFile=/opt/assistant/.env
+ExecStart=/opt/assistant/venv/bin/python main.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
