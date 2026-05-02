@@ -17,7 +17,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py"
+          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py"
           target: /opt/assistant
           strip_components: 1
 
@@ -37,6 +37,8 @@ jobs:
             grep -q "TELEGRAM_API_ID" /opt/assistant/.env || echo "TELEGRAM_API_ID=38039077" >> /opt/assistant/.env
             grep -q "TELEGRAM_API_HASH" /opt/assistant/.env || echo "TELEGRAM_API_HASH=5dda659889e12536b8d78a4444e960ae" >> /opt/assistant/.env
             grep -q "OPENAI_API_KEY" /opt/assistant/.env || echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> /opt/assistant/.env
+            grep -q "TRELLO_API_KEY" /opt/assistant/.env || echo "TRELLO_API_KEY=${{ secrets.TRELLO_API_KEY }}" >> /opt/assistant/.env
+            grep -q "TRELLO_TOKEN" /opt/assistant/.env || echo "TRELLO_TOKEN=${{ secrets.TRELLO_TOKEN }}" >> /opt/assistant/.env
             # Always update bot token in case it changed
             sed -i '/^TELEGRAM_BOT_TOKEN=/d' /opt/assistant/.env
             echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> /opt/assistant/.env

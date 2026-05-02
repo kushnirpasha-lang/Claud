@@ -72,26 +72,82 @@ def _transcribe_voice_sync(file_bytes: bytes) -> str:
     return result.text
 
 
-def _detect_send_intent(text: str):
-    """Returns (contact_name, message) if send intent detected, else None."""
+def _detect_intent(text: str) -> dict:
+    """
+    Detect user intent. Returns dict with 'type' key:
+    - {'type': 'send_tg', 'to': name, 'text': msg}
+    - {'type': 'trello', 'action': action_text}
+    - {'type': 'chat'}
+    """
     import anthropic
     c = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
     resp = c.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=200,
         system=(
-            "Detect if the user wants to send a Telegram message to someone. "
-            "If YES, respond ONLY: SEND:<recipient full name>|<message text>\n"
-            "If NO, respond: NO"
+            "Classify user intent into one of these:\n"
+            "1. Send Telegram message → respond: SEND_TG:<recipient name>|<message>\n"
+            "2. Trello task (show board, add card, move card, list tasks) → respond: TRELLO:<user request verbatim>\n"
+            "3. Anything else → respond: CHAT\n"
+            "Respond with ONLY one of these formats, nothing else."
         ),
         messages=[{"role": "user", "content": text}],
     )
     result = resp.content[0].text.strip()
-    if result.startswith("SEND:"):
-        parts = result[5:].split("|", 1)
+    if result.startswith("SEND_TG:"):
+        parts = result[8:].split("|", 1)
         if len(parts) == 2:
-            return parts[0].strip(), parts[1].strip()
-    return None
+            return {"type": "send_tg", "to": parts[0].strip(), "text": parts[1].strip()}
+    elif result.startswith("TRELLO:"):
+        return {"type": "trello", "action": result[7:].strip()}
+    return {"type": "chat"}
+
+
+def _handle_trello(uid: str, user_request: str) -> str:
+    """Process Trello-related request using Claude + Trello API."""
+    try:
+        import trello_client
+        boards = trello_client.get_boards()
+        if not boards:
+            return "В твоём Trello нет активных досок."
+
+        # Use the first board (or the one configured)
+        board_id = os.environ.get("TRELLO_BOARD_ID", boards[0]["id"])
+        board_name = next((b["name"] for b in boards if b["id"] == board_id), boards[0]["name"])
+        summary = trello_client.get_board_summary(board_id)
+
+        import anthropic
+        c = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        resp = c.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=1000,
+            system=(
+                f"Ты помощник для работы с Trello-доской '{board_name}'.\n"
+                f"Текущее состояние доски:\n{summary}\n\n"
+                "Отвечай кратко и по делу. Если нужно создать карточку или переместить — "
+                "скажи что именно сделал. Отвечай на русском."
+            ),
+            messages=[{"role": "user", "content": user_request}],
+        )
+        return resp.content[0].text
+    except Exception as e:
+        print(f"Trello error: {e}")
+        return f"Ошибка при работе с Trello: {e}"
+
+
+async def cmd_trello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    try:
+        import trello_client
+        boards = trello_client.get_boards()
+        if not boards:
+            await update.message.reply_text("В твоём Trello нет активных досок.")
+            return
+        board_id = os.environ.get("TRELLO_BOARD_ID", boards[0]["id"])
+        summary = trello_client.get_board_summary(board_id)
+        board_name = next((b["name"] for b in boards if b["id"] == board_id), boards[0]["name"])
+        await update.message.reply_text(f"📋 *{board_name}*\n{summary}", parse_mode="Markdown")
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка: {e}")
 
 
 async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
@@ -103,9 +159,10 @@ async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text
     try:
         loop = asyncio.get_running_loop()
 
-        send_intent = await loop.run_in_executor(None, partial(_detect_send_intent, text))
-        if send_intent:
-            contact_name, msg_text = send_intent
+        intent = await loop.run_in_executor(None, partial(_detect_intent, text))
+
+        if intent["type"] == "send_tg":
+            contact_name, msg_text = intent["to"], intent["text"]
             _pending_sends[update.effective_user.id] = {"to": contact_name, "text": msg_text}
             stop_event.set()
             typing_task.cancel()
@@ -118,6 +175,14 @@ async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text
                 parse_mode="Markdown",
                 reply_markup=keyboard,
             )
+            return
+
+        if intent["type"] == "trello":
+            trello_reply = await loop.run_in_executor(None, partial(_handle_trello, uid, text))
+            stop_event.set()
+            typing_task.cancel()
+            for i in range(0, len(trello_reply), 4096):
+                await update.message.reply_text(trello_reply[i:i + 4096])
             return
 
         reply = await loop.run_in_executor(None, partial(claude_client.chat, uid, text))
@@ -187,6 +252,7 @@ def run() -> None:
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("new", cmd_new))
     app.add_handler(CommandHandler("help", cmd_help))
+    app.add_handler(CommandHandler("trello", cmd_trello))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
     app.add_handler(CallbackQueryHandler(handle_send_callback, pattern="^send_"))
