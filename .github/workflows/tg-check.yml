@@ -1,0 +1,56 @@
+name: TG Auth Check
+"on":
+  workflow_dispatch:
+    inputs:
+      step:
+        description: 'request or signin'
+        required: true
+        default: request
+      code:
+        description: 'Code from Telegram (for signin step)'
+        required: false
+        default: ''
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Copy scripts to server
+        run: |
+          scp -i ~/.ssh/id_ed25519 \
+            .github/scripts/tg_request.py \
+            .github/scripts/tg_signin.py \
+            root@${{ secrets.SSH_HOST }}:/opt/assistant/
+
+      - name: Run on server
+        id: run
+        run: |
+          STEP="${{ inputs.step }}"
+          CODE="${{ inputs.code }}"
+          if [ "$STEP" = "request" ]; then
+            RESULT=$(ssh -i ~/.ssh/id_ed25519 root@${{ secrets.SSH_HOST }} \
+              "cd /opt/assistant && export \$(grep -v '^#' .env | xargs) && venv/bin/python3 tg_request.py 2>&1")
+          else
+            RESULT=$(ssh -i ~/.ssh/id_ed25519 root@${{ secrets.SSH_HOST }} \
+              "cd /opt/assistant && export \$(grep -v '^#' .env | xargs) && venv/bin/python3 tg_signin.py '${CODE}' 2>&1 && systemctl restart assistant")
+          fi
+          echo "result=$RESULT" >> $GITHUB_OUTPUT
+          echo "Result: [$RESULT]"
+
+      - name: Post result to issue
+        run: |
+          RESULT="${{ steps.run.outputs.result }}"
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            https://api.github.com/repos/${{ github.repository }}/issues/1/comments \
+            -d "{\"body\":\"**Step:** ${{ inputs.step }}\n\n**Result:**\n\`\`\`\n${RESULT}\n\`\`\`\"}"
