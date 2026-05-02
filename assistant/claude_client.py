@@ -33,6 +33,9 @@ def chat(conversation_id: str, message: str) -> str:
         _conversations[conversation_id].append({"role": "user", "content": message})
         history = list(_conversations[conversation_id][-MAX_HISTORY:])
 
+    # Drop any messages with empty content to avoid cache_control errors
+    history = [m for m in history if m.get("content")]
+
     response = _get_client().messages.create(
         model=CLAUDE_MODEL,
         max_tokens=MAX_TOKENS,
@@ -40,10 +43,11 @@ def chat(conversation_id: str, message: str) -> str:
         messages=history,
     )
 
-    reply = response.content[0].text
+    reply = response.content[0].text if response.content else ""
 
     with _conv_lock:
-        _conversations[conversation_id].append({"role": "assistant", "content": reply})
+        if reply:
+            _conversations[conversation_id].append({"role": "assistant", "content": reply})
 
     return reply
 
