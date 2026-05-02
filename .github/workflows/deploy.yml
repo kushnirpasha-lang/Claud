@@ -39,6 +39,7 @@ jobs:
             grep -q "OPENAI_API_KEY" /opt/assistant/.env || echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> /opt/assistant/.env
             grep -q "TRELLO_API_KEY" /opt/assistant/.env || echo "TRELLO_API_KEY=${{ secrets.TRELLO_API_KEY }}" >> /opt/assistant/.env
             grep -q "TRELLO_TOKEN" /opt/assistant/.env || echo "TRELLO_TOKEN=${{ secrets.TRELLO_TOKEN }}" >> /opt/assistant/.env
+            grep -q "TRELLO_BOARD_ID" /opt/assistant/.env || echo "TRELLO_BOARD_ID=69f5ee59565cd64f2e9da2ff" >> /opt/assistant/.env
             # Always update bot token in case it changed
             sed -i '/^TELEGRAM_BOT_TOKEN=/d' /opt/assistant/.env
             echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> /opt/assistant/.env

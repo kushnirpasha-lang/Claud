@@ -72,13 +72,23 @@ def _transcribe_voice_sync(file_bytes: bytes) -> str:
     return result.text
 
 
+_SEND_KEYWORDS = ("отправь", "напиши", "передай", "скажи", "пошли", "send")
+_TRELLO_KEYWORDS = ("trello", "трелло", "доска", "карточк", "задач", "колонк", "добавь задачу",
+                    "перемести", "покажи задачи", "что в работе", "что сделано")
+
+
+def _quick_intent(text: str) -> str | None:
+    """Fast keyword check — returns 'send_tg', 'trello', or None (=needs AI)."""
+    tl = text.lower()
+    if any(k in tl for k in _TRELLO_KEYWORDS):
+        return "trello"
+    if any(k in tl for k in _SEND_KEYWORDS):
+        return "maybe_send"
+    return None
+
+
 def _detect_intent(text: str) -> dict:
-    """
-    Detect user intent. Returns dict with 'type' key:
-    - {'type': 'send_tg', 'to': name, 'text': msg}
-    - {'type': 'trello', 'action': action_text}
-    - {'type': 'chat'}
-    """
+    """AI intent detection — only called when keywords suggest non-chat intent."""
     import anthropic
     c = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
     resp = c.messages.create(
@@ -86,8 +96,8 @@ def _detect_intent(text: str) -> dict:
         max_tokens=200,
         system=(
             "Classify user intent into one of these:\n"
-            "1. Send Telegram message → respond: SEND_TG:<recipient name>|<message>\n"
-            "2. Trello task (show board, add card, move card, list tasks) → respond: TRELLO:<user request verbatim>\n"
+            "1. Send Telegram message to someone → respond: SEND_TG:<recipient name>|<message>\n"
+            "2. Trello task (show board, add/move/delete card, list tasks) → respond: TRELLO:<user request verbatim>\n"
             "3. Anything else → respond: CHAT\n"
             "Respond with ONLY one of these formats, nothing else."
         ),
@@ -104,35 +114,65 @@ def _detect_intent(text: str) -> dict:
 
 
 def _handle_trello(uid: str, user_request: str) -> str:
-    """Process Trello-related request using Claude + Trello API."""
+    """Process Trello request: parse action with Haiku, execute via API, return result."""
     try:
         import trello_client
-        boards = trello_client.get_boards()
-        if not boards:
-            return "В твоём Trello нет активных досок."
-
-        # Use the first board (or the one configured)
-        board_id = os.environ.get("TRELLO_BOARD_ID", boards[0]["id"])
-        board_name = next((b["name"] for b in boards if b["id"] == board_id), boards[0]["name"])
-        summary = trello_client.get_board_summary(board_id)
+        summary = trello_client.get_board_summary()
 
         import anthropic
         c = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+        # Ask Haiku to parse the action
         resp = c.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=1000,
+            max_tokens=300,
             system=(
-                f"Ты помощник для работы с Trello-доской '{board_name}'.\n"
-                f"Текущее состояние доски:\n{summary}\n\n"
-                "Отвечай кратко и по делу. Если нужно создать карточку или переместить — "
-                "скажи что именно сделал. Отвечай на русском."
+                "Ты менеджер Trello-доски HairLove. Текущее состояние:\n"
+                f"{summary}\n\n"
+                "Определи что нужно сделать и ответь ТОЛЬКО одной из команд:\n"
+                "SHOW — показать доску\n"
+                "CREATE:<колонка>|<название карточки> — создать карточку\n"
+                "MOVE:<название карточки>|<колонка назначения> — переместить\n"
+                "DELETE:<название карточки> — удалить карточку\n"
+                "CHAT:<ответ пользователю> — просто ответить"
             ),
             messages=[{"role": "user", "content": user_request}],
         )
-        return resp.content[0].text
+        cmd = resp.content[0].text.strip()
+
+        if cmd == "SHOW" or cmd.startswith("SHOW"):
+            fresh = trello_client.get_board_summary(force=True)
+            return f"📋 *HairLove*\n{fresh}"
+
+        elif cmd.startswith("CREATE:"):
+            parts = cmd[7:].split("|", 1)
+            if len(parts) == 2:
+                col, name = parts[0].strip(), parts[1].strip()
+                trello_client.create_card(col, name)
+                return f"✅ Карточка «{name}» добавлена в «{col}»"
+            return "Не понял что создать. Уточни колонку и название."
+
+        elif cmd.startswith("MOVE:"):
+            parts = cmd[5:].split("|", 1)
+            if len(parts) == 2:
+                card, col = parts[0].strip(), parts[1].strip()
+                ok = trello_client.move_card(card, col)
+                return f"✅ «{card}» перемещена в «{col}»" if ok else f"❌ Карточка «{card}» не найдена"
+            return "Не понял что переместить."
+
+        elif cmd.startswith("DELETE:"):
+            name = cmd[7:].strip()
+            ok = trello_client.delete_card(name)
+            return f"✅ Карточка «{name}» удалена" if ok else f"❌ Карточка «{name}» не найдена"
+
+        elif cmd.startswith("CHAT:"):
+            return cmd[5:].strip()
+
+        return cmd  # fallback
+
     except Exception as e:
         print(f"Trello error: {e}")
-        return f"Ошибка при работе с Trello: {e}"
+        return f"Ошибка Trello: {e}"
 
 
 async def cmd_trello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -159,7 +199,12 @@ async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text
     try:
         loop = asyncio.get_running_loop()
 
-        intent = await loop.run_in_executor(None, partial(_detect_intent, text))
+        # Fast keyword check first — skip Haiku call for plain chat (~80% of messages)
+        quick = _quick_intent(text)
+        if quick is None:
+            intent = {"type": "chat"}
+        else:
+            intent = await loop.run_in_executor(None, partial(_detect_intent, text))
 
         if intent["type"] == "send_tg":
             contact_name, msg_text = intent["to"], intent["text"]
