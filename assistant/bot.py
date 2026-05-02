@@ -1,10 +1,12 @@
 import asyncio
+import io
 import os
 from functools import partial
 
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
+    CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
     MessageHandler,
@@ -13,10 +15,15 @@ from telegram.ext import (
 
 import claude_client
 
+# {user_id: {"to": contact_name, "text": message_text}}
+_pending_sends: dict = {}
+
 WELCOME = (
     "Привет! Я твой личный ИИ-ассистент 🤖\n\n"
-    "Задавай любые вопросы — ищу, анализирую, пишу тексты, "
-    "помогаю с бизнесом и техникой.\n\n"
+    "Задавай вопросы или отправляй голосовые команды.\n\n"
+    "Примеры:\n"
+    "• «Отправь Максу Маркову: встречаемся в 18:00»\n"
+    "• «Что такое квантовая физика?»\n\n"
     "Команды:\n"
     "/new — начать новый разговор\n"
     "/help — что я умею"
@@ -24,12 +31,11 @@ WELCOME = (
 
 HELP = (
     "Я умею:\n"
-    "• Искать информацию и сравнивать варианты\n"
-    "• Писать тексты, посты, письма, рекламу\n"
-    "• Помогать с сайтами (структура, SEO, UX)\n"
-    "• Развивать бизнес и соцсети\n"
-    "• Решать технические задачи (VPS, боты, API)\n"
-    "• Анализировать и давать рекомендации\n\n"
+    "• Отвечать на вопросы и анализировать\n"
+    "• Писать тексты, посты, письма\n"
+    "• Принимать голосовые команды 🎤\n"
+    "• Отправлять сообщения твоим Telegram-контактам\n\n"
+    "Голосовые: просто запиши голосовое — расшифрую и выполню.\n\n"
     "/new — очистить историю разговора"
 )
 
@@ -57,33 +63,121 @@ async def _keep_typing(context: ContextTypes.DEFAULT_TYPE, chat_id: int, stop: a
             pass
 
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    uid = f"tg_{update.effective_user.id}"
-    text = update.message.text
+def _transcribe_voice_sync(file_bytes: bytes) -> str:
+    import openai
+    c = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    audio_file = io.BytesIO(file_bytes)
+    audio_file.name = "voice.ogg"
+    result = c.audio.transcriptions.create(model="whisper-1", file=audio_file, language="ru")
+    return result.text
 
+
+def _detect_send_intent(text: str):
+    """Returns (contact_name, message) if send intent detected, else None."""
+    import anthropic
+    c = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    resp = c.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=200,
+        system=(
+            "Detect if the user wants to send a Telegram message to someone. "
+            "If YES, respond ONLY: SEND:<recipient full name>|<message text>\n"
+            "If NO, respond: NO"
+        ),
+        messages=[{"role": "user", "content": text}],
+    )
+    result = resp.content[0].text.strip()
+    if result.startswith("SEND:"):
+        parts = result[5:].split("|", 1)
+        if len(parts) == 2:
+            return parts[0].strip(), parts[1].strip()
+    return None
+
+
+async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
+    uid = f"tg_{update.effective_user.id}"
     stop_event = asyncio.Event()
     typing_task = asyncio.create_task(
         _keep_typing(context, update.effective_chat.id, stop_event)
     )
-
     try:
         loop = asyncio.get_running_loop()
-        reply = await loop.run_in_executor(None, partial(claude_client.chat, uid, text))
 
+        send_intent = await loop.run_in_executor(None, partial(_detect_send_intent, text))
+        if send_intent:
+            contact_name, msg_text = send_intent
+            _pending_sends[update.effective_user.id] = {"to": contact_name, "text": msg_text}
+            stop_event.set()
+            typing_task.cancel()
+            keyboard = InlineKeyboardMarkup([[
+                InlineKeyboardButton("✅ Отправить", callback_data="send_confirm"),
+                InlineKeyboardButton("❌ Отмена", callback_data="send_cancel"),
+            ]])
+            await update.message.reply_text(
+                f"📤 Готово отправить *{contact_name}*:\n\n_{msg_text}_",
+                parse_mode="Markdown",
+                reply_markup=keyboard,
+            )
+            return
+
+        reply = await loop.run_in_executor(None, partial(claude_client.chat, uid, text))
         stop_event.set()
         typing_task.cancel()
-
-        # Telegram message limit is 4096 chars
         for i in range(0, len(reply), 4096):
-            await update.message.reply_text(reply[i : i + 4096])
+            await update.message.reply_text(reply[i:i + 4096])
 
     except Exception as exc:
         stop_event.set()
         typing_task.cancel()
         print(f"Error for user {uid}: {exc}")
-        await update.message.reply_text(
-            "Что-то пошло не так. Попробуй ещё раз или напиши /new"
-        )
+        await update.message.reply_text("Что-то пошло не так. Попробуй ещё раз или /new")
+
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _process_text(update, context, update.message.text)
+
+
+async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+    try:
+        voice_file = await update.message.voice.get_file()
+        file_bytes = await voice_file.download_as_bytearray()
+        loop = asyncio.get_running_loop()
+        text = await loop.run_in_executor(None, partial(_transcribe_voice_sync, bytes(file_bytes)))
+        await update.message.reply_text(f"🎤 _{text}_", parse_mode="Markdown")
+        await _process_text(update, context, text)
+    except Exception as exc:
+        print(f"Voice error: {exc}")
+        await update.message.reply_text("Не смог распознать голосовое. Попробуй ещё раз.")
+
+
+async def handle_send_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    uid = query.from_user.id
+    pending = _pending_sends.pop(uid, None)
+
+    if query.data == "send_confirm" and pending:
+        try:
+            import telethon_user
+            loop = asyncio.get_running_loop()
+            ok = await loop.run_in_executor(
+                None,
+                partial(telethon_user.send_to_contact_sync, pending["to"], pending["text"])
+            )
+            if ok:
+                await query.edit_message_text(
+                    f"✅ Сообщение отправлено *{pending['to']}*", parse_mode="Markdown"
+                )
+            else:
+                await query.edit_message_text(
+                    f"❌ Контакт *{pending['to']}* не найден в Telegram", parse_mode="Markdown"
+                )
+        except Exception as exc:
+            print(f"Send callback error: {exc}")
+            await query.edit_message_text("❌ Ошибка при отправке сообщения")
+    else:
+        await query.edit_message_text("❌ Отменено")
 
 
 def run() -> None:
@@ -94,6 +188,8 @@ def run() -> None:
     app.add_handler(CommandHandler("new", cmd_new))
     app.add_handler(CommandHandler("help", cmd_help))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(MessageHandler(filters.VOICE, handle_voice))
+    app.add_handler(CallbackQueryHandler(handle_send_callback, pattern="^send_"))
 
     print("Telegram bot started.")
     app.run_polling(drop_pending_updates=True)

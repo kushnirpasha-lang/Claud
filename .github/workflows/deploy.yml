@@ -30,12 +30,13 @@ jobs:
           script: |
             set -e
 
-            # Install Telethon
-            /opt/assistant/venv/bin/pip install telethon -q
+            # Install dependencies
+            /opt/assistant/venv/bin/pip install -r /opt/assistant/requirements.txt -q
 
             # Add API credentials if missing
             grep -q "TELEGRAM_API_ID" /opt/assistant/.env || echo "TELEGRAM_API_ID=38039077" >> /opt/assistant/.env
             grep -q "TELEGRAM_API_HASH" /opt/assistant/.env || echo "TELEGRAM_API_HASH=5dda659889e12536b8d78a4444e960ae" >> /opt/assistant/.env
+            grep -q "OPENAI_API_KEY" /opt/assistant/.env || echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> /opt/assistant/.env
 
             # Authorize Telethon (only if session doesn't exist yet)
             if [ ! -f /opt/assistant/user_session.session ]; then
