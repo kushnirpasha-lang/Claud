@@ -15,42 +15,39 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          printf '%s' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
-
-      - name: Copy scripts to server
-        run: |
-          scp -i ~/.ssh/id_ed25519 \
-            .github/scripts/tg_request.py \
-            .github/scripts/tg_signin.py \
-            root@${{ secrets.SSH_HOST }}:/opt/assistant/
-
       - name: Run on server
-        id: run
-        run: |
-          STEP="${{ inputs.step }}"
-          CODE="${{ inputs.code }}"
-          if [ "$STEP" = "request" ]; then
-            RESULT=$(ssh -i ~/.ssh/id_ed25519 root@${{ secrets.SSH_HOST }} \
-              "cd /opt/assistant && export \$(grep -v '^#' .env | xargs) && venv/bin/python3 tg_request.py 2>&1")
-          else
-            RESULT=$(ssh -i ~/.ssh/id_ed25519 root@${{ secrets.SSH_HOST }} \
-              "cd /opt/assistant && export \$(grep -v '^#' .env | xargs) && venv/bin/python3 tg_signin.py '${CODE}' 2>&1 && systemctl restart assistant")
-          fi
-          echo "result=$RESULT" >> $GITHUB_OUTPUT
-          echo "Result: [$RESULT]"
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          STEP: ${{ inputs.step }}
+          CODE: ${{ inputs.code }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+          GH_REPO: ${{ github.repository }}
+          REQ_B64: aW1wb3J0IGFzeW5jaW8sIG9zCmZyb20gdGVsZXRob24gaW1wb3J0IFRlbGVncmFtQ2xpZW50Cgphc3luYyBkZWYgbWFpbigpOgogICAgYXBpX2lkICAgPSBpbnQob3MuZW52aXJvblsiVEVMRUdSQU1fQVBJX0lEIl0pCiAgICBhcGlfaGFzaCA9IG9zLmVudmlyb25bIlRFTEVHUkFNX0FQSV9IQVNIIl0KICAgIGMgPSBUZWxlZ3JhbUNsaWVudCgiL29wdC9hc3Npc3RhbnQvdXNlcl9zZXNzaW9uIiwgYXBpX2lkLCBhcGlfaGFzaCkKICAgIGF3YWl0IGMuY29ubmVjdCgpCiAgICBpZiBhd2FpdCBjLmlzX3VzZXJfYXV0aG9yaXplZCgpOgogICAgICAgIG1lID0gYXdhaXQgYy5nZXRfbWUoKQogICAgICAgIHByaW50KCJBTFJFQURZX0FVVEg6ICIgKyBtZS5maXJzdF9uYW1lICsgIiBAIiArIHN0cihtZS51c2VybmFtZSkpCiAgICBlbHNlOgogICAgICAgIHNlbnQgPSBhd2FpdCBjLnNlbmRfY29kZV9yZXF1ZXN0KCIrMzgwNjM3MzUzNzMzIikKICAgICAgICBvcGVuKCIvdG1wL3RnX2hhc2giLCJ3Iikud3JpdGUoc2VudC5waG9uZV9jb2RlX2hhc2gpCiAgICAgICAgcHJpbnQoIkNPREVfU0VOVCB0byArMzgwNjM3MzUzNzMzIikKICAgIGF3YWl0IGMuZGlzY29ubmVjdCgpCgphc3luY2lvLnJ1bihtYWluKCkpCg==
+          SIGN_B64: aW1wb3J0IGFzeW5jaW8sIG9zLCBzeXMKZnJvbSB0ZWxldGhvbiBpbXBvcnQgVGVsZWdyYW1DbGllbnQKZnJvbSB0ZWxldGhvbi5lcnJvcnMgaW1wb3J0IFNlc3Npb25QYXNzd29yZE5lZWRlZEVycm9yCgpDT0RFID0gc3lzLmFyZ3ZbMV0KCmFzeW5jIGRlZiBtYWluKCk6CiAgICBhcGlfaWQgICA9IGludChvcy5lbnZpcm9uWyJURUxFR1JBTV9BUElfSUQiXSkKICAgIGFwaV9oYXNoID0gb3MuZW52aXJvblsiVEVMRUdSQU1fQVBJX0hBU0giXQogICAgaCA9IG9wZW4oIi90bXAvdGdfaGFzaCIpLnJlYWQoKS5zdHJpcCgpCiAgICBjID0gVGVsZWdyYW1DbGllbnQoIi9vcHQvYXNzaXN0YW50L3VzZXJfc2Vzc2lvbiIsIGFwaV9pZCwgYXBpX2hhc2gpCiAgICBhd2FpdCBjLmNvbm5lY3QoKQogICAgdHJ5OgogICAgICAgIGF3YWl0IGMuc2lnbl9pbigiKzM4MDYzNzM1MzczMyIsIENPREUsIHBob25lX2NvZGVfaGFzaD1oKQogICAgICAgIG1lID0gYXdhaXQgYy5nZXRfbWUoKQogICAgICAgIHByaW50KCJTVUNDRVNTOiAiICsgbWUuZmlyc3RfbmFtZSArICIgQCIgKyBzdHIobWUudXNlcm5hbWUpKQogICAgZXhjZXB0IFNlc3Npb25QYXNzd29yZE5lZWRlZEVycm9yOgogICAgICAgIHByaW50KCIyRkFfUkVRVUlSRUQiKQogICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgIHByaW50KCJFUlJPUjogIiArIHN0cihlKSkKICAgIGF3YWl0IGMuZGlzY29ubmVjdCgpCgphc3luY2lvLnJ1bihtYWluKCkpCg==
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: STEP,CODE,GH_TOKEN,GH_REPO,REQ_B64,SIGN_B64
+          script_stop: false
+          script: |
+            export $(grep -v '^#' /opt/assistant/.env | xargs) 2>/dev/null || true
+            cd /opt/assistant
 
-      - name: Post result to issue
-        run: |
-          RESULT="${{ steps.run.outputs.result }}"
-          curl -s -X POST \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            https://api.github.com/repos/${{ github.repository }}/issues/1/comments \
-            -d "{\"body\":\"**Step:** ${{ inputs.step }}\n\n**Result:**\n\`\`\`\n${RESULT}\n\`\`\`\"}"
+            if [ "$STEP" = "request" ]; then
+              echo "$REQ_B64" | base64 -d > /tmp/tg_req.py
+              RESULT=$(venv/bin/python3 /tmp/tg_req.py 2>&1)
+            elif [ "$STEP" = "signin" ]; then
+              echo "$SIGN_B64" | base64 -d > /tmp/tg_sign.py
+              RESULT=$(venv/bin/python3 /tmp/tg_sign.py "$CODE" 2>&1)
+              systemctl restart assistant || true
+            else
+              RESULT="Unknown step"
+            fi
+
+            echo "RESULT: $RESULT"
+            curl -s -X POST \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.github.com/repos/$GH_REPO/issues/1/comments" \
+              -d "{\"body\":\"**$STEP result:**\n\`\`\`\n$RESULT\n\`\`\`\"}" || true
