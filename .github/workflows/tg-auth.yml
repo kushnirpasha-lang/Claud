@@ -1,0 +1,63 @@
+name: Telegram Auth
+
+on:
+  workflow_dispatch:
+    inputs:
+      code:
+        description: 'Telegram verification code'
+        required: true
+        type: string
+
+jobs:
+  auth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authorize Telethon on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/assistant
+            export $(grep -v '^#' .env | xargs)
+
+            venv/bin/python3 - << PYEOF
+            import asyncio
+            from telethon import TelegramClient
+            from telethon.errors import SessionPasswordNeededError
+            import os
+
+            async def main():
+                api_id   = int(os.environ["TELEGRAM_API_ID"])
+                api_hash = os.environ["TELEGRAM_API_HASH"]
+                phone    = "+380637353733"
+                code     = "${{ inputs.code }}"
+
+                client = TelegramClient("/opt/assistant/user_session", api_id, api_hash)
+                await client.connect()
+
+                if await client.is_user_authorized():
+                    me = await client.get_me()
+                    print(f"Already authorized as {me.first_name}")
+                    await client.disconnect()
+                    return
+
+                sent = await client.send_code_request(phone)
+                try:
+                    await client.sign_in(phone, code, phone_code_hash=sent.phone_code_hash)
+                except SessionPasswordNeededError:
+                    print("2FA required - need password")
+                    await client.disconnect()
+                    return
+
+                me = await client.get_me()
+                print(f"SUCCESS: authorized as {me.first_name} @{me.username}")
+                await client.disconnect()
+
+            asyncio.run(main())
+            PYEOF
+
+            systemctl restart assistant
+            sleep 3
+            systemctl status assistant --no-pager | head -20
