@@ -1,0 +1,74 @@
+name: Post to Instagram
+
+on:
+  push:
+    branches: [claude/setup-digitalocean-vps-4Ij39]
+    paths:
+      - 'posts/pending/*.jpg'
+      - 'posts/pending/*.jpeg'
+      - 'posts/pending/*.png'
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Post to Instagram
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+        run: |
+          set -e
+
+          # Find image and caption
+          IMG=$(find posts/pending -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" | grep -v ".gitkeep" | head -1)
+          if [ -z "$IMG" ]; then echo "No image found"; exit 0; fi
+
+          CAPTION_FILE="${IMG%.*}.txt"
+          CAPTION=""
+          if [ -f "$CAPTION_FILE" ]; then
+            CAPTION=$(cat "$CAPTION_FILE")
+          fi
+
+          # Public URL via raw.githubusercontent.com
+          IMAGE_URL="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/${IMG}"
+          echo "Posting: $IMAGE_URL"
+          echo "Caption: $CAPTION"
+
+          # Step 1: create media container
+          CONTAINER=$(curl -s -X POST \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media" \
+            -d "image_url=${IMAGE_URL}" \
+            -d "caption=${CAPTION}" \
+            -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Container: $CONTAINER"
+
+          CONTAINER_ID=$(echo "$CONTAINER" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+
+          # Step 2: publish
+          RESULT=$(curl -s -X POST \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media_publish" \
+            -d "creation_id=${CONTAINER_ID}" \
+            -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Result: $RESULT"
+
+          POST_ID=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id','ERROR'))")
+          echo "Published! Post ID: $POST_ID"
+
+      - name: Move posted files to done
+        run: |
+          IMG=$(find posts/pending -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" | grep -v ".gitkeep" | head -1)
+          if [ -z "$IMG" ]; then exit 0; fi
+          BASENAME=$(basename "$IMG")
+          CAPTION_FILE="posts/pending/${BASENAME%.*}.txt"
+
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          mv "$IMG" "posts/done/${BASENAME}"
+          [ -f "$CAPTION_FILE" ] && mv "$CAPTION_FILE" "posts/done/${BASENAME%.*}.txt" || true
+
+          git add posts/
+          git commit -m "✅ Posted to Instagram: ${BASENAME}" || true
+          git push || true
