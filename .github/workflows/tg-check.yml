@@ -46,8 +46,9 @@ jobs:
             fi
 
             echo "RESULT: $RESULT"
+            RESULT_JSON=$(printf '%s' "$RESULT" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
             curl -s -X POST \
               -H "Authorization: Bearer $GH_TOKEN" \
               -H "Content-Type: application/json" \
               "https://api.github.com/repos/$GH_REPO/issues/1/comments" \
-              -d "{\"body\":\"**$STEP result:**\n\`\`\`\n$RESULT\n\`\`\`\"}" || true
+              -d "{\"body\":\"**$STEP result:**\n\`\`\`\n${RESULT_JSON}\n\`\`\`\"}" || true
