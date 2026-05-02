@@ -1,0 +1,25 @@
+name: Server Check
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check server state
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "=== SESSION FILE ==="
+            ls -la /opt/assistant/user_session* 2>/dev/null || echo "No session files"
+            echo "=== HASH FILE ==="
+            ls -la /tmp/tg_phone_hash 2>/dev/null || echo "No hash file"
+            echo "=== ENV ==="
+            grep TELEGRAM /opt/assistant/.env
+            echo "=== SERVICE ==="
+            systemctl status assistant --no-pager | head -10
+            echo "=== RECENT LOGS ==="
+            journalctl -u assistant -n 20 --no-pager
