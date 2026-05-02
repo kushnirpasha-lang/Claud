@@ -7,14 +7,9 @@ _client_lock = threading.Lock()
 _conversations: dict[str, list] = {}
 _conv_lock = threading.Lock()
 
-# System prompt with cache_control — charged full price once, then 10% on cache hits
-_CACHED_SYSTEM = [
-    {
-        "type": "text",
-        "text": SYSTEM_PROMPT,
-        "cache_control": {"type": "ephemeral"},
-    }
-]
+# Plain system prompt without cache_control — avoids SDK auto-injecting cache_control
+# into messages which creates empty text blocks and causes 400 errors.
+_SYSTEM = SYSTEM_PROMPT
 
 
 def _get_client() -> Anthropic:
@@ -36,7 +31,7 @@ def chat(conversation_id: str, message: str) -> str:
     response = _get_client().messages.create(
         model=CLAUDE_MODEL,
         max_tokens=MAX_TOKENS,
-        system=_CACHED_SYSTEM,
+        system=_SYSTEM,
         messages=history,
     )
 
