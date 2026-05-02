@@ -7,6 +7,15 @@ _client_lock = threading.Lock()
 _conversations: dict[str, list] = {}
 _conv_lock = threading.Lock()
 
+# System prompt with cache_control — charged full price once, then 10% on cache hits
+_CACHED_SYSTEM = [
+    {
+        "type": "text",
+        "text": SYSTEM_PROMPT,
+        "cache_control": {"type": "ephemeral"},
+    }
+]
+
 
 def _get_client() -> Anthropic:
     global _client
@@ -27,7 +36,7 @@ def chat(conversation_id: str, message: str) -> str:
     response = _get_client().messages.create(
         model=CLAUDE_MODEL,
         max_tokens=MAX_TOKENS,
-        system=SYSTEM_PROMPT,
+        system=_CACHED_SYSTEM,
         messages=history,
     )
 

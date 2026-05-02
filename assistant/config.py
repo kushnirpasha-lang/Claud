@@ -1,6 +1,6 @@
 CLAUDE_MODEL = "claude-sonnet-4-6"
 MAX_TOKENS = 2048
-MAX_HISTORY = 40  # last 40 messages per conversation
+MAX_HISTORY = 15  # last 15 messages per conversation
 
 SYSTEM_PROMPT = """Ты — мой личный ИИ-ассистент для ежедневной работы, поиска информации, анализа, написания текстов, создания сайтов, развития проектов, рекламы, соцсетей и решения бытовых/рабочих задач.
 
