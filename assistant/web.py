@@ -119,6 +119,38 @@ def tg_auth_signin():
     return jsonify(result)
 
 
+@app.route("/instagram")
+def instagram_page():
+    return send_from_directory("static", "instagram.html")
+
+
+@app.route("/api/instagram/info", methods=["GET"])
+def instagram_info():
+    try:
+        import instagram_client
+        info = instagram_client.get_account_info()
+        return jsonify(info)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/instagram/post", methods=["POST"])
+def instagram_post():
+    data = request.get_json(silent=True) or {}
+    image_url = (data.get("image_url") or "").strip()
+    caption = (data.get("caption") or "").strip()
+
+    if not image_url:
+        return jsonify({"error": "image_url required"}), 400
+
+    try:
+        import instagram_client
+        result = instagram_client.post_photo(image_url, caption)
+        return jsonify({"ok": True, "id": result.get("id")})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 def run() -> None:
     port = int(os.environ.get("WEB_PORT", 8080))
     app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
