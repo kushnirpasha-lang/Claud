@@ -17,7 +17,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py,assistant/instagram_client.py"
+          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py,assistant/instagram_client.py,assistant/static/instagram.html,assistant/static/uploads/.gitkeep"
           target: /opt/assistant
           strip_components: 1
 
@@ -68,6 +68,10 @@ jobs:
             asyncio.run(auth())
             PYEOF
             fi
+
+            # Ensure uploads directory exists and is writable
+            mkdir -p /opt/assistant/static/uploads
+            chmod 755 /opt/assistant/static/uploads
 
             # Restart service
             systemctl restart assistant

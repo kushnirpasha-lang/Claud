@@ -1,6 +1,7 @@
 import asyncio
 import os
 import threading
+import uuid
 
 from flask import Flask, jsonify, request, send_from_directory
 
@@ -117,6 +118,26 @@ def tg_auth_signin():
         os.system("systemctl restart assistant &")
 
     return jsonify(result)
+
+
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+VPS_URL = os.environ.get("VPS_URL", "http://188.166.67.237")
+
+
+@app.route("/api/upload", methods=["POST"])
+def upload_file():
+    if "file" not in request.files:
+        return jsonify({"error": "no file"}), 400
+    f = request.files["file"]
+    if not f.filename:
+        return jsonify({"error": "empty filename"}), 400
+    ext = os.path.splitext(f.filename)[1].lower() or ".jpg"
+    filename = uuid.uuid4().hex + ext
+    f.save(os.path.join(UPLOAD_DIR, filename))
+    url = f"{VPS_URL}/static/uploads/{filename}"
+    return jsonify({"url": url, "filename": filename})
 
 
 @app.route("/instagram")

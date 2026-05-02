@@ -6,149 +6,74 @@
   <title>Instagram — HairLove</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #fafafa;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: flex; flex-direction: column; align-items: center;
       padding: 32px 16px;
     }
-
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-
+    .header { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
     .header-logo {
       width: 40px; height: 40px;
       background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
       border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
     }
-
     .header h1 { font-size: 22px; color: #262626; font-weight: 600; }
-    .header p { font-size: 13px; color: #8e8e8e; }
-
+    .header p  { font-size: 13px; color: #8e8e8e; }
     .card {
-      background: #fff;
-      border: 1px solid #dbdbdb;
-      border-radius: 12px;
-      padding: 24px;
-      width: 100%;
-      max-width: 480px;
-      margin-bottom: 16px;
+      background: #fff; border: 1px solid #dbdbdb; border-radius: 12px;
+      padding: 24px; width: 100%; max-width: 480px; margin-bottom: 16px;
     }
-
-    .account-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .account-info { display: flex; align-items: center; gap: 12px; }
     .account-avatar {
-      width: 48px; height: 48px;
-      border-radius: 50%;
+      width: 48px; height: 48px; border-radius: 50%;
       background: linear-gradient(135deg, #f09433, #bc1888);
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px; color: white; font-weight: 700;
-      flex-shrink: 0;
+      font-size: 20px; color: white; font-weight: 700; flex-shrink: 0;
     }
-
-    .account-name { font-weight: 600; color: #262626; font-size: 15px; }
+    .account-name  { font-weight: 600; color: #262626; font-size: 15px; }
     .account-stats { font-size: 13px; color: #8e8e8e; margin-top: 2px; }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #262626;
-      margin-bottom: 6px;
-    }
-
+    label { display: block; font-size: 13px; font-weight: 600; color: #262626; margin-bottom: 6px; }
     input[type="text"], textarea {
-      width: 100%;
-      border: 1px solid #dbdbdb;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 14px;
-      color: #262626;
-      outline: none;
-      transition: border-color 0.2s;
-      font-family: inherit;
+      width: 100%; border: 1px solid #dbdbdb; border-radius: 8px;
+      padding: 10px 12px; font-size: 14px; color: #262626;
+      outline: none; transition: border-color 0.2s; font-family: inherit;
     }
-
-    input[type="text"]:focus, textarea:focus {
-      border-color: #0095f6;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-
+    input[type="text"]:focus, textarea:focus { border-color: #0095f6; }
+    textarea { resize: vertical; min-height: 100px; }
     .field { margin-bottom: 18px; }
-
+    .drop-zone {
+      border: 2px dashed #dbdbdb; border-radius: 8px; padding: 32px 16px;
+      text-align: center; cursor: pointer; transition: all 0.2s;
+      color: #8e8e8e; font-size: 14px; background: #fafafa;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #0095f6; background: #f0f8ff; color: #0095f6; }
+    .drop-zone input { display: none; }
     .preview-box {
-      border: 1px solid #dbdbdb;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #f0f0f0;
-      min-height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #8e8e8e;
-      font-size: 14px;
-      margin-top: 8px;
+      border: 1px solid #dbdbdb; border-radius: 8px; overflow: hidden;
+      background: #f0f0f0; min-height: 200px;
+      display: flex; align-items: center; justify-content: center;
+      color: #8e8e8e; font-size: 14px; margin-top: 8px;
     }
-
-    .preview-box img {
-      width: 100%;
-      max-height: 400px;
-      object-fit: cover;
-      display: block;
-    }
-
+    .preview-box img { width: 100%; max-height: 400px; object-fit: cover; display: block; }
     .btn {
-      width: 100%;
-      padding: 12px;
-      background: #0095f6;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
+      width: 100%; padding: 12px; background: #0095f6; color: white;
+      border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: background 0.2s;
     }
-
     .btn:hover { background: #0081d6; }
     .btn:disabled { background: #b2dffc; cursor: not-allowed; }
-
     .status {
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      text-align: center;
-      display: none;
+      margin-top: 12px; padding: 12px; border-radius: 8px;
+      font-size: 14px; text-align: center; display: none;
     }
-
     .status.success { background: #d4edda; color: #155724; display: block; }
     .status.error   { background: #f8d7da; color: #721c24; display: block; }
     .status.loading { background: #d1ecf1; color: #0c5460; display: block; }
-
-    .hint {
-      font-size: 12px;
-      color: #8e8e8e;
-      margin-top: 4px;
-    }
+    .hint { font-size: 12px; color: #8e8e8e; margin-top: 4px; }
+    .uploaded-url { font-size: 11px; color: #8e8e8e; margin-top: 4px; word-break: break-all; }
   </style>
 </head>
 <body>
@@ -161,7 +86,7 @@
     </div>
   </div>
 
-  <div class="card" id="accountCard">
+  <div class="card">
     <div class="account-info">
       <div class="account-avatar">H</div>
       <div>
@@ -173,14 +98,16 @@
 
   <div class="card">
     <div class="field">
-      <label>Ссылка на фото (публичный URL)</label>
-      <input type="text" id="imageUrl" placeholder="https://example.com/photo.jpg" oninput="previewImage()">
-      <p class="hint">Фото должно быть доступно по прямой ссылке (JPG/PNG)</p>
-    </div>
-
-    <div class="field">
-      <label>Предпросмотр</label>
-      <div class="preview-box" id="preview">Введите ссылку выше</div>
+      <label>Фото</label>
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+           ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+        <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)">
+        📁 Нажми или перетащи фото сюда
+      </div>
+      <div class="preview-box" id="preview" style="display:none">
+        <img id="previewImg" src="" alt="preview">
+      </div>
+      <div class="uploaded-url" id="uploadedUrl"></div>
     </div>
 
     <div class="field">
@@ -188,11 +115,13 @@
       <textarea id="caption" placeholder="Напишите подпись к публикации...&#10;&#10;#hairlove #hair #beauty"></textarea>
     </div>
 
-    <button class="btn" id="publishBtn" onclick="publish()">Опубликовать</button>
+    <button class="btn" id="publishBtn" onclick="publish()" disabled>Опубликовать</button>
     <div class="status" id="status"></div>
   </div>
 
   <script>
+    let uploadedUrl = null;
+
     async function loadAccountInfo() {
       try {
         const r = await fetch('/api/instagram/info');
@@ -202,62 +131,101 @@
           document.getElementById('accStats').textContent =
             `Публикаций: ${data.media_count ?? '—'} · Подписчиков: ${data.followers_count ?? '—'}`;
         }
-      } catch (e) {
+      } catch(e) {
         document.getElementById('accName').textContent = '@hair_love_company';
       }
     }
 
-    function previewImage() {
-      const url = document.getElementById('imageUrl').value.trim();
-      const box = document.getElementById('preview');
-      if (!url) {
-        box.innerHTML = 'Введите ссылку выше';
-        return;
+    function onDragOver(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.add('drag-over');
+    }
+    function onDragLeave(e) {
+      document.getElementById('dropZone').classList.remove('drag-over');
+    }
+    function onDrop(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) uploadFile(file);
+    }
+    function onFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) uploadFile(file);
+    }
+
+    async function uploadFile(file) {
+      const status = document.getElementById('status');
+      status.className = 'status loading';
+      status.textContent = 'Загружаем фото на сервер...';
+
+      // show local preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('preview').style.display = 'block';
+        document.getElementById('dropZone').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+
+      const form = new FormData();
+      form.append('file', file);
+
+      try {
+        const r = await fetch('/api/upload', { method: 'POST', body: form });
+        const data = await r.json();
+        if (data.url) {
+          uploadedUrl = data.url;
+          document.getElementById('uploadedUrl').textContent = '✅ ' + data.url;
+          document.getElementById('publishBtn').disabled = false;
+          status.className = 'status success';
+          status.textContent = 'Фото загружено! Добавь подпись и нажми «Опубликовать»';
+        } else {
+          throw new Error(data.error || 'upload failed');
+        }
+      } catch(e) {
+        status.className = 'status error';
+        status.textContent = '❌ Ошибка загрузки: ' + e.message;
       }
-      box.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='Не удалось загрузить фото'" alt="preview">`;
     }
 
     async function publish() {
-      const imageUrl = document.getElementById('imageUrl').value.trim();
-      const caption  = document.getElementById('caption').value.trim();
-      const btn      = document.getElementById('publishBtn');
-      const status   = document.getElementById('status');
-
-      if (!imageUrl) {
-        status.className = 'status error';
-        status.textContent = 'Введите ссылку на фото';
-        return;
-      }
+      if (!uploadedUrl) return;
+      const caption = document.getElementById('caption').value.trim();
+      const btn = document.getElementById('publishBtn');
+      const status = document.getElementById('status');
 
       btn.disabled = true;
       status.className = 'status loading';
-      status.textContent = 'Публикуем...';
+      status.textContent = 'Публикуем в Instagram...';
 
       try {
         const r = await fetch('/api/instagram/post', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image_url: imageUrl, caption })
+          body: JSON.stringify({ image_url: uploadedUrl, caption })
         });
         const data = await r.json();
-
         if (data.ok) {
           status.className = 'status success';
           status.textContent = '✅ Пост опубликован в @hair_love_company!';
-          document.getElementById('imageUrl').value = '';
+          uploadedUrl = null;
           document.getElementById('caption').value = '';
-          document.getElementById('preview').innerHTML = 'Введите ссылку выше';
+          document.getElementById('uploadedUrl').textContent = '';
+          document.getElementById('preview').style.display = 'none';
+          document.getElementById('dropZone').style.display = 'block';
+          document.getElementById('fileInput').value = '';
           loadAccountInfo();
         } else {
           status.className = 'status error';
-          status.textContent = '❌ Ошибка: ' + (data.error || 'неизвестная ошибка');
+          status.textContent = '❌ ' + (data.error || 'неизвестная ошибка');
+          btn.disabled = false;
         }
-      } catch (e) {
+      } catch(e) {
         status.className = 'status error';
-        status.textContent = '❌ Ошибка соединения с сервером';
+        status.textContent = '❌ Ошибка соединения';
+        btn.disabled = false;
       }
-
-      btn.disabled = false;
     }
 
     loadAccountInfo();
