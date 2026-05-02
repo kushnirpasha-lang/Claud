@@ -34,9 +34,13 @@ HELP = (
     "• Отвечать на вопросы и анализировать\n"
     "• Писать тексты, посты, письма\n"
     "• Принимать голосовые команды 🎤\n"
-    "• Отправлять сообщения твоим Telegram-контактам\n\n"
+    "• Отправлять сообщения твоим Telegram-контактам\n"
+    "• Управлять Trello-доской HairLove\n"
+    "• Публиковать посты в Instagram @hair_love_company\n\n"
     "Голосовые: просто запиши голосовое — расшифрую и выполню.\n\n"
-    "/new — очистить историю разговора"
+    "/new — очистить историю разговора\n"
+    "/trello — показать доску\n"
+    "/instagram — статус Instagram"
 )
 
 
@@ -72,13 +76,26 @@ def _transcribe_voice_sync(file_bytes: bytes) -> str:
     return result.text
 
 
+_SEND_KEYWORDS = ("отправь", "напиши", "передай", "скажи", "пошли", "send")
+_TRELLO_KEYWORDS = ("trello", "трелло", "доска", "карточк", "задач", "колонк", "добавь задачу",
+                    "перемести", "покажи задачи", "что в работе", "что сделано")
+_INSTAGRAM_KEYWORDS = ("инстаграм", "instagram", "инста", "пост", "опубликуй", "выложи", "reels", "рилс")
+
+
+def _quick_intent(text: str) -> str | None:
+    """Fast keyword check — returns 'trello', 'instagram', 'maybe_send', or None (=needs AI)."""
+    tl = text.lower()
+    if any(k in tl for k in _TRELLO_KEYWORDS):
+        return "trello"
+    if any(k in tl for k in _INSTAGRAM_KEYWORDS):
+        return "instagram"
+    if any(k in tl for k in _SEND_KEYWORDS):
+        return "maybe_send"
+    return None
+
+
 def _detect_intent(text: str) -> dict:
-    """
-    Detect user intent. Returns dict with 'type' key:
-    - {'type': 'send_tg', 'to': name, 'text': msg}
-    - {'type': 'trello', 'action': action_text}
-    - {'type': 'chat'}
-    """
+    """AI intent detection — only called when keywords suggest non-chat intent."""
     import anthropic
     c = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
     resp = c.messages.create(
@@ -86,9 +103,10 @@ def _detect_intent(text: str) -> dict:
         max_tokens=200,
         system=(
             "Classify user intent into one of these:\n"
-            "1. Send Telegram message → respond: SEND_TG:<recipient name>|<message>\n"
-            "2. Trello task (show board, add card, move card, list tasks) → respond: TRELLO:<user request verbatim>\n"
-            "3. Anything else → respond: CHAT\n"
+            "1. Send Telegram message to someone → respond: SEND_TG:<recipient name>|<message>\n"
+            "2. Trello task (show board, add/move/delete card, list tasks) → respond: TRELLO:<user request verbatim>\n"
+            "3. Instagram post (publish photo/reel/post to Instagram) → respond: INSTAGRAM:<user request verbatim>\n"
+            "4. Anything else → respond: CHAT\n"
             "Respond with ONLY one of these formats, nothing else."
         ),
         messages=[{"role": "user", "content": text}],
@@ -100,6 +118,8 @@ def _detect_intent(text: str) -> dict:
             return {"type": "send_tg", "to": parts[0].strip(), "text": parts[1].strip()}
     elif result.startswith("TRELLO:"):
         return {"type": "trello", "action": result[7:].strip()}
+    elif result.startswith("INSTAGRAM:"):
+        return {"type": "instagram", "action": result[10:].strip()}
     return {"type": "chat"}
 
 
@@ -111,7 +131,6 @@ def _handle_trello(uid: str, user_request: str) -> str:
         if not boards:
             return "В твоём Trello нет активных досок."
 
-        # Use the first board (or the one configured)
         board_id = os.environ.get("TRELLO_BOARD_ID", boards[0]["id"])
         board_name = next((b["name"] for b in boards if b["id"] == board_id), boards[0]["name"])
         summary = trello_client.get_board_summary(board_id)
@@ -133,6 +152,40 @@ def _handle_trello(uid: str, user_request: str) -> str:
     except Exception as e:
         print(f"Trello error: {e}")
         return f"Ошибка при работе с Trello: {e}"
+
+
+def _handle_instagram(user_request: str) -> str:
+    """Handle Instagram posting requests."""
+    try:
+        import instagram_client
+        info = instagram_client.get_account_info()
+        username = info.get("username", "hair_love_company")
+        media_count = info.get("media_count", 0)
+        followers = info.get("followers_count", 0)
+        return (
+            f"📸 Instagram @{username}\n"
+            f"Публикаций: {media_count} | Подписчиков: {followers}\n\n"
+            f"Для публикации поста отправь мне:\n"
+            f"• Фото с подписью — напиши «выложи это фото: [URL] с подписью [текст]»\n"
+            f"• Или просто пришли фото и скажи что написать"
+        )
+    except Exception as e:
+        return f"Ошибка Instagram: {e}"
+
+
+async def cmd_instagram(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    try:
+        import instagram_client
+        info = instagram_client.get_account_info()
+        username = info.get("username", "hair_love_company")
+        media_count = info.get("media_count", 0)
+        followers = info.get("followers_count", 0)
+        await update.message.reply_text(
+            f"📸 Instagram @{username}\n"
+            f"Публикаций: {media_count} | Подписчиков: {followers}"
+        )
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка: {e}")
 
 
 async def cmd_trello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -159,7 +212,12 @@ async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text
     try:
         loop = asyncio.get_running_loop()
 
-        intent = await loop.run_in_executor(None, partial(_detect_intent, text))
+        # Fast keyword check first — skip Haiku call for plain chat (~80% of messages)
+        quick = _quick_intent(text)
+        if quick is None:
+            intent = {"type": "chat"}
+        else:
+            intent = await loop.run_in_executor(None, partial(_detect_intent, text))
 
         if intent["type"] == "send_tg":
             contact_name, msg_text = intent["to"], intent["text"]
@@ -183,6 +241,13 @@ async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text
             typing_task.cancel()
             for i in range(0, len(trello_reply), 4096):
                 await update.message.reply_text(trello_reply[i:i + 4096])
+            return
+
+        if intent["type"] == "instagram":
+            ig_reply = await loop.run_in_executor(None, partial(_handle_instagram, text))
+            stop_event.set()
+            typing_task.cancel()
+            await update.message.reply_text(ig_reply)
             return
 
         reply = await loop.run_in_executor(None, partial(claude_client.chat, uid, text))
@@ -253,6 +318,7 @@ def run() -> None:
     app.add_handler(CommandHandler("new", cmd_new))
     app.add_handler(CommandHandler("help", cmd_help))
     app.add_handler(CommandHandler("trello", cmd_trello))
+    app.add_handler(CommandHandler("instagram", cmd_instagram))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
     app.add_handler(CallbackQueryHandler(handle_send_callback, pattern="^send_"))
