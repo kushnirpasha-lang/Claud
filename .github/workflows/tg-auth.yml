@@ -1,0 +1,86 @@
+name: Telegram Auth
+
+on:
+  workflow_dispatch:
+    inputs:
+      step:
+        description: 'Step: "request" to send code, "signin" to authenticate'
+        required: true
+        default: 'request'
+        type: choice
+        options:
+          - request
+          - signin
+      code:
+        description: 'Code from Telegram (only for signin step)'
+        required: false
+        type: string
+
+jobs:
+  auth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Telegram auth
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/assistant
+            export $(grep -v '^#' .env | xargs)
+
+            STEP="${{ inputs.step }}"
+            CODE="${{ inputs.code }}"
+
+            venv/bin/python3 - << PYEOF
+            import asyncio, os, json
+            from telethon import TelegramClient
+            from telethon.errors import SessionPasswordNeededError
+
+            API_ID   = int(os.environ["TELEGRAM_API_ID"])
+            API_HASH = os.environ["TELEGRAM_API_HASH"]
+            PHONE    = "+380637353733"
+            HASH_FILE = "/tmp/tg_phone_hash"
+            STEP     = "$STEP"
+            CODE     = "$CODE"
+
+            async def main():
+                client = TelegramClient("/opt/assistant/user_session", API_ID, API_HASH)
+                await client.connect()
+
+                if await client.is_user_authorized():
+                    me = await client.get_me()
+                    print(f"Already authorized: {me.first_name} @{me.username}")
+                    await client.disconnect()
+                    return
+
+                if STEP == "request":
+                    sent = await client.send_code_request(PHONE)
+                    with open(HASH_FILE, "w") as f:
+                        f.write(sent.phone_code_hash)
+                    print(f"Code sent to {PHONE}. Hash saved.")
+
+                elif STEP == "signin":
+                    with open(HASH_FILE) as f:
+                        phone_hash = f.read().strip()
+                    try:
+                        await client.sign_in(PHONE, CODE, phone_code_hash=phone_hash)
+                        me = await client.get_me()
+                        print(f"SUCCESS: {me.first_name} @{me.username}")
+                        os.remove(HASH_FILE)
+                    except SessionPasswordNeededError:
+                        print("2FA enabled - need password")
+                    except Exception as e:
+                        print(f"Error: {e}")
+
+                await client.disconnect()
+
+            asyncio.run(main())
+            PYEOF
+
+            if [ "$STEP" = "signin" ]; then
+              systemctl restart assistant
+              sleep 3
+              systemctl status assistant --no-pager | head -15
+            fi
