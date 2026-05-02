@@ -1,0 +1,77 @@
+name: TG Auth with Output
+on:
+  workflow_dispatch:
+    inputs:
+      step:
+        description: 'request or signin'
+        required: true
+        default: 'request'
+      code:
+        description: 'Telegram code (for signin)'
+        required: false
+
+jobs:
+  auth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Run on server and report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STEP: ${{ inputs.step }}
+          CODE: ${{ inputs.code }}
+        run: |
+          OUTPUT=$(ssh -i ~/.ssh/id_ed25519 root@${{ secrets.SSH_HOST }} bash -s << '''SSHEOF'''
+            export $(grep -v '"'''^''''#'"''' /opt/assistant/.env | xargs) 2>/dev/null
+            if [ "$STEP" = "request" ]; then
+              cd /opt/assistant && venv/bin/python3 - << '''PYEOF'''
+import asyncio, os
+from telethon import TelegramClient
+async def main():
+    c = TelegramClient("/opt/assistant/user_session", int(os.environ["TELEGRAM_API_ID"]), os.environ["TELEGRAM_API_HASH"])
+    await c.connect()
+    if await c.is_user_authorized():
+        me = await c.get_me()
+        print(f"ALREADY_AUTH: {me.first_name} @{me.username}")
+    else:
+        sent = await c.send_code_request("+380637353733")
+        with open("/tmp/tg_hash", "w") as f: f.write(sent.phone_code_hash)
+        print(f"CODE_SENT hash_saved to /tmp/tg_hash")
+    await c.disconnect()
+asyncio.run(main())
+PYEOF
+            elif [ "$STEP" = "signin" ]; then
+              cd /opt/assistant && venv/bin/python3 - << PYEOF2
+import asyncio, os
+from telethon import TelegramClient
+from telethon.errors import SessionPasswordNeededError
+async def main():
+    phone_hash = open("/tmp/tg_hash").read().strip()
+    c = TelegramClient("/opt/assistant/user_session", int(os.environ["TELEGRAM_API_ID"]), os.environ["TELEGRAM_API_HASH"])
+    await c.connect()
+    try:
+        await c.sign_in("+380637353733", "", phone_code_hash=phone_hash)
+        me = await c.get_me()
+        print(f"SUCCESS: {me.first_name} @{me.username}")
+    except SessionPasswordNeededError:
+        print("2FA_REQUIRED")
+    except Exception as e:
+        print(f"ERROR: {e}")
+    await c.disconnect()
+asyncio.run(main())
+PYEOF2
+              systemctl restart assistant
+            fi
+          SSHEOF
+          ) 2>&1
+
+          echo "Server output: $OUTPUT"
+
+          # Post result as gist
+          curl -s -X POST https://api.github.com/gists             -H "Authorization: Bearer $GH_TOKEN"             -H "Content-Type: application/json"             -d "{"public":true,"files":{"tg_auth_result.txt":{"content":"$(echo $OUTPUT | sed s/"/\\"/g)"}}}"             | python3 -c "import json,sys; g=json.load(sys.stdin); print('GIST:', g.get('html_url','error'))"
