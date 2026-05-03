@@ -172,6 +172,27 @@ def instagram_post():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/drive/ai-process", methods=["POST"])
+def drive_ai_process():
+    """Full AI pipeline: crop → remove bg → AI background → upload to Обработанные."""
+    product = request.form.get("product", "").strip()
+    size = request.form.get("size", "").strip()
+    ig_format = request.form.get("format", "1:1").strip()
+    if "file" not in request.files:
+        return jsonify({"error": "no file"}), 400
+    f = request.files["file"]
+    image_bytes = f.read()
+    try:
+        import image_ai_processor
+        import google_drive_client
+        processed = image_ai_processor.process_product_photo(image_bytes, f"{product} {size}", ig_format)
+        file_id = google_drive_client.upload_to_product(product, size, "Обработанные", processed, "image/jpeg")
+        preview_url = f"{VPS_URL}/api/drive/file/{file_id}"
+        return jsonify({"ok": True, "file_id": file_id, "preview_url": preview_url})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/drive/setup", methods=["POST"])
 def drive_setup():
     try:
