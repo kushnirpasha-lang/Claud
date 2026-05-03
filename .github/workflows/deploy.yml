@@ -17,7 +17,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py,assistant/instagram_client.py,assistant/static/instagram.html,assistant/static/uploads/.gitkeep"
+          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py,assistant/instagram_client.py,assistant/google_drive_client.py"
           target: /opt/assistant
           strip_components: 1
 
@@ -69,7 +69,10 @@ jobs:
             PYEOF
             fi
 
-            # Ensure uploads directory exists and is writable
+            # Google Service Account credentials
+            echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT }}' > /opt/assistant/google_service_account.json
+
+            # Ensure uploads directory exists
             mkdir -p /opt/assistant/static/uploads
             chmod 755 /opt/assistant/static/uploads
 

@@ -1,6 +1,7 @@
 import asyncio
 import io
 import os
+import uuid
 from functools import partial
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -17,6 +18,8 @@ import claude_client
 
 # {user_id: {"to": contact_name, "text": message_text}}
 _pending_sends: dict = {}
+# {user_id: {"image_bytes": bytes, "caption": str, "temp_path": str, "temp_name": str}}
+_pending_instagram: dict = {}
 
 WELCOME = (
     "Привет! Я твой личный ИИ-ассистент 🤖\n\n"
@@ -310,6 +313,93 @@ async def handle_send_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         await query.edit_message_text("❌ Отменено")
 
 
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    uid = update.effective_user.id
+    stop_event = asyncio.Event()
+    typing_task = asyncio.create_task(
+        _keep_typing(context, update.effective_chat.id, stop_event)
+    )
+    try:
+        photo = update.message.photo[-1]
+        file = await photo.get_file()
+        image_bytes = bytes(await file.download_as_bytearray())
+
+        loop = asyncio.get_running_loop()
+        caption = await loop.run_in_executor(
+            None, partial(claude_client.generate_instagram_caption, image_bytes)
+        )
+
+        temp_name = uuid.uuid4().hex + ".jpg"
+        temp_path = f"/opt/assistant/static/uploads/{temp_name}"
+        os.makedirs(os.path.dirname(temp_path), exist_ok=True)
+        with open(temp_path, "wb") as fp:
+            fp.write(image_bytes)
+
+        _pending_instagram[uid] = {
+            "image_bytes": image_bytes,
+            "caption": caption,
+            "temp_path": temp_path,
+            "temp_name": temp_name,
+        }
+        stop_event.set()
+        typing_task.cancel()
+
+        keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("✅ Выложить в Instagram", callback_data="ig_confirm"),
+            InlineKeyboardButton("❌ Отмена", callback_data="ig_cancel"),
+        ]])
+        await update.message.reply_text(
+            f"📸 Готово к публикации в @hair_love_company\n\n*Подпись:*\n{caption}",
+            parse_mode="Markdown",
+            reply_markup=keyboard,
+        )
+    except Exception as exc:
+        stop_event.set()
+        typing_task.cancel()
+        print(f"Photo handler error: {exc}")
+        await update.message.reply_text("Ошибка при обработке фото. Попробуй ещё раз.")
+
+
+async def handle_instagram_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    uid = query.from_user.id
+    pending = _pending_instagram.pop(uid, None)
+
+    if query.data == "ig_confirm" and pending:
+        await query.edit_message_text("⏳ Публикую в Instagram...")
+        try:
+            import instagram_client
+            vps_url = os.environ.get("VPS_URL", "http://188.166.67.237")
+            image_url = f"{vps_url}/static/uploads/{pending['temp_name']}"
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(
+                None, partial(instagram_client.post_photo, image_url, pending["caption"])
+            )
+            try:
+                import google_drive_client
+                await loop.run_in_executor(
+                    None, partial(google_drive_client.upload_to_posted, pending["image_bytes"])
+                )
+            except Exception as e:
+                print(f"Drive upload error (non-fatal): {e}")
+            try:
+                os.remove(pending["temp_path"])
+            except Exception:
+                pass
+            await query.edit_message_text("✅ Пост опубликован в Instagram @hair_love_company!")
+        except Exception as exc:
+            print(f"Instagram post error: {exc}")
+            await query.edit_message_text(f"❌ Ошибка публикации: {exc}")
+    elif query.data == "ig_cancel":
+        if pending:
+            try:
+                os.remove(pending["temp_path"])
+            except Exception:
+                pass
+        await query.edit_message_text("❌ Отменено")
+
+
 def run() -> None:
     token = os.environ["TELEGRAM_BOT_TOKEN"]
     app = Application.builder().token(token).build()
@@ -321,7 +411,9 @@ def run() -> None:
     app.add_handler(CommandHandler("instagram", cmd_instagram))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
+    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_handler(CallbackQueryHandler(handle_send_callback, pattern="^send_"))
+    app.add_handler(CallbackQueryHandler(handle_instagram_callback, pattern="^ig_"))
 
     print("Telegram bot started.")
     app.run_polling(drop_pending_updates=True)

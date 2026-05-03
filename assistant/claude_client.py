@@ -72,3 +72,17 @@ def chat(conversation_id: str, message: str) -> str:
 def clear(conversation_id: str) -> None:
     with _conv_lock:
         _conversations.pop(conversation_id, None)
+
+
+def generate_instagram_caption(image_bytes: bytes, mime_type: str = "image/jpeg") -> str:
+    import base64
+    b64 = base64.standard_b64encode(image_bytes).decode("utf-8")
+    response = _get_client().messages.create(
+        model=CLAUDE_MODEL,
+        max_tokens=600,
+        messages=[{"role": "user", "content": [
+            {"type": "image", "source": {"type": "base64", "media_type": mime_type, "data": b64}},
+            {"type": "text", "text": "Это фото для Instagram аккаунта @hair_love_company — украинский салон красоты, специализируется на уходе за волосами (кератин, ботокс, окрашивание, стрижки). Напиши продающую подпись на русском языке:\n- 3-5 предложений, тепло и эмоционально\n- В конце 5-10 хэштегов через пробел\n- Без вступлений типа 'Конечно!' — сразу текст поста\n- Emoji приветствуются"}
+        ]}]
+    )
+    return response.content[0].text
