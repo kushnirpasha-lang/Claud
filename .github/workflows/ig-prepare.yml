@@ -40,15 +40,17 @@ jobs:
 
             # Build JSON payload safely via python
             python3 - << PYEOF
-            import json, requests, os
+            import requests
 
             session_id = open('/tmp/ig_pending/session_id.txt').read().strip()
             caption    = open('/tmp/ig_pending/caption.txt').read().strip()
-            host       = os.environ.get('VPS_HOST', '188.166.67.237')
+
+            # Use GitHub raw URL (HTTPS) — Instagram API requires HTTPS
+            image_url = 'https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/_ig_pending/image.jpg'
 
             payload = {
                 'session_id': session_id,
-                'image_url':  f'http://{host}/static/uploads/{session_id}.jpg',
+                'image_url':  image_url,
                 'caption':    caption,
             }
             r = requests.post('http://localhost:8080/api/instagram/session-create', json=payload)
