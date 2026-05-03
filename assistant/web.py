@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 import threading
 import time
@@ -10,8 +11,27 @@ import claude_client
 
 app = Flask(__name__, static_folder="static")
 
-_ig_sessions: dict[str, dict] = {}
 _ig_lock = threading.Lock()
+_IG_SESSIONS_FILE = os.path.join(os.path.dirname(__file__), "ig_sessions.json")
+
+
+def _load_sessions() -> dict:
+    try:
+        with open(_IG_SESSIONS_FILE) as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _save_sessions(sessions: dict) -> None:
+    try:
+        with open(_IG_SESSIONS_FILE, "w") as f:
+            json.dump(sessions, f)
+    except Exception:
+        pass
+
+
+_ig_sessions: dict[str, dict] = _load_sessions()
 
 _tg_auth_state: dict = {}
 _tg_auth_lock = threading.Lock()
@@ -140,6 +160,7 @@ def instagram_session_create():
             "caption": caption,
             "created_at": time.time(),
         }
+        _save_sessions(_ig_sessions)
     return jsonify({"ok": True, "session_id": session_id})
 
 
@@ -174,6 +195,7 @@ def instagram_prepare():
             "caption": caption,
             "created_at": time.time(),
         }
+        _save_sessions(_ig_sessions)
 
     preview_url = f"{VPS_URL}/instagram/preview/{session_id}"
     return jsonify({"session_id": session_id, "preview_url": preview_url, "caption": caption})
@@ -208,6 +230,7 @@ def instagram_session_post(session_id):
         result = instagram_client.post_photo(s["image_url"], s["caption"])
         with _ig_lock:
             _ig_sessions.pop(session_id, None)
+            _save_sessions(_ig_sessions)
         return jsonify({"ok": True, "id": result.get("id")})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -226,6 +249,7 @@ def instagram_session_regen(session_id):
         caption = claude_client.generate_instagram_caption(image_bytes, "image/jpeg", "")
         with _ig_lock:
             _ig_sessions[session_id]["caption"] = caption
+            _save_sessions(_ig_sessions)
         return jsonify({"caption": caption})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -239,6 +263,7 @@ def instagram_session_update(session_id):
         if session_id not in _ig_sessions:
             return jsonify({"error": "not found"}), 404
         _ig_sessions[session_id]["caption"] = caption
+        _save_sessions(_ig_sessions)
     return jsonify({"ok": True})
 
 
@@ -246,6 +271,7 @@ def instagram_session_update(session_id):
 def instagram_session_cancel(session_id):
     with _ig_lock:
         _ig_sessions.pop(session_id, None)
+        _save_sessions(_ig_sessions)
     return jsonify({"ok": True})
 
 

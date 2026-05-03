@@ -31,12 +31,28 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
-            SESSION_ID=$(cat /tmp/ig_pending/session_id.txt)
-            CAPTION=$(cat /tmp/ig_pending/caption.txt)
+            SESSION_ID=$(cat /tmp/ig_pending/session_id.txt | tr -d '[:space:]')
+            echo "Session ID: $SESSION_ID"
+
             # Copy image to uploads folder
             cp /tmp/ig_pending/image.jpg /opt/assistant/static/uploads/${SESSION_ID}.jpg
-            # Create session via local API
-            curl -s -X POST http://localhost:8080/api/instagram/session-create \
-              -H "Content-Type: application/json" \
-              -d "{\"session_id\": \"${SESSION_ID}\", \"image_url\": \"http://${{ secrets.SSH_HOST }}/static/uploads/${SESSION_ID}.jpg\", \"caption\": $(python3 -c "import sys,json; print(json.dumps(open('/tmp/ig_pending/caption.txt').read().strip()))")}"
+            echo "Image copied"
+
+            # Build JSON payload safely via python
+            python3 - << PYEOF
+            import json, requests, os
+
+            session_id = open('/tmp/ig_pending/session_id.txt').read().strip()
+            caption    = open('/tmp/ig_pending/caption.txt').read().strip()
+            host       = os.environ.get('VPS_HOST', '188.166.67.237')
+
+            payload = {
+                'session_id': session_id,
+                'image_url':  f'http://{host}/static/uploads/{session_id}.jpg',
+                'caption':    caption,
+            }
+            r = requests.post('http://localhost:8080/api/instagram/session-create', json=payload)
+            print('API response:', r.status_code, r.text)
+            PYEOF
+
             echo "Preview URL: http://${{ secrets.SSH_HOST }}/instagram/preview/${SESSION_ID}"
