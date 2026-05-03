@@ -27,6 +27,8 @@ def _get_client() -> Anthropic:
 
 
 def chat(conversation_id: str, message: str) -> str:
+    if not (message or "").strip():
+        raise ValueError("message must not be empty")
     with _conv_lock:
         if conversation_id not in _conversations:
             _conversations[conversation_id] = []
