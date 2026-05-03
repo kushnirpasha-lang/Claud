@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram — HairLove</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #fafafa;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 32px 16px;
+    }
+    .header { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .header-logo {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .header h1 { font-size: 22px; color: #262626; font-weight: 600; }
+    .header p  { font-size: 13px; color: #8e8e8e; }
+
+    .card {
+      background: #fff; border: 1px solid #dbdbdb; border-radius: 12px;
+      padding: 24px; width: 100%; max-width: 520px; margin-bottom: 16px;
+    }
+
+    /* Upload phase */
+    #phase-upload { display: block; }
+    #phase-preview { display: none; }
+
+    .drop-zone {
+      border: 2px dashed #dbdbdb; border-radius: 12px; padding: 48px 16px;
+      text-align: center; cursor: pointer; transition: all 0.2s;
+      color: #8e8e8e; font-size: 15px; background: #fafafa;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #0095f6; background: #f0f8ff; color: #0095f6; }
+    .drop-zone input { display: none; }
+    .drop-zone .icon { font-size: 40px; margin-bottom: 12px; }
+    .drop-zone .hint { font-size: 13px; color: #8e8e8e; margin-top: 6px; }
+
+    /* Spinner */
+    .spinner-wrap {
+      display: none; flex-direction: column; align-items: center;
+      gap: 16px; padding: 40px 0; color: #8e8e8e; font-size: 14px;
+    }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid #dbdbdb;
+      border-top-color: #0095f6; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Preview phase */
+    .preview-img {
+      width: 100%; border-radius: 10px; display: block;
+      max-height: 420px; object-fit: cover; margin-bottom: 20px;
+    }
+    .caption-label {
+      font-size: 12px; font-weight: 600; color: #8e8e8e;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+    }
+    textarea {
+      width: 100%; border: 1px solid #dbdbdb; border-radius: 8px;
+      padding: 12px; font-size: 14px; color: #262626; line-height: 1.5;
+      outline: none; transition: border-color 0.2s; font-family: inherit;
+      resize: vertical; min-height: 120px;
+    }
+    textarea:focus { border-color: #0095f6; }
+    textarea[readonly] { background: #fafafa; cursor: default; }
+
+    .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+    .btn {
+      width: 100%; padding: 13px; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-publish  { background: #0095f6; color: #fff; }
+    .btn-regen    { background: #7c3aed; color: #fff; }
+    .btn-edit     { background: #f0f0f0; color: #262626; }
+    .btn-save     { background: #0095f6; color: #fff; display: none; }
+    .btn-cancel   { background: #fff; color: #ed4956; border: 1px solid #ed4956; }
+
+    .status {
+      margin-top: 14px; padding: 12px 16px; border-radius: 8px;
+      font-size: 14px; text-align: center; display: none;
+    }
+    .status.success { background: #d4edda; color: #155724; display: block; }
+    .status.error   { background: #f8d7da; color: #721c24; display: block; }
+    .status.loading { background: #d1ecf1; color: #0c5460; display: block; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">📸</div>
+  <div>
+    <h1>Публикация в Instagram</h1>
+    <p id="accLabel">@hair_love_company</p>
+  </div>
+</div>
+
+<!-- PHASE 1: Upload -->
+<div class="card" id="phase-upload">
+  <div class="drop-zone" id="dropZone"
+       onclick="document.getElementById('fileInput').click()"
+       ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+    <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)">
+    <div class="icon">🖼️</div>
+    <div>Нажми или перетащи фото сюда</div>
+    <div class="hint">JPG, PNG — подпись сгенерируется автоматически</div>
+  </div>
+  <div class="spinner-wrap" id="spinner">
+    <div class="spinner"></div>
+    <div id="spinnerText">Загружаем фото...</div>
+  </div>
+</div>
+
+<!-- PHASE 2: Preview + actions -->
+<div class="card" id="phase-preview">
+  <img id="previewImg" class="preview-img" src="" alt="preview">
+  <div class="caption-label">Подпись</div>
+  <textarea id="caption" readonly></textarea>
+  <div class="actions">
+    <button class="btn btn-publish" onclick="publish()">✅ Опубликовать</button>
+    <button class="btn btn-regen"   onclick="regen()">🔄 Новый текст</button>
+    <button class="btn btn-edit"    id="btnEdit"   onclick="toggleEdit()">✏️ Изменить текст</button>
+    <button class="btn btn-save"    id="btnSave"   onclick="saveEdit()">💾 Сохранить текст</button>
+    <button class="btn btn-cancel"  onclick="cancelAll()">❌ Отмена</button>
+  </div>
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+  let uploadedUrl  = null;
+  let uploadedFile = null;
+  let isEditing    = false;
+
+  async function loadAccInfo() {
+    try {
+      const r = await fetch('/api/instagram/info');
+      const d = await r.json();
+      if (d.username) document.getElementById('accLabel').textContent = '@' + d.username;
+    } catch {}
+  }
+
+  function onDragOver(e)  { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+  function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  }
+  function onFileSelect(e) { const f = e.target.files[0]; if (f) handleFile(f); }
+
+  function showSpinner(text) {
+    document.getElementById('dropZone').style.display  = 'none';
+    document.getElementById('spinner').style.display   = 'flex';
+    document.getElementById('spinnerText').textContent = text;
+  }
+  function hideSpinner() {
+    document.getElementById('spinner').style.display = 'none';
+  }
+
+  async function handleFile(file) {
+    uploadedFile = file;
+
+    // local preview
+    const reader = new FileReader();
+    reader.onload = e => document.getElementById('previewImg').src = e.target.result;
+    reader.readAsDataURL(file);
+
+    showSpinner('Загружаем фото...');
+
+    // 1. Upload
+    const form = new FormData();
+    form.append('file', file);
+    try {
+      const r = await fetch('/api/upload', { method: 'POST', body: form });
+      const d = await r.json();
+      if (!d.url) throw new Error(d.error || 'upload failed');
+      uploadedUrl = d.url;
+    } catch(e) {
+      hideSpinner();
+      document.getElementById('dropZone').style.display = '';
+      alert('❌ Ошибка загрузки: ' + e.message);
+      return;
+    }
+
+    // 2. Generate caption
+    document.getElementById('spinnerText').textContent = '✨ Генерируем подпись с AI...';
+    const form2 = new FormData();
+    form2.append('file', file);
+    try {
+      const r = await fetch('/api/generate-caption', { method: 'POST', body: form2 });
+      const d = await r.json();
+      if (!d.caption) throw new Error(d.error || 'caption failed');
+      document.getElementById('caption').value = d.caption;
+    } catch(e) {
+      document.getElementById('caption').value = '';
+    }
+
+    hideSpinner();
+    document.getElementById('phase-upload').style.display  = 'none';
+    document.getElementById('phase-preview').style.display = 'block';
+    setStatus('', '');
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    const ta      = document.getElementById('caption');
+    const btnEdit = document.getElementById('btnEdit');
+    const btnSave = document.getElementById('btnSave');
+    if (isEditing) {
+      ta.removeAttribute('readonly');
+      ta.focus();
+      btnEdit.style.display = 'none';
+      btnSave.style.display = '';
+    } else {
+      ta.setAttribute('readonly', '');
+      btnEdit.style.display = '';
+      btnSave.style.display = 'none';
+    }
+  }
+
+  function saveEdit() {
+    if (isEditing) toggleEdit();
+  }
+
+  async function regen() {
+    if (!uploadedFile) return;
+    setStatus('loading', '🔄 Генерируем новую подпись...');
+    disableActions(true);
+    const form = new FormData();
+    form.append('file', uploadedFile);
+    try {
+      const r = await fetch('/api/generate-caption', { method: 'POST', body: form });
+      const d = await r.json();
+      if (!d.caption) throw new Error(d.error || 'Ошибка');
+      document.getElementById('caption').value = d.caption;
+      if (isEditing) { isEditing = false; toggleEdit(); }
+      setStatus('', '');
+    } catch(e) {
+      setStatus('error', '❌ ' + e.message);
+    }
+    disableActions(false);
+  }
+
+  async function publish() {
+    if (!uploadedUrl) return;
+    const caption = document.getElementById('caption').value.trim();
+    setStatus('loading', '📤 Публикуем в Instagram...');
+    disableActions(true);
+    try {
+      const r = await fetch('/api/instagram/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_url: uploadedUrl, caption }),
+      });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || 'Ошибка');
+      setStatus('success', '✅ Пост опубликован в @hair_love_company!');
+      setTimeout(cancelAll, 3000);
+    } catch(e) {
+      setStatus('error', '❌ ' + e.message);
+      disableActions(false);
+    }
+  }
+
+  function cancelAll() {
+    uploadedUrl  = null;
+    uploadedFile = null;
+    isEditing    = false;
+    document.getElementById('caption').value = '';
+    document.getElementById('caption').setAttribute('readonly', '');
+    document.getElementById('previewImg').src = '';
+    document.getElementById('btnEdit').style.display = '';
+    document.getElementById('btnSave').style.display = 'none';
+    document.getElementById('dropZone').style.display  = '';
+    document.getElementById('spinner').style.display   = 'none';
+    document.getElementById('fileInput').value         = '';
+    document.getElementById('phase-preview').style.display = 'none';
+    document.getElementById('phase-upload').style.display  = 'block';
+    setStatus('', '');
+    loadAccInfo();
+  }
+
+  function disableActions(v) {
+    document.querySelectorAll('.actions .btn').forEach(b => b.disabled = v);
+  }
+
+  function setStatus(type, text) {
+    const el = document.getElementById('status');
+    el.className = 'status' + (type ? ' ' + type : '');
+    el.textContent = text;
+    el.style.display = type ? 'block' : 'none';
+  }
+
+  loadAccInfo();
+</script>
+</body>
+</html>
