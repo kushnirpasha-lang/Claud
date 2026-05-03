@@ -179,7 +179,7 @@
       document.getElementById('mainCard').style.display = 'none';
       document.getElementById('doneScreen').style.display = 'block';
     } else {
-      const msg = data.error || JSON.stringify(data);
+      const msg = typeof data.error === 'object' ? JSON.stringify(data.error, null, 2) : (data.error || JSON.stringify(data));
       setStatus('err', '❌ Ошибка Instagram: ' + msg);
       lock(false);
     }
