@@ -233,7 +233,15 @@ def instagram_session_post(session_id):
             _save_sessions(_ig_sessions)
         return jsonify({"ok": True, "id": result.get("id")})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        detail = str(e)
+        # Try to extract Instagram API JSON error body
+        try:
+            import requests as req_lib
+            if hasattr(e, 'response') and e.response is not None:
+                detail = e.response.json()
+        except Exception:
+            pass
+        return jsonify({"error": detail}), 500
 
 
 @app.route("/api/instagram/session/<session_id>/regen", methods=["POST"])
