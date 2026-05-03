@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Превью поста — HairLove</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #fafafa; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 32px 16px;
+    }
+    .header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .logo {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+      border-radius: 12px; display: flex; align-items: center;
+      justify-content: center; font-size: 22px;
+    }
+    .header h1 { font-size: 20px; color: #262626; font-weight: 600; }
+    .header p  { font-size: 13px; color: #8e8e8e; }
+
+    .card {
+      background: #fff; border: 1px solid #dbdbdb; border-radius: 12px;
+      padding: 20px; width: 100%; max-width: 500px; margin-bottom: 12px;
+    }
+
+    .preview-img {
+      width: 100%; border-radius: 10px; display: block;
+      max-height: 440px; object-fit: cover; margin-bottom: 18px;
+    }
+
+    .caption-label {
+      font-size: 11px; font-weight: 700; color: #8e8e8e;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;
+    }
+    textarea {
+      width: 100%; border: 1.5px solid #dbdbdb; border-radius: 8px;
+      padding: 12px; font-size: 14px; color: #262626; line-height: 1.55;
+      outline: none; transition: border-color 0.2s; font-family: inherit;
+      resize: vertical; min-height: 130px; background: #fafafa;
+    }
+    textarea:not([readonly]) { background: #fff; border-color: #0095f6; }
+
+    .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+    .btn {
+      width: 100%; padding: 13px; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s;
+    }
+    .btn:hover:not(:disabled) { opacity: 0.82; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-publish { background: #0095f6; color: #fff; }
+    .btn-regen   { background: #7c3aed; color: #fff; }
+    .btn-edit    { background: #f0f0f0; color: #262626; }
+    .btn-save    { background: #0095f6; color: #fff; display: none; }
+    .btn-cancel  { background: #fff; color: #ed4956; border: 1.5px solid #ed4956; }
+
+    .status {
+      margin-top: 14px; padding: 12px 16px; border-radius: 8px;
+      font-size: 14px; text-align: center; display: none;
+    }
+    .status.ok      { background: #d4edda; color: #155724; display: block; }
+    .status.err     { background: #f8d7da; color: #721c24; display: block; }
+    .status.loading { background: #d1ecf1; color: #0c5460; display: block; }
+    .done-screen {
+      text-align: center; padding: 40px 20px; display: none;
+    }
+    .done-screen .big { font-size: 56px; margin-bottom: 16px; }
+    .done-screen h2  { font-size: 20px; color: #262626; font-weight: 600; margin-bottom: 8px; }
+    .done-screen p   { font-size: 14px; color: #8e8e8e; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">📸</div>
+  <div>
+    <h1>Превью поста</h1>
+    <p>@hair_love_company</p>
+  </div>
+</div>
+
+<div class="card" id="mainCard">
+  <img id="photo" class="preview-img" src="" alt="фото">
+
+  <div class="caption-label">Подпись</div>
+  <textarea id="caption" readonly></textarea>
+
+  <div class="actions">
+    <button class="btn btn-publish" onclick="doPost()">✅ Опубликовать</button>
+    <button class="btn btn-regen"   onclick="doRegen()">🔄 Новый текст</button>
+    <button class="btn btn-edit"    id="btnEdit" onclick="toggleEdit()">✏️ Изменить текст</button>
+    <button class="btn btn-save"    id="btnSave" onclick="saveEdit()">💾 Сохранить</button>
+    <button class="btn btn-cancel"  onclick="doCancel()">❌ Отмена</button>
+  </div>
+  <div class="status" id="status"></div>
+</div>
+
+<div class="card done-screen" id="doneScreen">
+  <div class="big">✅</div>
+  <h2>Опубликовано!</h2>
+  <p>Пост появится в @hair_love_company</p>
+</div>
+
+<script>
+  const sid = location.pathname.split('/').pop();
+  let isEditing = false;
+
+  async function load() {
+    try {
+      const r = await fetch(`/api/instagram/session/${sid}`);
+      if (!r.ok) { document.body.innerHTML = '<p style="text-align:center;padding:40px;color:#8e8e8e">Сессия не найдена или истекла</p>'; return; }
+      const d = await r.json();
+      document.getElementById('photo').src = d.image_url;
+      document.getElementById('caption').value = d.caption;
+    } catch(e) {
+      setStatus('err', '❌ Ошибка загрузки: ' + e.message);
+    }
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    const ta = document.getElementById('caption');
+    if (isEditing) {
+      ta.removeAttribute('readonly'); ta.focus();
+      document.getElementById('btnEdit').style.display = 'none';
+      document.getElementById('btnSave').style.display = '';
+    } else {
+      ta.setAttribute('readonly', '');
+      document.getElementById('btnEdit').style.display = '';
+      document.getElementById('btnSave').style.display = 'none';
+    }
+  }
+
+  async function saveEdit() {
+    const caption = document.getElementById('caption').value.trim();
+    try {
+      await fetch(`/api/instagram/session/${sid}/update`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({caption}),
+      });
+    } catch {}
+    toggleEdit();
+  }
+
+  async function doRegen() {
+    setStatus('loading', '🔄 Генерируем новую подпись...');
+    lock(true);
+    try {
+      const r = await fetch(`/api/instagram/session/${sid}/regen`, {method: 'POST'});
+      const d = await r.json();
+      if (!d.caption) throw new Error(d.error || 'Ошибка');
+      document.getElementById('caption').value = d.caption;
+      if (isEditing) toggleEdit();
+      setStatus('', '');
+    } catch(e) {
+      setStatus('err', '❌ ' + e.message);
+    }
+    lock(false);
+  }
+
+  async function doPost() {
+    setStatus('loading', '📤 Публикуем в Instagram...');
+    lock(true);
+    if (isEditing) await saveEdit();
+    try {
+      const r = await fetch(`/api/instagram/session/${sid}/post`, {method: 'POST'});
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || 'Ошибка');
+      document.getElementById('mainCard').style.display = 'none';
+      document.getElementById('doneScreen').style.display = 'block';
+    } catch(e) {
+      setStatus('err', '❌ ' + e.message);
+      lock(false);
+    }
+  }
+
+  async function doCancel() {
+    await fetch(`/api/instagram/session/${sid}/cancel`, {method: 'DELETE'}).catch(()=>{});
+    document.getElementById('mainCard').innerHTML = '<p style="text-align:center;padding:20px;color:#8e8e8e">❌ Отменено</p>';
+  }
+
+  function lock(v) {
+    document.querySelectorAll('.actions .btn').forEach(b => b.disabled = v);
+  }
+
+  function setStatus(type, text) {
+    const el = document.getElementById('status');
+    el.className = 'status' + (type ? ' ' + type : '');
+    el.textContent = text;
+    el.style.display = type ? 'block' : 'none';
+  }
+
+  load();
+</script>
+</body>
+</html>

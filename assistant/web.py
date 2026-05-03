@@ -1,12 +1,17 @@
 import asyncio
 import os
 import threading
+import time
+import uuid
 
 from flask import Flask, jsonify, request, send_from_directory
 
 import claude_client
 
 app = Flask(__name__, static_folder="static")
+
+_ig_sessions: dict[str, dict] = {}
+_ig_lock = threading.Lock()
 
 _tg_auth_state: dict = {}
 _tg_auth_lock = threading.Lock()
@@ -117,6 +122,112 @@ def tg_auth_signin():
         os.system("systemctl restart assistant &")
 
     return jsonify(result)
+
+
+@app.route("/api/instagram/prepare", methods=["POST"])
+def instagram_prepare():
+    if "file" not in request.files:
+        return jsonify({"error": "no file"}), 400
+    f = request.files["file"]
+    image_bytes = f.read()
+    if not image_bytes:
+        return jsonify({"error": "empty file"}), 400
+    mime_type = (f.content_type or "image/jpeg").strip()
+    user_hint = (request.form.get("hint") or "").strip()
+
+    ext = os.path.splitext(f.filename or "photo.jpg")[1].lower() or ".jpg"
+    filename = uuid.uuid4().hex + ext
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    with open(filepath, "wb") as fp:
+        fp.write(image_bytes)
+    image_url = f"{VPS_URL}/static/uploads/{filename}"
+
+    try:
+        caption = claude_client.generate_instagram_caption(image_bytes, mime_type, user_hint)
+    except Exception as e:
+        caption = ""
+
+    session_id = uuid.uuid4().hex
+    with _ig_lock:
+        _ig_sessions[session_id] = {
+            "image_url": image_url,
+            "filename": filename,
+            "caption": caption,
+            "created_at": time.time(),
+        }
+
+    preview_url = f"{VPS_URL}/instagram/preview/{session_id}"
+    return jsonify({"session_id": session_id, "preview_url": preview_url, "caption": caption})
+
+
+@app.route("/instagram/preview/<session_id>")
+def instagram_preview_page(session_id):
+    with _ig_lock:
+        exists = session_id in _ig_sessions
+    if not exists:
+        return "Сессия не найдена или истекла", 404
+    return send_from_directory("static", "instagram_preview.html")
+
+
+@app.route("/api/instagram/session/<session_id>", methods=["GET"])
+def instagram_session_get(session_id):
+    with _ig_lock:
+        s = _ig_sessions.get(session_id)
+    if not s:
+        return jsonify({"error": "not found"}), 404
+    return jsonify({"image_url": s["image_url"], "caption": s["caption"]})
+
+
+@app.route("/api/instagram/session/<session_id>/post", methods=["POST"])
+def instagram_session_post(session_id):
+    with _ig_lock:
+        s = _ig_sessions.get(session_id)
+    if not s:
+        return jsonify({"error": "not found"}), 404
+    try:
+        import instagram_client
+        result = instagram_client.post_photo(s["image_url"], s["caption"])
+        with _ig_lock:
+            _ig_sessions.pop(session_id, None)
+        return jsonify({"ok": True, "id": result.get("id")})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/instagram/session/<session_id>/regen", methods=["POST"])
+def instagram_session_regen(session_id):
+    with _ig_lock:
+        s = _ig_sessions.get(session_id)
+    if not s:
+        return jsonify({"error": "not found"}), 404
+    try:
+        filepath = os.path.join(UPLOAD_DIR, s["filename"])
+        with open(filepath, "rb") as fp:
+            image_bytes = fp.read()
+        caption = claude_client.generate_instagram_caption(image_bytes, "image/jpeg", "")
+        with _ig_lock:
+            _ig_sessions[session_id]["caption"] = caption
+        return jsonify({"caption": caption})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/instagram/session/<session_id>/update", methods=["POST"])
+def instagram_session_update(session_id):
+    data = request.get_json(silent=True) or {}
+    caption = (data.get("caption") or "").strip()
+    with _ig_lock:
+        if session_id not in _ig_sessions:
+            return jsonify({"error": "not found"}), 404
+        _ig_sessions[session_id]["caption"] = caption
+    return jsonify({"ok": True})
+
+
+@app.route("/api/instagram/session/<session_id>/cancel", methods=["DELETE"])
+def instagram_session_cancel(session_id):
+    with _ig_lock:
+        _ig_sessions.pop(session_id, None)
+    return jsonify({"ok": True})
 
 
 def run() -> None:
