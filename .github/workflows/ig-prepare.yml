@@ -1,0 +1,42 @@
+name: Prepare Instagram Preview
+
+on:
+  push:
+    branches: [claude/update-nodejs-actions-M3RLv, main]
+    paths: ['_ig_pending/**']
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy image to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "_ig_pending/image.jpg,_ig_pending/caption.txt,_ig_pending/session_id.txt"
+          target: /tmp/ig_pending/
+          strip_components: 1
+
+      - name: Create preview session on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            SESSION_ID=$(cat /tmp/ig_pending/session_id.txt)
+            CAPTION=$(cat /tmp/ig_pending/caption.txt)
+            # Copy image to uploads folder
+            cp /tmp/ig_pending/image.jpg /opt/assistant/static/uploads/${SESSION_ID}.jpg
+            # Create session via local API
+            curl -s -X POST http://localhost:8080/api/instagram/session-create \
+              -H "Content-Type: application/json" \
+              -d "{\"session_id\": \"${SESSION_ID}\", \"image_url\": \"http://${{ secrets.SSH_HOST }}/static/uploads/${SESSION_ID}.jpg\", \"caption\": $(python3 -c "import sys,json; print(json.dumps(open('/tmp/ig_pending/caption.txt').read().strip()))")}"
+            echo "Preview URL: http://${{ secrets.SSH_HOST }}/instagram/preview/${SESSION_ID}"

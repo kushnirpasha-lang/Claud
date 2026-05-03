@@ -124,6 +124,25 @@ def tg_auth_signin():
     return jsonify(result)
 
 
+@app.route("/api/instagram/session-create", methods=["POST"])
+def instagram_session_create():
+    data = request.get_json(silent=True) or {}
+    session_id = (data.get("session_id") or "").strip()
+    image_url = (data.get("image_url") or "").strip()
+    caption = (data.get("caption") or "").strip()
+    if not session_id or not image_url:
+        return jsonify({"error": "session_id and image_url required"}), 400
+    filename = f"{session_id}.jpg"
+    with _ig_lock:
+        _ig_sessions[session_id] = {
+            "image_url": image_url,
+            "filename": filename,
+            "caption": caption,
+            "created_at": time.time(),
+        }
+    return jsonify({"ok": True, "session_id": session_id})
+
+
 @app.route("/api/instagram/prepare", methods=["POST"])
 def instagram_prepare():
     if "file" not in request.files:
