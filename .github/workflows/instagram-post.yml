@@ -1,0 +1,44 @@
+name: Post to Instagram
+
+on:
+  push:
+    branches: [claude/setup-digitalocean-vps-4Ij39]
+    paths: ['_pending/**']
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy pending files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "_pending/"
+          target: /tmp/pending_upload/
+          strip_components: 1
+
+      - name: Copy post_pending.py to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "assistant/post_pending.py"
+          target: /opt/assistant/
+          strip_components: 1
+
+      - name: Upload to Drive and post to Instagram
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /opt/assistant
+            export $(grep -v '^#' .env | xargs)
+            venv/bin/python3 /opt/assistant/post_pending.py
