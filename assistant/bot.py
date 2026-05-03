@@ -1,6 +1,7 @@
 import asyncio
 import io
 import os
+import uuid
 from functools import partial
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -17,6 +18,20 @@ import claude_client
 
 # {user_id: {"to": contact_name, "text": message_text}}
 _pending_sends: dict = {}
+
+# {user_id: {"photo_bytes": bytes, "mime_type": str, "caption": str, "waiting_text": bool}}
+_pending_ig: dict[int, dict] = {}
+
+
+def _ig_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("✅ Опубликовать", callback_data="ig_post")],
+        [
+            InlineKeyboardButton("🔄 Новый текст", callback_data="ig_regen"),
+            InlineKeyboardButton("✏️ Изменить", callback_data="ig_edit"),
+        ],
+        [InlineKeyboardButton("❌ Отмена", callback_data="ig_cancel")],
+    ])
 
 WELCOME = (
     "Привет! Я твой личный ИИ-ассистент 🤖\n\n"
@@ -243,7 +258,117 @@ async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text
         await update.message.reply_text("Что-то пошло не так. Попробуй ещё раз или /new")
 
 
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    uid = update.effective_user.id
+    msg = await update.message.reply_text("📸 Генерирую подпись для Instagram...")
+
+    photo = update.message.photo[-1]
+    file = await photo.get_file()
+    file_bytes = bytes(await file.download_as_bytearray())
+
+    loop = asyncio.get_running_loop()
+    try:
+        caption = await loop.run_in_executor(
+            None,
+            partial(claude_client.generate_instagram_caption, file_bytes, "image/jpeg", ""),
+        )
+    except Exception as e:
+        await msg.edit_text(f"❌ Ошибка генерации подписи: {e}")
+        return
+
+    _pending_ig[uid] = {"photo_bytes": file_bytes, "mime_type": "image/jpeg",
+                        "caption": caption, "waiting_text": False}
+    await msg.edit_text(
+        f"📝 *Подпись для Instagram:*\n\n{caption}",
+        parse_mode="Markdown",
+        reply_markup=_ig_keyboard(),
+    )
+
+
+async def handle_ig_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    uid = query.from_user.id
+    pending = _pending_ig.get(uid)
+
+    if not pending:
+        await query.edit_message_text("❌ Нет активного поста. Отправь фото заново.")
+        return
+
+    if query.data == "ig_post":
+        await query.edit_message_text("📤 Публикуем в Instagram...")
+        loop = asyncio.get_running_loop()
+        try:
+            def _upload_and_post():
+                import instagram_client
+                filename = uuid.uuid4().hex + ".jpg"
+                upload_dir = os.path.join(os.path.dirname(__file__), "static", "uploads")
+                os.makedirs(upload_dir, exist_ok=True)
+                with open(os.path.join(upload_dir, filename), "wb") as f:
+                    f.write(pending["photo_bytes"])
+                vps_url = os.environ.get("VPS_URL", "http://188.166.67.237")
+                public_url = f"{vps_url}/static/uploads/{filename}"
+                return instagram_client.post_photo(public_url, pending["caption"])
+
+            result = await loop.run_in_executor(None, _upload_and_post)
+            _pending_ig.pop(uid, None)
+            await query.edit_message_text(
+                f"✅ Опубликовано в @hair_love_company!\nID: {result.get('id', '—')}"
+            )
+        except Exception as e:
+            await query.edit_message_text(
+                f"❌ Ошибка публикации: {e}\n\n{pending['caption']}",
+                reply_markup=_ig_keyboard(),
+            )
+
+    elif query.data == "ig_regen":
+        await query.edit_message_text("🔄 Генерирую новую подпись...")
+        loop = asyncio.get_running_loop()
+        try:
+            caption = await loop.run_in_executor(
+                None,
+                partial(claude_client.generate_instagram_caption,
+                        pending["photo_bytes"], pending["mime_type"], ""),
+            )
+            pending["caption"] = caption
+            await query.edit_message_text(
+                f"📝 *Новая подпись:*\n\n{caption}",
+                parse_mode="Markdown",
+                reply_markup=_ig_keyboard(),
+            )
+        except Exception as e:
+            await query.edit_message_text(
+                f"❌ Ошибка: {e}\n\n{pending['caption']}",
+                reply_markup=_ig_keyboard(),
+            )
+
+    elif query.data == "ig_edit":
+        pending["waiting_text"] = True
+        await query.edit_message_text(
+            f"✏️ *Текущая подпись:*\n\n{pending['caption']}\n\n📝 Отправь новый текст:",
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("❌ Отмена", callback_data="ig_cancel")]
+            ]),
+        )
+
+    elif query.data == "ig_cancel":
+        _pending_ig.pop(uid, None)
+        await query.edit_message_text("❌ Публикация отменена.")
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    uid = update.effective_user.id
+    pending = _pending_ig.get(uid)
+    if pending and pending.get("waiting_text"):
+        pending["waiting_text"] = False
+        pending["caption"] = update.message.text
+        await update.message.reply_text(
+            f"📝 *Обновлённая подпись:*\n\n{pending['caption']}",
+            parse_mode="Markdown",
+            reply_markup=_ig_keyboard(),
+        )
+        return
     await _process_text(update, context, update.message.text)
 
 
@@ -300,7 +425,9 @@ def run() -> None:
     app.add_handler(CommandHandler("trello", cmd_trello))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
+    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_handler(CallbackQueryHandler(handle_send_callback, pattern="^send_"))
+    app.add_handler(CallbackQueryHandler(handle_ig_callback, pattern="^ig_"))
 
     print("Telegram bot started.")
     app.run_polling(drop_pending_updates=True)
