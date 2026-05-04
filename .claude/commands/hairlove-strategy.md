@@ -18,16 +18,23 @@
 
 ## ПРОДУКТЫ HairLove
 
-| Продукт | Статус |
-|---|---|
-| Крем-спрей 20 в 1 | ✅ В продаже |
-| Термозащита | ✅ В продаже |
-| Ламинарная вода | ✅ В продаже |
-| Шелк | 🧪 Испытания |
+**Производство: Made in Italy** — HAIR LOVE COMPANY, Viterbo, Italy ← ключевое УТП
+
+| Продукт | Название на этикетке | Объём | pH | Статус |
+|---|---|---|---|---|
+| Крем-спрей 20 в 1 | 20 IN 1 CREAM-SPRAY | 200 мл | 4.5-5.0 | ✅ В продаже |
+| Термозащита | THERMO PROTECTOR SPRAY | 200 мл | 4.5-5.0 | ✅ В продаже |
+| Ламинарная вода | LIQUID LAMELLAR FILLER-MASK | 200 мл | 5.0-6.0 | ✅ В продаже |
+| Шелк | SILK | — | — | 🧪 Испытания |
 
 **Рынок первого этапа:** Украина
 **Основная модель:** B2B (салоны красоты, дистрибуторы)
 **Дополнительно:** B2C через Instagram + сайт
+
+### Ключевые ингредиенты по продуктам
+- **Крем-спрей:** Keratin, Argania Oil, Silk, Macadamia, Wheat Protein, Sphingolipids, Panthenol
+- **Термозащита:** Keratin, Amino Acids (Arginine, Alanine, Serine...), Grape Seed Extract, Avocado Extract
+- **Ламинарная вода:** Keratin, Collagen, Aloe Vera, Wheat Protein, Rice Protein, Panthenol
 
 ---
 
