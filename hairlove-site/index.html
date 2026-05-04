@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HairLove — Made in Italy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & BASE ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --teal:       #1B6B68;
+  --teal-dark:  #124845;
+  --teal-light: #5BBFB9;
+  --teal-pale:  #E8F4F3;
+  --sage:       #8FB5A0;
+  --blush:      #F5E0DC;
+  --blush-deep: #E8C4BE;
+  --cream:      #FAF8F4;
+  --white:      #FFFFFF;
+  --ink:        #1A1A1A;
+  --ink-soft:   #4A4A4A;
+  --gold:       #C9A05A;
+  --ff-serif:   'Cormorant Garamond', Georgia, serif;
+  --ff-sans:    'Jost', sans-serif;
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--ff-sans);
+  background: var(--cream);
+  color: var(--ink);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── CUSTOM CURSOR ────────────────────────────────────────────────── */
+.cursor {
+  position: fixed; top: 0; left: 0; z-index: 9999;
+  pointer-events: none;
+}
+.cursor-dot {
+  width: 8px; height: 8px;
+  background: var(--teal);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s, background 0.3s;
+}
+.cursor-ring {
+  position: fixed; top: 0; left: 0;
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--teal);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.18s var(--ease-out), width 0.3s, height 0.3s, border-color 0.3s;
+  pointer-events: none; z-index: 9998;
+}
+body:has(a:hover) .cursor-ring,
+body:has(button:hover) .cursor-ring { width: 56px; height: 56px; border-color: var(--gold); }
+
+/* ─── SCROLLBAR ────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--teal-light); border-radius: 2px; }
+
+/* ─── NAV ──────────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 48px;
+  transition: background 0.4s, padding 0.4s, box-shadow 0.4s;
+}
+nav.scrolled {
+  background: rgba(250,248,244,0.95);
+  backdrop-filter: blur(12px);
+  padding: 14px 48px;
+  box-shadow: 0 1px 0 rgba(27,107,104,0.1);
+}
+.nav-logo {
+  font-family: var(--ff-serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.4s;
+}
+nav.scrolled .nav-logo { color: var(--teal-dark); }
+.nav-links {
+  display: flex; align-items: center; gap: 36px;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--ff-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+nav.scrolled .nav-links a { color: var(--ink-soft); }
+.nav-links a:hover { color: var(--white); }
+nav.scrolled .nav-links a:hover { color: var(--teal); }
+.nav-cta {
+  font-family: var(--ff-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal-dark) !important;
+  background: var(--white);
+  padding: 10px 24px;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: background 0.3s, color 0.3s, transform 0.2s;
+}
+nav.scrolled .nav-cta { background: var(--teal); color: var(--white) !important; }
+.nav-cta:hover { transform: scale(1.04); }
+.nav-burger {
+  display: none;
+  flex-direction: column; gap: 5px;
+  cursor: pointer; padding: 4px;
+}
+.nav-burger span {
+  display: block; width: 24px; height: 1.5px;
+  background: var(--white);
+  transition: background 0.4s, transform 0.3s;
+}
+nav.scrolled .nav-burger span { background: var(--teal-dark); }
+
+/* ─── HERO ─────────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  background: var(--teal-dark);
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.hero-bg-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--ff-serif);
+  font-size: clamp(120px, 20vw, 260px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgba(255,255,255,0.04);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+.hero-noise {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.5; pointer-events: none;
+}
+.hero-gradient {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 70% 50%, rgba(91,191,185,0.12) 0%, transparent 70%),
+              radial-gradient(ellipse 40% 60% at 20% 80%, rgba(245,224,220,0.06) 0%, transparent 60%);
+}
+.hero-content {
+  position: relative; z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  padding: 120px 48px 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.hero-left { padding-right: 40px; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--teal-light);
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease-out) 0.2s forwards;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: block; width: 32px; height: 1px;
+  background: var(--teal-light);
+}
+.hero-title {
+  font-family: var(--ff-serif);
+  font-size: clamp(52px, 6.5vw, 88px);
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--white);
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: fadeUp 0.9s var(--ease-out) 0.4s forwards;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--teal-light);
+}
+.hero-title .line-accent {
+  display: block;
+  font-style: italic;
+  font-size: 0.88em;
+  color: rgba(255,255,255,0.5);
+  font-weight: 300;
+}
+.hero-desc {
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.6);
+  max-width: 400px;
+  margin-bottom: 44px;
+  opacity: 0;
+  animation: fadeUp 0.9s var(--ease-out) 0.6s forwards;
+}
+.hero-actions {
+  display: flex; align-items: center; gap: 20px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.9s var(--ease-out) 0.8s forwards;
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--ff-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal-dark);
+  background: var(--white);
+  padding: 16px 34px;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+  border: none; cursor: pointer;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+  background: var(--blush);
+}
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--ff-sans);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  transition: color 0.2s;
+  background: none; border: none; cursor: pointer;
+}
+.btn-ghost:hover { color: var(--white); }
+.btn-ghost svg { transition: transform 0.2s; }
+.btn-ghost:hover svg { transform: translateX(4px); }
+
+/* Hero right – product showcase */
+.hero-right {
+  position: relative;
+  display: flex; justify-content: center; align-items: center;
+  min-height: 520px;
+  opacity: 0;
+  animation: fadeIn 1.2s var(--ease-out) 0.5s forwards;
+}
+.hero-bottles {
+  position: relative;
+  width: 340px; height: 480px;
+}
+/* Bottle base styles */
+.bottle {
+  position: absolute;
+  transition: transform 0.6s var(--ease-out);
+}
+.bottle:hover { transform: translateY(-8px) scale(1.03); }
+
+/* Bottle 1 – Cream Spray (center, front) */
+.bottle-1 { bottom: 0; left: 50%; transform: translateX(-50%); z-index: 3; }
+/* Bottle 2 – Thermo (left, behind) */
+.bottle-2 { bottom: 20px; left: 10px; z-index: 2; }
+/* Bottle 3 – Lamellar (right, behind) */
+.bottle-3 { bottom: 20px; right: 10px; z-index: 1; }
+
+/* Glow circle behind bottles */
+.hero-glow {
+  position: absolute;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(91,191,185,0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+/* Italy badge */
+.italy-badge {
+  position: absolute;
+  top: 20px; right: 0;
+  background: var(--gold);
+  color: var(--white);
+  font-family: var(--ff-serif);
+  font-style: italic;
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  border-radius: 100px;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(201,160,90,0.3);
+}
+/* Floating stat */
+.hero-stat {
+  position: absolute;
+  bottom: 60px; left: -20px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  padding: 16px 20px;
+  z-index: 10;
+}
+.hero-stat-num {
+  font-family: var(--ff-serif);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1;
+}
+.hero-stat-label {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Scroll indicator */
+.scroll-hint {
+  position: absolute;
+  bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  z-index: 5;
+  opacity: 0;
+  animation: fadeIn 1s var(--ease-out) 1.5s forwards;
+}
+.scroll-line {
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3));
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.1); }
+}
+
+/* ─── SECTION SHARED ───────────────────────────────────────────────── */
+.section { padding: 100px 48px; }
+.section-inner { max-width: 1200px; margin: 0 auto; }
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--teal); margin-bottom: 16px;
+}
+.section-eyebrow::before {
+  content: ''; display: block;
+  width: 28px; height: 1px; background: var(--teal);
+}
+.section-title {
+  font-family: var(--ff-serif);
+  font-size: clamp(38px, 4.5vw, 58px);
+  font-weight: 400; line-height: 1.1;
+  color: var(--ink); margin-bottom: 20px;
+}
+.section-title em { font-style: italic; color: var(--teal); }
+
+/* ─── BRAND STRIP ──────────────────────────────────────────────────── */
+.brand-strip {
+  background: var(--teal-dark);
+  overflow: hidden; padding: 20px 0;
+}
+.strip-track {
+  display: flex; gap: 64px;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+.strip-item {
+  display: flex; align-items: center; gap: 14px;
+  white-space: nowrap;
+  font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+}
+.strip-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%; background: var(--teal-light);
+  flex-shrink: 0;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ─── PRODUCTS ─────────────────────────────────────────────────────── */
+.products-section { background: var(--white); }
+.products-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 64px; flex-wrap: wrap; gap: 20px;
+}
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.product-card {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s;
+  background: var(--cream);
+}
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 60px rgba(27,107,104,0.12);
+}
+.product-card-visual {
+  height: 320px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.card-bg-1 { background: linear-gradient(135deg, #E8F4F3 0%, #D0EDEB 100%); }
+.card-bg-2 { background: linear-gradient(135deg, #F5E0DC 0%, #EDD4CF 100%); }
+.card-bg-3 { background: linear-gradient(135deg, #EAF0E8 0%, #D8E8D4 100%); }
+.product-card-visual svg { transition: transform 0.5s var(--ease-out); }
+.product-card:hover .product-card-visual svg { transform: scale(1.06) translateY(-6px); }
+.product-card-body { padding: 28px 28px 32px; }
+.product-vol {
+  font-size: 0.68rem; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--teal); margin-bottom: 8px;
+}
+.product-name {
+  font-family: var(--ff-serif);
+  font-size: 1.45rem; font-weight: 500;
+  line-height: 1.2; color: var(--ink);
+  margin-bottom: 12px;
+}
+.product-desc {
+  font-size: 0.85rem; font-weight: 300; line-height: 1.65;
+  color: var(--ink-soft); margin-bottom: 20px;
+}
+.product-tags {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.tag {
+  font-size: 0.68rem; font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--teal-dark);
+  background: var(--teal-pale);
+  padding: 4px 10px; border-radius: 100px;
+}
+.product-card-footer {
+  padding: 0 28px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.product-price {
+  font-family: var(--ff-serif);
+  font-size: 1.3rem; font-weight: 500; color: var(--teal-dark);
+}
+.product-price span { font-size: 0.8rem; font-weight: 300; color: var(--ink-soft); }
+.btn-card {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.73rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--teal-dark);
+  background: transparent;
+  border: 1.5px solid var(--teal-dark);
+  padding: 10px 18px; border-radius: 100px;
+  text-decoration: none; cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+.btn-card:hover { background: var(--teal-dark); color: var(--white); }
+/* Made in Italy tag on card */
+.card-italy {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  font-family: var(--ff-serif);
+  font-style: italic;
+  font-size: 0.75rem; color: var(--teal-dark);
+  padding: 4px 10px; border-radius: 100px;
+}
+
+/* ─── WHY HAIRLOVE ─────────────────────────────────────────────────── */
+.why-section { background: var(--cream); }
+.why-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.why-visual {
+  position: relative;
+  height: 520px;
+  border-radius: 32px;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--teal-dark) 0%, #0D3836 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.why-visual-inner {
+  text-align: center; padding: 40px;
+}
+.why-visual-num {
+  font-family: var(--ff-serif);
+  font-size: clamp(80px, 12vw, 140px);
+  font-weight: 300;
+  color: rgba(255,255,255,0.1);
+  line-height: 1;
+}
+.why-visual-label {
+  font-family: var(--ff-serif);
+  font-size: 1.6rem;
+  font-style: italic;
+  color: var(--white);
+  margin-top: 8px;
+}
+.why-visual-sub {
+  font-size: 0.78rem; font-weight: 300;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-top: 12px;
+}
+.why-corner-badge {
+  position: absolute; bottom: 32px; right: 32px;
+  width: 80px; height: 80px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+}
+.why-corner-badge span:first-child {
+  font-family: var(--ff-serif);
+  font-size: 1.5rem; font-weight: 400;
+  color: var(--white);
+}
+.why-corner-badge span:last-child {
+  font-size: 0.58rem; font-weight: 400;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+}
+.why-list { list-style: none; margin-top: 40px; }
+.why-item {
+  display: flex; align-items: flex-start; gap: 20px;
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(27,107,104,0.1);
+}
+.why-item:first-child { padding-top: 0; }
+.why-item:last-child { border-bottom: none; }
+.why-icon {
+  width: 44px; height: 44px;
+  flex-shrink: 0;
+  background: var(--teal-pale);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--teal);
+}
+.why-item-title {
+  font-family: var(--ff-serif);
+  font-size: 1.15rem; font-weight: 500;
+  color: var(--ink); margin-bottom: 5px;
+}
+.why-item-desc {
+  font-size: 0.84rem; font-weight: 300;
+  line-height: 1.65; color: var(--ink-soft);
+}
+
+/* ─── REVIEWS ──────────────────────────────────────────────────────── */
+.reviews-section { background: var(--teal-dark); overflow: hidden; }
+.reviews-section .section-title { color: var(--white); }
+.reviews-section .section-eyebrow { color: var(--teal-light); }
+.reviews-section .section-eyebrow::before { background: var(--teal-light); }
+.reviews-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 52px; flex-wrap: wrap; gap: 20px;
+}
+.reviews-track-wrap { overflow: hidden; margin: 0 -48px; padding: 0 48px; }
+.reviews-track {
+  display: flex; gap: 24px;
+  transition: transform 0.5s var(--ease-out);
+}
+.review-card {
+  flex: 0 0 360px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 32px;
+}
+.review-stars {
+  display: flex; gap: 3px; margin-bottom: 18px;
+}
+.review-stars svg { color: var(--gold); }
+.review-text {
+  font-family: var(--ff-serif);
+  font-size: 1.05rem; font-weight: 400;
+  font-style: italic;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 24px;
+}
+.review-author {
+  display: flex; align-items: center; gap: 12px;
+}
+.review-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-serif);
+  font-size: 1rem;
+  color: var(--white);
+  font-style: italic;
+  flex-shrink: 0;
+}
+.av1 { background: var(--teal); }
+.av2 { background: var(--blush-deep); }
+.av3 { background: var(--sage); }
+.av4 { background: linear-gradient(135deg, var(--teal-light), var(--teal)); }
+.av5 { background: linear-gradient(135deg, var(--blush-deep), #d4a8a2); }
+.review-name {
+  font-size: 0.85rem; font-weight: 500;
+  color: var(--white);
+}
+.review-role {
+  font-size: 0.73rem; font-weight: 300;
+  color: rgba(255,255,255,0.45);
+  margin-top: 2px;
+}
+.reviews-nav {
+  display: flex; gap: 12px;
+  margin-top: 44px;
+}
+.rev-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.rev-btn:hover { background: var(--white); color: var(--teal-dark); border-color: var(--white); }
+
+/* ─── PARTNERS / B2B ───────────────────────────────────────────────── */
+.partners-section { background: var(--cream); }
+.partners-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: center;
+}
+.partners-content .section-title { margin-bottom: 16px; }
+.partners-lead {
+  font-size: 1rem; font-weight: 300;
+  line-height: 1.75; color: var(--ink-soft);
+  margin-bottom: 36px;
+}
+.partners-benefits { list-style: none; margin-bottom: 40px; }
+.partners-benefits li {
+  display: flex; align-items: flex-start; gap: 14px;
+  font-size: 0.9rem; font-weight: 300;
+  line-height: 1.6; color: var(--ink);
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(27,107,104,0.1);
+}
+.partners-benefits li:last-child { border-bottom: none; }
+.benefit-check {
+  width: 20px; height: 20px; flex-shrink: 0;
+  background: var(--teal-pale);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--teal); margin-top: 2px;
+}
+/* Partner form */
+.partner-form-wrap {
+  background: var(--white);
+  border-radius: 32px;
+  padding: 48px 44px;
+  box-shadow: 0 4px 48px rgba(27,107,104,0.08);
+}
+.form-title {
+  font-family: var(--ff-serif);
+  font-size: 1.6rem; font-weight: 500;
+  color: var(--ink); margin-bottom: 6px;
+}
+.form-subtitle {
+  font-size: 0.83rem; font-weight: 300;
+  color: var(--ink-soft); margin-bottom: 32px;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-label {
+  font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.form-input, .form-select, .form-textarea {
+  font-family: var(--ff-sans);
+  font-size: 0.9rem; font-weight: 300;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  padding: 13px 16px;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--teal);
+  background: var(--white);
+}
+.form-textarea { resize: none; height: 100px; }
+.form-submit {
+  width: 100%;
+  font-family: var(--ff-sans);
+  font-size: 0.82rem; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--white);
+  background: var(--teal-dark);
+  border: none;
+  padding: 16px; border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.2s;
+  margin-top: 8px;
+}
+.form-submit:hover { background: var(--teal); transform: translateY(-1px); }
+
+/* ─── INSTAGRAM ────────────────────────────────────────────────────── */
+.insta-section { background: var(--white); }
+.insta-header {
+  display: flex; justify-content: space-between;
+  align-items: flex-end; margin-bottom: 40px;
+  flex-wrap: wrap; gap: 16px;
+}
+.insta-handle {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.95rem; font-weight: 400;
+  color: var(--teal); text-decoration: none;
+  transition: color 0.2s;
+}
+.insta-handle:hover { color: var(--teal-dark); }
+.insta-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.insta-item {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+.insta-item::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--teal-dark);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.insta-item:hover::after { opacity: 0.45; }
+.insta-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.insta-cta {
+  text-align: center;
+  margin-top: 40px;
+}
+.btn-insta {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 0.8rem; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--white);
+  background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCAF45);
+  padding: 14px 32px; border-radius: 100px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-insta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(253,29,29,0.25);
+}
+
+/* ─── FOOTER ───────────────────────────────────────────────────────── */
+footer {
+  background: var(--teal-dark);
+  padding: 64px 48px 36px;
+}
+.footer-inner { max-width: 1200px; margin: 0 auto; }
+.footer-top {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px; margin-bottom: 64px;
+}
+.footer-brand-name {
+  font-family: var(--ff-serif);
+  font-size: 2rem; font-weight: 600;
+  color: var(--white); margin-bottom: 14px;
+}
+.footer-brand-desc {
+  font-size: 0.84rem; font-weight: 300;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.45);
+  max-width: 260px; margin-bottom: 24px;
+}
+.footer-made {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--ff-serif); font-style: italic;
+  font-size: 0.85rem; color: var(--gold);
+}
+.footer-col-title {
+  font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 20px;
+}
+.footer-col a {
+  display: block;
+  font-size: 0.85rem; font-weight: 300;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none; margin-bottom: 12px;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--white); }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 28px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-copy {
+  font-size: 0.75rem; font-weight: 300;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ─── ANIMATIONS ───────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.reveal {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+}
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ─── MOBILE NAV OVERLAY ───────────────────────────────────────────── */
+.mobile-menu {
+  position: fixed; inset: 0; z-index: 99;
+  background: var(--teal-dark);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 32px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s;
+}
+.mobile-menu.open { opacity: 1; pointer-events: all; }
+.mobile-menu a {
+  font-family: var(--ff-serif);
+  font-size: 2.2rem; font-weight: 400; font-style: italic;
+  color: var(--white); text-decoration: none;
+  transition: color 0.2s;
+}
+.mobile-menu a:hover { color: var(--teal-light); }
+
+/* ─── RESPONSIVE ───────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .products-grid { grid-template-columns: 1fr 1fr; }
+  .footer-top { grid-template-columns: 1fr 1fr; }
+  .insta-grid { grid-template-columns: repeat(3, 1fr); }
+  .insta-item:nth-child(n+4) { display: none; }
+}
+@media (max-width: 768px) {
+  nav { padding: 18px 24px; }
+  nav.scrolled { padding: 14px 24px; }
+  .nav-links { display: none; }
+  .nav-burger { display: flex; }
+  .section { padding: 72px 24px; }
+  .hero-content {
+    grid-template-columns: 1fr;
+    padding: 100px 24px 60px;
+    text-align: center;
+  }
+  .hero-left { padding-right: 0; }
+  .hero-desc { margin: 0 auto 36px; }
+  .hero-actions { justify-content: center; }
+  .hero-right { min-height: 360px; margin-top: 40px; }
+  .hero-bottles { width: 260px; height: 360px; }
+  .hero-stat { display: none; }
+  .products-grid { grid-template-columns: 1fr; }
+  .products-header { flex-direction: column; align-items: flex-start; }
+  .why-grid { grid-template-columns: 1fr; }
+  .why-visual { height: 280px; }
+  .partners-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .insta-grid { grid-template-columns: repeat(2, 1fr); }
+  .insta-item:nth-child(n+3) { display: none; }
+  .reviews-track { gap: 16px; }
+  .review-card { flex: 0 0 300px; }
+  body { cursor: auto; }
+  .cursor, .cursor-ring { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor"><div class="cursor-dot" id="dot"></div></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#products" onclick="closeMobile()">Продукти</a>
+  <a href="#why" onclick="closeMobile()">Про бренд</a>
+  <a href="#reviews" onclick="closeMobile()">Відгуки</a>
+  <a href="#partners" onclick="closeMobile()">Партнерам</a>
+  <a href="#contact" onclick="closeMobile()">Контакти</a>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">HairLove</a>
+  <ul class="nav-links">
+    <li><a href="#products">Продукти</a></li>
+    <li><a href="#why">Про бренд</a></li>
+    <li><a href="#reviews">Відгуки</a></li>
+    <li><a href="#partners">Партнерам</a></li>
+    <li><a href="#contact" class="nav-cta">Стати партнером</a></li>
+  </ul>
+  <div class="nav-burger" id="burger" onclick="toggleMobile()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg-text">HAIR LOVE</div>
+  <div class="hero-noise"></div>
+  <div class="hero-gradient"></div>
+
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Зроблено в Італії</div>
+      <h1 class="hero-title">
+        Волосся,<br>
+        що <em>закохує</em><br>
+        <span class="line-accent">в себе знову</span>
+      </h1>
+      <p class="hero-desc">
+        Професійний догляд італійської якості — тепер доступний кожній.
+        Три продукти, що перетворюють рутину на ритуал.
+      </p>
+      <div class="hero-actions">
+        <a href="#products" class="btn-primary">
+          Переглянути продукти
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#partners" class="btn-ghost">
+          Стати партнером
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-glow"></div>
+      <div class="italy-badge">✦ Made in Italy</div>
+
+      <div class="hero-bottles">
+        <!-- Bottle 3 – Lamellar (right back) -->
+        <div class="bottle bottle-3">
+          <svg width="80" height="200" viewBox="0 0 80 200" fill="none">
+            <rect x="20" y="30" width="40" height="160" rx="8" fill="url(#b3grad)"/>
+            <rect x="26" y="20" width="28" height="18" rx="4" fill="#6BAF9A"/>
+            <rect x="30" y="12" width="20" height="12" rx="3" fill="#7DC4A8"/>
+            <rect x="24" y="60" width="32" height="80" rx="4" fill="rgba(255,255,255,0.08)"/>
+            <text x="40" y="105" text-anchor="middle" font-family="serif" font-size="6" fill="rgba(255,255,255,0.7)" font-style="italic">LIQUID</text>
+            <text x="40" y="115" text-anchor="middle" font-family="serif" font-size="5" fill="rgba(255,255,255,0.5)">LAMELLAR</text>
+            <text x="40" y="124" text-anchor="middle" font-family="serif" font-size="5" fill="rgba(255,255,255,0.5)">FILLER-MASK</text>
+            <defs>
+              <linearGradient id="b3grad" x1="20" y1="30" x2="80" y2="200">
+                <stop offset="0%" stop-color="#5B9E8A"/>
+                <stop offset="100%" stop-color="#3D7A66"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- Bottle 2 – Thermo (left back) -->
+        <div class="bottle bottle-2">
+          <svg width="78" height="190" viewBox="0 0 78 190" fill="none">
+            <rect x="18" y="35" width="42" height="148" rx="8" fill="url(#b2grad)"/>
+            <rect x="26" y="22" width="26" height="18" rx="4" fill="#C89090"/>
+            <rect x="30" y="14" width="18" height="12" rx="3" fill="#D8A8A8"/>
+            <!-- spray nozzle -->
+            <rect x="44" y="14" width="18" height="6" rx="3" fill="#D8A8A8"/>
+            <rect x="28" y="58" width="22" height="70" rx="3" fill="rgba(255,255,255,0.08)"/>
+            <text x="39" y="97" text-anchor="middle" font-family="serif" font-size="6" fill="rgba(255,255,255,0.7)" font-style="italic">THERMO</text>
+            <text x="39" y="107" text-anchor="middle" font-family="serif" font-size="5" fill="rgba(255,255,255,0.5)">PROTECTOR</text>
+            <text x="39" y="116" text-anchor="middle" font-family="serif" font-size="5" fill="rgba(255,255,255,0.5)">SPRAY</text>
+            <defs>
+              <linearGradient id="b2grad" x1="18" y1="35" x2="78" y2="190">
+                <stop offset="0%" stop-color="#C8888A"/>
+                <stop offset="100%" stop-color="#A86068"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- Bottle 1 – Cream Spray (center front) -->
+        <div class="bottle bottle-1">
+          <svg width="95" height="230" viewBox="0 0 95 230" fill="none">
+            <rect x="18" y="40" width="58" height="182" rx="10" fill="url(#b1grad)"/>
+            <rect x="26" y="26" width="32" height="20" rx="5" fill="#3BADA8"/>
+            <rect x="32" y="15" width="20" height="15" rx="4" fill="#4DBEBC"/>
+            <!-- pump head -->
+            <rect x="38" y="6" width="14" height="10" rx="3" fill="#5DCFCD"/>
+            <!-- label area -->
+            <rect x="22" y="72" width="50" height="100" rx="6" fill="rgba(255,255,255,0.1)"/>
+            <text x="47" y="110" text-anchor="middle" font-family="serif" font-size="8" fill="white" font-style="italic" font-weight="500">HairLove</text>
+            <text x="47" y="125" text-anchor="middle" font-family="serif" font-size="5.5" fill="rgba(255,255,255,0.75)">20 IN 1</text>
+            <text x="47" y="136" text-anchor="middle" font-family="serif" font-size="5.5" fill="rgba(255,255,255,0.75)">CREAM-SPRAY</text>
+            <text x="47" y="150" text-anchor="middle" font-family="sans-serif" font-size="4.5" fill="rgba(255,255,255,0.45)">Made in Italy</text>
+            <!-- shine -->
+            <rect x="22" y="40" width="12" height="182" rx="6" fill="rgba(255,255,255,0.07)"/>
+            <defs>
+              <linearGradient id="b1grad" x1="18" y1="40" x2="95" y2="230">
+                <stop offset="0%" stop-color="#2A9D96"/>
+                <stop offset="100%" stop-color="#1B6B68"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+
+      <div class="hero-stat">
+        <div class="hero-stat-num">4000+</div>
+        <div class="hero-stat-label">флаконів продано</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    scroll
+  </div>
+</section>
+
+<!-- BRAND STRIP -->
+<div class="brand-strip">
+  <div class="strip-track">
+    <!-- repeated for seamless loop -->
+    <div class="strip-item"><span class="strip-dot"></span> Made in Italy</div>
+    <div class="strip-item"><span class="strip-dot"></span> pH 4.5–5.0</div>
+    <div class="strip-item"><span class="strip-dot"></span> Без обтяження</div>
+    <div class="strip-item"><span class="strip-dot"></span> Кератин і шовк</div>
+    <div class="strip-item"><span class="strip-dot"></span> Захист до 220°C</div>
+    <div class="strip-item"><span class="strip-dot"></span> Viterbo, Italia</div>
+    <div class="strip-item"><span class="strip-dot"></span> Професійний рівень</div>
+    <div class="strip-item"><span class="strip-dot"></span> HairLove Company</div>
+    <div class="strip-item"><span class="strip-dot"></span> Made in Italy</div>
+    <div class="strip-item"><span class="strip-dot"></span> pH 4.5–5.0</div>
+    <div class="strip-item"><span class="strip-dot"></span> Без обтяження</div>
+    <div class="strip-item"><span class="strip-dot"></span> Кератин і шовк</div>
+    <div class="strip-item"><span class="strip-dot"></span> Захист до 220°C</div>
+    <div class="strip-item"><span class="strip-dot"></span> Viterbo, Italia</div>
+    <div class="strip-item"><span class="strip-dot"></span> Професійний рівень</div>
+    <div class="strip-item"><span class="strip-dot"></span> HairLove Company</div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<section class="section products-section" id="products">
+  <div class="section-inner">
+    <div class="products-header reveal">
+      <div>
+        <div class="section-eyebrow">Лінійка</div>
+        <h2 class="section-title">Три продукти —<br><em>повний цикл догляду</em></h2>
+      </div>
+      <p style="max-width:320px;font-size:0.88rem;font-weight:300;line-height:1.7;color:var(--ink-soft);">
+        Кожен продукт вирішує конкретну задачу. Разом — повноцінний догляд від миття до укладки.
+      </p>
+    </div>
+
+    <div class="products-grid">
+
+      <!-- Card 1: 20 IN 1 -->
+      <div class="product-card reveal reveal-delay-1">
+        <div class="product-card-visual card-bg-1">
+          <span class="card-italy">Made in Italy</span>
+          <svg width="110" height="260" viewBox="0 0 110 260" fill="none">
+            <rect x="22" y="46" width="66" height="206" rx="12" fill="url(#pc1)"/>
+            <rect x="30" y="30" width="36" height="23" rx="6" fill="#3BADA8"/>
+            <rect x="37" y="18" width="22" height="16" rx="4" fill="#4DBEBC"/>
+            <rect x="44" y="8" width="16" height="12" rx="3" fill="#5DCFCD"/>
+            <rect x="26" y="84" width="58" height="116" rx="7" fill="rgba(255,255,255,0.45)"/>
+            <text x="55" y="132" text-anchor="middle" font-family="serif" font-size="9" fill="#1B6B68" font-style="italic" font-weight="600">HairLove</text>
+            <text x="55" y="148" text-anchor="middle" font-family="serif" font-size="7" fill="#1B6B68">20 IN 1</text>
+            <text x="55" y="162" text-anchor="middle" font-family="serif" font-size="6" fill="#2A9D96">CREAM-SPRAY</text>
+            <text x="55" y="178" text-anchor="middle" font-family="sans-serif" font-size="5" fill="rgba(27,107,104,0.5)">200 ml</text>
+            <rect x="22" y="46" width="16" height="206" rx="8" fill="rgba(255,255,255,0.1)"/>
+            <defs>
+              <linearGradient id="pc1" x1="22" y1="46" x2="110" y2="260">
+                <stop offset="0%" stop-color="#3BADA8"/>
+                <stop offset="100%" stop-color="#1B6B68"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="product-card-body">
+          <div class="product-vol">200 мл / 50 мл</div>
+          <div class="product-name">20 in 1<br>Cream-Spray</div>
+          <p class="product-desc">Живить, зволожує, прибирає пухнастість, надає слухняність. Не обтяжує, не жирнить. Наноси на вологе волосся — і все.</p>
+          <div class="product-tags">
+            <span class="tag">Кератин</span>
+            <span class="tag">Аргана</span>
+            <span class="tag">Шовк</span>
+            <span class="tag">Не змивати</span>
+          </div>
+        </div>
+        <div class="product-card-footer">
+          <div class="product-price">490 ₴ <span>/ 200 мл</span></div>
+          <a href="#partners" class="btn-card">Замовити →</a>
+        </div>
+      </div>
+
+      <!-- Card 2: Thermo -->
+      <div class="product-card reveal reveal-delay-2">
+        <div class="product-card-visual card-bg-2">
+          <span class="card-italy">Made in Italy</span>
+          <svg width="100" height="250" viewBox="0 0 100 250" fill="none">
+            <rect x="20" y="44" width="62" height="200" rx="11" fill="url(#pc2)"/>
+            <rect x="28" y="30" width="32" height="20" rx="5" fill="#C89090"/>
+            <rect x="34" y="18" width="20" height="14" rx="4" fill="#D8A8A8"/>
+            <rect x="50" y="16" width="26" height="8" rx="4" fill="#D8A8A8"/>
+            <rect x="24" y="78" width="52" height="112" rx="6" fill="rgba(255,255,255,0.4)"/>
+            <text x="51" y="122" text-anchor="middle" font-family="serif" font-size="8.5" fill="#6B3040" font-style="italic" font-weight="600">HairLove</text>
+            <text x="51" y="138" text-anchor="middle" font-family="serif" font-size="6.5" fill="#8B4050">THERMO</text>
+            <text x="51" y="152" text-anchor="middle" font-family="serif" font-size="6" fill="#9B5060">PROTECTOR</text>
+            <text x="51" y="165" text-anchor="middle" font-family="serif" font-size="6" fill="#9B5060">SPRAY</text>
+            <text x="51" y="178" text-anchor="middle" font-family="sans-serif" font-size="5" fill="rgba(107,48,64,0.45)">200 ml</text>
+            <defs>
+              <linearGradient id="pc2" x1="20" y1="44" x2="100" y2="250">
+                <stop offset="0%" stop-color="#C8888A"/>
+                <stop offset="100%" stop-color="#9A5860"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="product-card-body">
+          <div class="product-vol">200 мл / 50 мл</div>
+          <div class="product-name">Thermo<br>Protector Spray</div>
+          <p class="product-desc">Захист до 220°C, від сонця і морозу. Розгладжує, додає блиск, не склеює. Наноси до або після укладки.</p>
+          <div class="product-tags">
+            <span class="tag">Захист 220°C</span>
+            <span class="tag">Кератин</span>
+            <span class="tag">Виноград</span>
+            <span class="tag">Авокадо</span>
+          </div>
+        </div>
+        <div class="product-card-footer">
+          <div class="product-price">520 ₴ <span>/ 200 мл</span></div>
+          <a href="#partners" class="btn-card">Замовити →</a>
+        </div>
+      </div>
+
+      <!-- Card 3: Lamellar -->
+      <div class="product-card reveal reveal-delay-3">
+        <div class="product-card-visual card-bg-3">
+          <span class="card-italy">Made in Italy</span>
+          <svg width="100" height="250" viewBox="0 0 100 250" fill="none">
+            <rect x="18" y="44" width="64" height="200" rx="11" fill="url(#pc3)"/>
+            <rect x="26" y="30" width="34" height="20" rx="5" fill="#6BAF9A"/>
+            <rect x="32" y="18" width="22" height="14" rx="4" fill="#7DC4A8"/>
+            <rect x="22" y="78" width="56" height="112" rx="6" fill="rgba(255,255,255,0.4)"/>
+            <text x="50" y="120" text-anchor="middle" font-family="serif" font-size="8.5" fill="#2D6050" font-style="italic" font-weight="600">HairLove</text>
+            <text x="50" y="136" text-anchor="middle" font-family="serif" font-size="6" fill="#3D7A66">LIQUID LAMELLAR</text>
+            <text x="50" y="150" text-anchor="middle" font-family="serif" font-size="6" fill="#4D8A76">FILLER-MASK</text>
+            <text x="50" y="168" text-anchor="middle" font-family="sans-serif" font-size="4.5" fill="rgba(45,96,80,0.45)">15–30 сек → бальзам</text>
+            <text x="50" y="178" text-anchor="middle" font-family="sans-serif" font-size="4.5" fill="rgba(45,96,80,0.45)">30 хв → маска-філлер</text>
+            <defs>
+              <linearGradient id="pc3" x1="18" y1="44" x2="100" y2="250">
+                <stop offset="0%" stop-color="#6BAF9A"/>
+                <stop offset="100%" stop-color="#3D7A66"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="product-card-body">
+          <div class="product-vol">200 мл / 50 мл</div>
+          <div class="product-name">Liquid Lamellar<br>Filler-Mask</div>
+          <p class="product-desc">Два режими: 15–30 сек — щоденний бальзам, до 30 хв — інтенсивна маска-філлер. Відновлює, зволожує, надає блиск.</p>
+          <div class="product-tags">
+            <span class="tag">Колаген</span>
+            <span class="tag">Алое вера</span>
+            <span class="tag">Пантенол</span>
+            <span class="tag">2 в 1</span>
+          </div>
+        </div>
+        <div class="product-card-footer">
+          <div class="product-price">630 ₴ <span>/ 200 мл</span></div>
+          <a href="#partners" class="btn-card">Замовити →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- WHY HAIRLOVE -->
+<section class="section why-section" id="why">
+  <div class="section-inner">
+    <div class="why-grid">
+      <div class="why-visual reveal">
+        <div class="why-visual-inner">
+          <div class="why-visual-num">4</div>
+          <div class="why-visual-label">Роки у красі</div>
+          <div class="why-visual-sub">Viterbo, Italia · 2021</div>
+        </div>
+        <div class="why-corner-badge">
+          <span>IT</span>
+          <span>Made</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-eyebrow reveal">Чому HairLove</div>
+        <h2 class="section-title reveal">Якість,<br><em>що відчувається</em></h2>
+        <ul class="why-list">
+          <li class="why-item reveal reveal-delay-1">
+            <div class="why-icon">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            </div>
+            <div>
+              <div class="why-item-title">Виготовлено в Італії</div>
+              <div class="why-item-desc">Виробництво HAIR LOVE COMPANY, Viterbo. Строгий контроль якості, перевірені рецептури, сертифіковані компоненти.</div>
+            </div>
+          </li>
+          <li class="why-item reveal reveal-delay-2">
+            <div class="why-icon">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            </div>
+            <div>
+              <div class="why-item-title">Склад без компромісів</div>
+              <div class="why-item-desc">Кератин, шовк, аргана, колаген — активні інгредієнти, що реально працюють. pH 4.5–5.0 зберігає структуру волосся.</div>
+            </div>
+          </li>
+          <li class="why-item reveal reveal-delay-3">
+            <div class="why-icon">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div>
+              <div class="why-item-title">Результат з першого разу</div>
+              <div class="why-item-desc">Видимий ефект вже після першого застосування. Понад 4000 флаконів продано — і кожен клієнт повертається.</div>
+            </div>
+          </li>
+          <li class="why-item reveal reveal-delay-4">
+            <div class="why-icon">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg>
+            </div>
+            <div>
+              <div class="why-item-title">Підтримка для партнерів</div>
+              <div class="why-item-desc">Тестери, маркетингові матеріали, гнучкі умови для салонів і дистриб'юторів. Ростемо разом.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section reviews-section" id="reviews">
+  <div class="section-inner">
+    <div class="reviews-header reveal">
+      <div>
+        <div class="section-eyebrow">Відгуки</div>
+        <h2 class="section-title">Що кажуть<br><em>клієнти та майстри</em></h2>
+      </div>
+    </div>
+
+    <div class="reviews-track-wrap">
+      <div class="reviews-track" id="reviewsTrack">
+
+        <div class="review-card">
+          <div class="review-stars">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">«Крем-спрей 20 в 1 — просто магія. Волосся після нього як шовк, і жодного обтяження. Клієнти одразу питають що це за засіб.»</p>
+          <div class="review-author">
+            <div class="review-avatar av1">О</div>
+            <div>
+              <div class="review-name">Олена К.</div>
+              <div class="review-role">Майстер-стиліст, Одеса</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card">
+          <div class="review-stars">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">«Термозахист — знахідка! Раніше після праски волосся сухіло, а зараз блиск і живе волосся. Купила ще подрузі.»</p>
+          <div class="review-author">
+            <div class="review-avatar av2">М</div>
+            <div>
+              <div class="review-name">Марина Д.</div>
+              <div class="review-role">Постійна клієнтка</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card">
+          <div class="review-stars">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">«Взяли як дистриб'ютор на Харків. Продукт продає себе сам — після першого тестера клієнти самі запитують де купити. Рекомендую.»</p>
+          <div class="review-author">
+            <div class="review-avatar av3">С</div>
+            <div>
+              <div class="review-name">Сергій Л.</div>
+              <div class="review-role">Дистриб'ютор, Харків</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card">
+          <div class="review-stars">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">«Ламелярна маска — найкращий бальзам що я пробувала. 15 секунд і волосся м'яке, без ваги. Використовую щодня.»</p>
+          <div class="review-author">
+            <div class="review-avatar av4">А</div>
+            <div>
+              <div class="review-name">Анастасія В.</div>
+              <div class="review-role">Майстер, Київ</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card">
+          <div class="review-stars">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">«Підключили салон до програми. Умови супер, тестери надали одразу. Клієнти задоволені — продажі пішли з першого місяця.»</p>
+          <div class="review-author">
+            <div class="review-avatar av5">Т</div>
+            <div>
+              <div class="review-name">Тетяна М.</div>
+              <div class="review-role">Власниця салону, Одеса</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="reviews-nav">
+      <button class="rev-btn" onclick="slideReviews(-1)" aria-label="Назад">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <button class="rev-btn" onclick="slideReviews(1)" aria-label="Вперед">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERS / B2B -->
+<section class="section partners-section" id="partners">
+  <div class="section-inner">
+    <div class="partners-grid">
+      <div class="partners-content reveal">
+        <div class="section-eyebrow">Партнерам</div>
+        <h2 class="section-title">Стати<br><em>дистриб'ютором</em></h2>
+        <p class="partners-lead">
+          Ми шукаємо партнерів по всій Україні — салони, майстрів і дистриб'юторів, які хочуть працювати з якісним продуктом Made in Italy.
+        </p>
+        <ul class="partners-benefits">
+          <li>
+            <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
+            Тестери для кожного продукту при першому замовленні
+          </li>
+          <li>
+            <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
+            Гнучка система цін: дистриб'ютор → салон → РРЦ
+          </li>
+          <li>
+            <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
+            Маркетингові матеріали та підтримка продажів
+          </li>
+          <li>
+            <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
+            Прямий зв'язок із командою бренду
+          </li>
+          <li>
+            <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
+            Виріб сертифікований, відповідає вимогам MOH України
+          </li>
+        </ul>
+      </div>
+
+      <!-- FORM -->
+      <div class="partner-form-wrap reveal reveal-delay-2" id="contact">
+        <div class="form-title">Залишити заявку</div>
+        <div class="form-subtitle">Напишіть нам — відповімо протягом доби</div>
+        <form onsubmit="submitForm(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ім'я</label>
+              <input class="form-input" type="text" placeholder="Ваше ім'я" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Телефон</label>
+              <input class="form-input" type="tel" placeholder="+380 __ ___ ____">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Місто</label>
+            <input class="form-input" type="text" placeholder="Ваше місто">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Тип співпраці</label>
+            <select class="form-select">
+              <option value="">Оберіть тип</option>
+              <option>Дистриб'ютор</option>
+              <option>Салон краси</option>
+              <option>Майстер</option>
+              <option>Інтернет-магазин</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Коментар</label>
+            <textarea class="form-textarea" placeholder="Розкажіть трохи про себе..."></textarea>
+          </div>
+          <button type="submit" class="form-submit">Надіслати заявку →</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTAGRAM -->
+<section class="section insta-section">
+  <div class="section-inner">
+    <div class="insta-header reveal">
+      <div>
+        <div class="section-eyebrow">Instagram</div>
+        <h2 class="section-title" style="margin-bottom:0;">Ми в<br><em>соціальних мережах</em></h2>
+      </div>
+      <a href="https://instagram.com/hair_love_company" target="_blank" class="insta-handle">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+        @hair_love_company
+      </a>
+    </div>
+
+    <div class="insta-grid reveal">
+      <!-- Placeholder tiles with brand colors -->
+      <div class="insta-item"><div class="insta-placeholder" style="background:linear-gradient(135deg,#E8F4F3,#C8E8E5)">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24" opacity="0.4"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#1B6B68" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="#1B6B68" stroke-width="1.5"/></svg>
+      </div></div>
+      <div class="insta-item"><div class="insta-placeholder" style="background:linear-gradient(135deg,#F5E0DC,#EDD4CF)">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24" opacity="0.4"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#C8888A" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="#C8888A" stroke-width="1.5"/></svg>
+      </div></div>
+      <div class="insta-item"><div class="insta-placeholder" style="background:linear-gradient(135deg,#EAF0E8,#D8E8D4)">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24" opacity="0.4"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#6BAF9A" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="#6BAF9A" stroke-width="1.5"/></svg>
+      </div></div>
+      <div class="insta-item"><div class="insta-placeholder" style="background:linear-gradient(135deg,#124845,#1B6B68)">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24" opacity="0.5"><rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.5"/></svg>
+      </div></div>
+      <div class="insta-item"><div class="insta-placeholder" style="background:linear-gradient(135deg,#F5E0DC,#C8888A)">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24" opacity="0.5"><rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.5"/></svg>
+      </div></div>
+      <div class="insta-item"><div class="insta-placeholder" style="background:linear-gradient(135deg,#C9A05A,#A07840)">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24" opacity="0.5"><rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.5"/></svg>
+      </div></div>
+    </div>
+
+    <div class="insta-cta reveal">
+      <a href="https://instagram.com/hair_love_company" target="_blank" class="btn-insta">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1" fill="white"/></svg>
+        Підписатися на Instagram
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">HairLove</div>
+        <p class="footer-brand-desc">Професійний догляд за волоссям, виготовлений в Італії. Для тих, хто закохує себе у своє волосся щодня.</p>
+        <div class="footer-made">
+          <svg width="14" height="14" viewBox="0 0 20 14" fill="none">
+            <rect width="20" height="14" rx="2" fill="#009246"/>
+            <rect x="6.67" width="6.67" height="14" fill="white"/>
+            <rect x="13.33" width="6.67" height="14" fill="#CE2B37"/>
+          </svg>
+          Made in Italy · Viterbo
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Продукти</div>
+        <a href="#products">20 in 1 Cream-Spray</a>
+        <a href="#products">Thermo Protector</a>
+        <a href="#products">Lamellar Filler-Mask</a>
+        <a href="#products">Silk (скоро)</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Компанія</div>
+        <a href="#why">Про бренд</a>
+        <a href="#partners">Партнерам</a>
+        <a href="#reviews">Відгуки</a>
+        <a href="#contact">Контакти</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Соцмережі</div>
+        <a href="https://instagram.com/hair_love_company" target="_blank">Instagram</a>
+        <a href="#contact">Telegram</a>
+        <a href="#contact">WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 HairLove. Всі права захищені.</div>
+      <div class="footer-copy">HAIR LOVE COMPANY · Viterbo, Italia</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Cursor
+const dot = document.getElementById('dot');
+const ring = document.getElementById('ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animCursor() {
+  if (dot) { dot.style.left = mx + 'px'; dot.style.top = my + 'px'; }
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  if (ring) { ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; }
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Mobile menu
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMobile() {
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+reveals.forEach(el => observer.observe(el));
+
+// Reviews slider
+let reviewIdx = 0;
+const track = document.getElementById('reviewsTrack');
+function slideReviews(dir) {
+  const cards = track.querySelectorAll('.review-card');
+  const cardW = cards[0].offsetWidth + 24;
+  const maxIdx = Math.max(0, cards.length - Math.floor(track.parentElement.offsetWidth / cardW));
+  reviewIdx = Math.max(0, Math.min(reviewIdx + dir, maxIdx));
+  track.style.transform = `translateX(-${reviewIdx * cardW}px)`;
+}
+
+// Form submit
+function submitForm(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.form-submit');
+  btn.textContent = '✓ Заявку надіслано!';
+  btn.style.background = '#2A9D96';
+  setTimeout(() => {
+    btn.textContent = 'Надіслати заявку →';
+    btn.style.background = '';
+    e.target.reset();
+  }, 3000);
+}
+
+// Parallax hero bg text
+const heroBgText = document.querySelector('.hero-bg-text');
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  if (heroBgText) heroBgText.style.transform = `translate(-50%, calc(-50% + ${y * 0.15}px))`;
+});
+</script>
+</body>
+</html>
