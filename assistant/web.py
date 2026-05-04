@@ -127,6 +127,8 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
 .agent-icon { font-size:22px; margin-bottom:5px; }
 .agent-name { font-size:11px; font-weight:600; color:var(--text); }
 .agent-cmd { font-size:9px; color:#6366f1; font-family:monospace; margin-top:3px; }
+.agent-focus { font-size:9px; color:var(--muted); margin-top:4px; line-height:1.3; font-style:italic; }
+.agent-updated { font-size:8px; color:var(--muted2); margin-top:3px; }
 .agent-badge { display:inline-block; margin-top:5px; padding:2px 6px; border-radius:8px; font-size:9px; font-weight:600; }
 .badge-active { background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.25); }
 .badge-building { background:rgba(245,158,11,0.12); color:#f59e0b; border:1px solid rgba(245,158,11,0.25); }
@@ -195,22 +197,22 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
 
   <!-- Агенты HairLove -->
   <div class="agent-node" style="left:5%;top:17%">
-    <div class="agent-card"><div class="agent-icon">✍️</div><div class="agent-name">Тексты бренда</div><div class="agent-cmd">/hairlove-texts</div><span class="agent-badge badge-active">● Активен</span></div>
+    <div class="agent-card"><div class="agent-icon">✍️</div><div class="agent-name">Тексты бренда</div><div class="agent-cmd">/hairlove-texts</div><div class="agent-focus">Голос бренда, Instagram, сайт, реклама</div><div class="agent-updated">обновлён 04.05.2026</div><span class="agent-badge badge-active">● Активен</span></div>
   </div>
   <div class="agent-node" style="left:5%;top:37%">
-    <div class="agent-card"><div class="agent-icon">📸</div><div class="agent-name">Instagram</div><div class="agent-cmd">/hairlove-insta</div><span class="agent-badge badge-active">● Активен</span></div>
+    <div class="agent-card"><div class="agent-icon">📸</div><div class="agent-name">Instagram</div><div class="agent-cmd">/hairlove-insta</div><div class="agent-focus">Публикация постов, превью, контент-план</div><div class="agent-updated">обновлён 04.05.2026</div><span class="agent-badge badge-active">● Активен</span></div>
   </div>
   <div class="agent-node" style="left:5%;top:57%">
-    <div class="agent-card"><div class="agent-icon">🎯</div><div class="agent-name">Стратегия</div><div class="agent-cmd">/hairlove-strategy</div><span class="agent-badge badge-building">◐ В работе</span></div>
+    <div class="agent-card"><div class="agent-icon">🎯</div><div class="agent-name">Стратегия</div><div class="agent-cmd">/hairlove-strategy</div><div class="agent-focus">Дорожная карта, сайт, конкуренты, B2B</div><div class="agent-updated">обновлён 04.05.2026</div><span class="agent-badge badge-building">◐ В работе</span></div>
   </div>
   <div class="agent-node" style="left:5%;top:77%">
-    <div class="agent-card"><div class="agent-icon">🔍</div><div class="agent-name">Конкуренты</div><div class="agent-cmd">/hairlove-competitors</div><span class="agent-badge badge-pending">○ Предстоит</span></div>
+    <div class="agent-card"><div class="agent-icon">🔍</div><div class="agent-name">Конкуренты</div><div class="agent-cmd">/hairlove-competitors</div><div class="agent-focus">Анализ рынка Украины — ждёт задачи</div><div class="agent-updated">обновлён 03.05.2026</div><span class="agent-badge badge-pending">○ Ждёт задачи</span></div>
   </div>
   <div class="agent-node" style="left:22%;top:83%">
-    <div class="agent-card"><div class="agent-icon">📣</div><div class="agent-name">Реклама</div><div class="agent-cmd">/hairlove-ads</div><span class="agent-badge badge-pending">○ Предстоит</span></div>
+    <div class="agent-card"><div class="agent-icon">📣</div><div class="agent-name">Реклама</div><div class="agent-cmd">/hairlove-ads</div><div class="agent-focus">Meta Ads / Google — этап 2 после сайта</div><div class="agent-updated">обновлён 03.05.2026</div><span class="agent-badge badge-pending">○ Этап 2</span></div>
   </div>
   <div class="agent-node" style="left:22%;top:17%">
-    <div class="agent-card"><div class="agent-icon">🌐</div><div class="agent-name">Сайт</div><div class="agent-cmd">/hairlove-site</div><span class="agent-badge badge-pending">○ Предстоит</span></div>
+    <div class="agent-card"><div class="agent-icon">🌐</div><div class="agent-name">Сайт</div><div class="agent-cmd">/hairlove-site</div><div class="agent-focus">B2B витрина — в планах, следующий приоритет</div><div class="agent-updated">обновлён 03.05.2026</div><span class="agent-badge badge-pending">○ Следующий</span></div>
   </div>
 
   <div class="bottom-bar">
