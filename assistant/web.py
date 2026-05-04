@@ -376,12 +376,12 @@ const AGENTS = {
     icon:'🎯', name:'Стратегия', cmd:'/hairlove-strategy',
     updated:'04.05.2026',
     done:[
-      {t:'Анализ конкурентов: deeply, jNOWA, SEKTA, K18, Olaplex', d:'01.05.2026'},
-      {t:'Таблица цен: 9 SKU, 4 уровня (дистр/салон/РРЦ мастер/РРЦ интернет)', d:'01.05.2026'},
-      {t:'Структура сайта: 5 страниц, B2B витрина', d:'02.05.2026'},
-      {t:'Instagram: 6 рубрик с частотой и форматами', d:'02.05.2026'},
-      {t:'Дорожная карта: 3 этапа, роли Павел/Максим', d:'03.05.2026'},
-      {t:'Продажи: крем-спрей ~3500-4000 шт., термозащита 2-я партия', d:'04.05.2026'},
+      {t:'Анализ конкурентов: deeply, jNOWA, SEKTA, K18, Olaplex', d:'01.05.2026 11:30'},
+      {t:'Таблица цен: 9 SKU, 4 уровня (дистр/салон/РРЦ мастер/РРЦ интернет)', d:'01.05.2026 14:15'},
+      {t:'Структура сайта: 5 страниц, B2B витрина', d:'02.05.2026 10:00'},
+      {t:'Instagram: 6 рубрик с частотой и форматами', d:'02.05.2026 16:40'},
+      {t:'Дорожная карта: 3 этапа, роли Павел/Максим', d:'03.05.2026 12:20'},
+      {t:'Продажи: крем-спрей ~3500-4000 шт., термозащита 2-я партия', d:'04.05.2026 09:50'},
     ],
     progress:['Сайт — следующий приоритет, Tilda vs Shopify','Прямой B2B Одесса — стартует Максим'],
     next:['Решить: Tilda или Shopify','Данные по продажам Ламелярной маски','Список активных дистрибуторов для ABC-анализа'],
@@ -390,10 +390,10 @@ const AGENTS = {
     icon:'✍️', name:'Тексты бренда', cmd:'/hairlove-texts',
     updated:'04.05.2026',
     done:[
-      {t:'База знаний: составы, pH, объёмы всех 4 продуктов', d:'02.05.2026'},
-      {t:'Голос бренда: живой, тёплый, экспертный', d:'02.05.2026'},
-      {t:'Список запрещённых слов и шаблонов', d:'02.05.2026'},
-      {t:'Форматы: Instagram, сайт, реклама, email', d:'03.05.2026'},
+      {t:'База знаний: составы, pH, объёмы всех 4 продуктов', d:'02.05.2026 11:00'},
+      {t:'Голос бренда: живой, тёплый, экспертный', d:'02.05.2026 11:45'},
+      {t:'Список запрещённых слов и шаблонов', d:'02.05.2026 13:10'},
+      {t:'Форматы: Instagram, сайт, реклама, email', d:'03.05.2026 15:30'},
     ],
     progress:['Первые посты для Instagram — в очереди'],
     next:['Пост: представление термозащиты (2-я партия)','Карточки продуктов для сайта (4 шт.)','Текст раздела "О бренде": Made in Italy, история'],
@@ -402,10 +402,10 @@ const AGENTS = {
     icon:'🔍', name:'Конкуренты', cmd:'/hairlove-competitors',
     updated:'04.05.2026',
     done:[
-      {t:'deeply.com.ua: минимализм, простые составы', d:'01.05.2026'},
-      {t:'jnowaprofessional.ua: B2B, обучение', d:'01.05.2026'},
-      {t:'hairsekta.com: Pro-программа (идея HairLove Pro)', d:'01.05.2026'},
-      {t:'K18hair.com и Olaplex.com — международные ориентиры', d:'01.05.2026'},
+      {t:'deeply.com.ua: минимализм, простые составы', d:'01.05.2026 12:00'},
+      {t:'jnowaprofessional.ua: B2B, обучение', d:'01.05.2026 12:30'},
+      {t:'hairsekta.com: Pro-программа (идея HairLove Pro)', d:'01.05.2026 13:00'},
+      {t:'K18hair.com и Olaplex.com — международные ориентиры', d:'01.05.2026 13:40'},
     ],
     progress:[],
     next:['Ценовые стратегии конкурентов (акции, скидки)','Мониторинг Instagram — что работает у них','Новые игроки на рынке Украины'],
@@ -414,10 +414,10 @@ const AGENTS = {
     icon:'📸', name:'Instagram', cmd:'/hairlove-insta',
     updated:'04.05.2026',
     done:[
-      {t:'Токен настроен, публикация работает', d:'25.04.2026'},
-      {t:'Workflow ig-publish.yml через GitHub Actions', d:'25.04.2026'},
-      {t:'Превью-страница перед постингом', d:'28.04.2026'},
-      {t:'Последний пост: ID 17926264809292098', d:'04.05.2026'},
+      {t:'Токен настроен, публикация работает', d:'25.04.2026 18:00'},
+      {t:'Workflow ig-publish.yml через GitHub Actions', d:'25.04.2026 19:30'},
+      {t:'Превью-страница перед постингом', d:'28.04.2026 14:20'},
+      {t:'Последний пост: ID 17926264809292098', d:'04.05.2026 11:15'},
     ],
     progress:['Контент-план есть, посты не запущены','Токен обновлять каждые ~60 дней'],
     next:['Пост: термозащита (2-я партия — повод)','Пост: Made in Italy — что это значит','Reels: применение крем-спрея'],
@@ -426,9 +426,9 @@ const AGENTS = {
     icon:'🌐', name:'Сайт', cmd:'/hairlove-site',
     updated:'04.05.2026',
     done:[
-      {t:'Структура: 5 страниц в стратегии', d:'02.05.2026'},
-      {t:'Дизайн-требования: цвет, шрифт, mobile-first', d:'02.05.2026'},
-      {t:'Tilda (витрина) vs Shopify (магазин) — сравнение', d:'03.05.2026'},
+      {t:'Структура: 5 страниц в стратегии', d:'02.05.2026 10:30'},
+      {t:'Дизайн-требования: цвет, шрифт, mobile-first', d:'02.05.2026 11:20'},
+      {t:'Tilda (витрина) vs Shopify (магазин) — сравнение', d:'03.05.2026 16:00'},
     ],
     progress:['Решение о платформе ждёт Павла'],
     next:['Выбрать: Tilda или Shopify','Главная: Hero + 4 продукта + УТП + CTA','B2B страница: условия + прайс + форма'],
@@ -501,8 +501,9 @@ function renderDoneItems(cid, items) {
   if(!items||items.length===0){ el.innerHTML='<div class="panel-empty">Пусто</div>'; return; }
   el.innerHTML = items.map(item => {
     const text = typeof item === 'string' ? item : item.t;
-    const date = typeof item === 'object' && item.d ? `<span style="font-size:9px;color:var(--muted2);margin-left:4px;white-space:nowrap">${item.d}</span>` : '';
-    return `<div class="panel-item"><span class="item-bullet">✓</span><span style="flex:1">${text}</span>${date}</div>`;
+    const dt = typeof item === 'object' && item.d ? item.d : '';
+    const dateHtml = dt ? `<div style="font-size:9px;color:var(--muted2);margin-top:3px;display:flex;align-items:center;gap:4px"><span style="opacity:0.5">🕐</span>${dt}</div>` : '';
+    return `<div class="panel-item" style="flex-direction:column;align-items:flex-start;gap:0"><div style="display:flex;align-items:flex-start;gap:8px"><span class="item-bullet">✓</span><span>${text}</span></div>${dateHtml}</div>`;
   }).join('');
 }
 function closePanel() {
