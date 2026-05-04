@@ -933,6 +933,59 @@ footer {
   body { cursor: auto; }
   .cursor, .cursor-ring { display: none; }
 }
+
+/* ─── CONSTELLATION JADE RASTER — pearlescent shimmer ─────────────── */
+@keyframes pearlShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes shimmerSlide {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.pearl-section {
+  position: relative;
+}
+.pearl-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(110deg,
+    transparent 0%, rgba(201,236,230,0.18) 25%,
+    rgba(240,252,248,0.28) 50%,
+    rgba(201,236,230,0.18) 75%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmerSlide 6s ease-in-out infinite;
+  pointer-events: none; z-index: 0;
+}
+.pearl-section > * { position: relative; z-index: 1; }
+
+/* ─── LANGUAGE SWITCHER ─────────────────────────────────────────────── */
+.lang-switch {
+  display: flex; align-items: center; gap: 4px;
+  margin-left: 16px;
+}
+.lang-btn {
+  font-family: var(--ff-sans);
+  font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: none; border: none; cursor: pointer;
+  color: rgba(255,255,255,0.55);
+  padding: 4px 2px;
+  transition: color 0.2s;
+}
+.lang-btn:hover { color: rgba(255,255,255,0.9); }
+.lang-btn.active { color: var(--white); }
+nav.scrolled .lang-btn { color: rgba(26,26,26,0.4); }
+nav.scrolled .lang-btn:hover { color: var(--teal); }
+nav.scrolled .lang-btn.active { color: var(--teal-dark); }
+.lang-sep { color: rgba(255,255,255,0.25); font-size: 0.6rem; }
+nav.scrolled .lang-sep { color: rgba(26,26,26,0.2); }
+@media (max-width: 768px) {
+  .lang-switch { margin-left: 8px; }
+  .lang-btn { font-size: 0.65rem; }
+}
 </style>
 </head>
 <body>
@@ -943,25 +996,34 @@ footer {
 
 <!-- Mobile menu -->
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#products" onclick="closeMobile()">Продукти</a>
-  <a href="#why" onclick="closeMobile()">Про бренд</a>
-  <a href="#reviews" onclick="closeMobile()">Відгуки</a>
-  <a href="#partners" onclick="closeMobile()">Партнерам</a>
-  <a href="#contact" onclick="closeMobile()">Контакти</a>
+  <a href="#products" onclick="closeMobile()" data-i18n="nav_products">Продукти</a>
+  <a href="#why" onclick="closeMobile()" data-i18n="nav_about">Про бренд</a>
+  <a href="#reviews" onclick="closeMobile()" data-i18n="nav_reviews">Відгуки</a>
+  <a href="#partners" onclick="closeMobile()" data-i18n="nav_partners">Партнерам</a>
+  <a href="#contact" onclick="closeMobile()" data-i18n="mob_contact">Контакти</a>
 </div>
 
 <!-- NAV -->
 <nav id="nav">
   <a href="#" class="nav-logo">HairLove</a>
   <ul class="nav-links">
-    <li><a href="#products">Продукти</a></li>
-    <li><a href="#why">Про бренд</a></li>
-    <li><a href="#reviews">Відгуки</a></li>
-    <li><a href="#partners">Партнерам</a></li>
-    <li><a href="#contact" class="nav-cta">Стати партнером</a></li>
+    <li><a href="#products" data-i18n="nav_products">Продукти</a></li>
+    <li><a href="#why" data-i18n="nav_about">Про бренд</a></li>
+    <li><a href="#reviews" data-i18n="nav_reviews">Відгуки</a></li>
+    <li><a href="#partners" data-i18n="nav_partners">Партнерам</a></li>
+    <li><a href="#contact" class="nav-cta" data-i18n="nav_cta">Стати партнером</a></li>
   </ul>
-  <div class="nav-burger" id="burger" onclick="toggleMobile()">
-    <span></span><span></span><span></span>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="lang-switch">
+      <button class="lang-btn" onclick="setLang('uk')" data-lang="uk">UA</button>
+      <span class="lang-sep">·</span>
+      <button class="lang-btn" onclick="setLang('ru')" data-lang="ru">RU</button>
+      <span class="lang-sep">·</span>
+      <button class="lang-btn" onclick="setLang('en')" data-lang="en">EN</button>
+    </div>
+    <div class="nav-burger" id="burger" onclick="toggleMobile()">
+      <span></span><span></span><span></span>
+    </div>
   </div>
 </nav>
 
@@ -973,13 +1035,13 @@ footer {
 
   <div class="hero-content">
     <div class="hero-left">
-      <div class="hero-eyebrow">Зроблено в Італії</div>
-      <h1 class="hero-title">
+      <div class="hero-eyebrow" data-i18n="hero_eyebrow">Зроблено в Італії</div>
+      <h1 class="hero-title" data-i18n-html="hero_title">
         Волосся,<br>
         що <em>закохує</em><br>
         <span class="line-accent">в себе знову</span>
       </h1>
-      <p class="hero-desc">
+      <p class="hero-desc" data-i18n="hero_desc">
         Професійний догляд італійської якості — тепер доступний кожній.
         Три продукти, що перетворюють рутину на ритуал.
       </p>
@@ -1068,7 +1130,7 @@ footer {
 
       <div class="hero-stat">
         <div class="hero-stat-num">4000+</div>
-        <div class="hero-stat-label">флаконів продано</div>
+        <div class="hero-stat-label" data-i18n="hero_stat_label">флаконів продано</div>
       </div>
     </div>
   </div>
@@ -1085,11 +1147,11 @@ footer {
     <!-- repeated for seamless loop -->
     <div class="strip-item"><span class="strip-dot"></span> Made in Italy</div>
     <div class="strip-item"><span class="strip-dot"></span> pH 4.5–5.0</div>
-    <div class="strip-item"><span class="strip-dot"></span> Без обтяження</div>
-    <div class="strip-item"><span class="strip-dot"></span> Кератин і шовк</div>
-    <div class="strip-item"><span class="strip-dot"></span> Захист до 220°C</div>
+    <div class="strip-item"><span class="strip-dot"></span> <span data-i18n="strip_weightless">Без обтяження</span></div>
+    <div class="strip-item"><span class="strip-dot"></span> <span data-i18n="strip_keratin">Кератин і шовк</span></div>
+    <div class="strip-item"><span class="strip-dot"></span> <span data-i18n="strip_thermo">Захист до 220°C</span></div>
     <div class="strip-item"><span class="strip-dot"></span> Viterbo, Italia</div>
-    <div class="strip-item"><span class="strip-dot"></span> Професійний рівень</div>
+    <div class="strip-item"><span class="strip-dot"></span> <span data-i18n="strip_pro">Професійний рівень</span></div>
     <div class="strip-item"><span class="strip-dot"></span> HairLove Company</div>
     <div class="strip-item"><span class="strip-dot"></span> Made in Italy</div>
     <div class="strip-item"><span class="strip-dot"></span> pH 4.5–5.0</div>
@@ -1107,10 +1169,10 @@ footer {
   <div class="section-inner">
     <div class="products-header reveal">
       <div>
-        <div class="section-eyebrow">Лінійка</div>
-        <h2 class="section-title">Три продукти —<br><em>повний цикл догляду</em></h2>
+        <div class="section-eyebrow" data-i18n="products_eyebrow">Лінійка</div>
+        <h2 class="section-title" data-i18n-html="products_title">Три продукти —<br><em>повний цикл догляду</em></h2>
       </div>
-      <p style="max-width:320px;font-size:0.88rem;font-weight:300;line-height:1.7;color:var(--ink-soft);">
+      <p style="max-width:320px;font-size:0.88rem;font-weight:300;line-height:1.7;color:var(--ink-soft);" data-i18n="products_subtitle">
         Кожен продукт вирішує конкретну задачу. Разом — повноцінний догляд від миття до укладки.
       </p>
     </div>
@@ -1143,7 +1205,7 @@ footer {
         <div class="product-card-body">
           <div class="product-vol">200 мл / 50 мл</div>
           <div class="product-name">20 in 1<br>Cream-Spray</div>
-          <p class="product-desc">Живить, зволожує, прибирає пухнастість, надає слухняність. Не обтяжує, не жирнить. Наноси на вологе волосся — і все.</p>
+          <p class="product-desc" data-i18n="c1_desc">Живить, зволожує, прибирає пухнастість, надає слухняність. Не обтяжує, не жирнить. Наноси на вологе волосся — і все.</p>
           <div class="product-tags">
             <span class="tag">Кератин</span>
             <span class="tag">Аргана</span>
@@ -1153,7 +1215,7 @@ footer {
         </div>
         <div class="product-card-footer">
           <div class="product-price">490 ₴ <span>/ 200 мл</span></div>
-          <a href="#partners" class="btn-card">Замовити →</a>
+          <a href="#partners" class="btn-card" data-i18n="c_btn">Замовити →</a>
         </div>
       </div>
 
@@ -1183,7 +1245,7 @@ footer {
         <div class="product-card-body">
           <div class="product-vol">200 мл / 50 мл</div>
           <div class="product-name">Thermo<br>Protector Spray</div>
-          <p class="product-desc">Захист до 220°C, від сонця і морозу. Розгладжує, додає блиск, не склеює. Наноси до або після укладки.</p>
+          <p class="product-desc" data-i18n="c2_desc">Захист до 220°C, від сонця і морозу. Розгладжує, додає блиск, не склеює. Наноси до або після укладки.</p>
           <div class="product-tags">
             <span class="tag">Захист 220°C</span>
             <span class="tag">Кератин</span>
@@ -1193,7 +1255,7 @@ footer {
         </div>
         <div class="product-card-footer">
           <div class="product-price">520 ₴ <span>/ 200 мл</span></div>
-          <a href="#partners" class="btn-card">Замовити →</a>
+          <a href="#partners" class="btn-card" data-i18n="c_btn">Замовити →</a>
         </div>
       </div>
 
@@ -1222,7 +1284,7 @@ footer {
         <div class="product-card-body">
           <div class="product-vol">200 мл / 50 мл</div>
           <div class="product-name">Liquid Lamellar<br>Filler-Mask</div>
-          <p class="product-desc">Два режими: 15–30 сек — щоденний бальзам, до 30 хв — інтенсивна маска-філлер. Відновлює, зволожує, надає блиск.</p>
+          <p class="product-desc" data-i18n="c3_desc">Два режими: 15–30 сек — щоденний бальзам, до 30 хв — інтенсивна маска-філлер. Відновлює, зволожує, надає блиск.</p>
           <div class="product-tags">
             <span class="tag">Колаген</span>
             <span class="tag">Алое вера</span>
@@ -1232,7 +1294,7 @@ footer {
         </div>
         <div class="product-card-footer">
           <div class="product-price">630 ₴ <span>/ 200 мл</span></div>
-          <a href="#partners" class="btn-card">Замовити →</a>
+          <a href="#partners" class="btn-card" data-i18n="c_btn">Замовити →</a>
         </div>
       </div>
 
@@ -1241,13 +1303,13 @@ footer {
 </section>
 
 <!-- WHY HAIRLOVE -->
-<section class="section why-section" id="why">
+<section class="section why-section pearl-section" id="why">
   <div class="section-inner">
     <div class="why-grid">
       <div class="why-visual reveal">
         <div class="why-visual-inner">
           <div class="why-visual-num">4</div>
-          <div class="why-visual-label">Роки у красі</div>
+          <div class="why-visual-label" data-i18n="why_visual_label">Роки у красі</div>
           <div class="why-visual-sub">Viterbo, Italia · 2021</div>
         </div>
         <div class="why-corner-badge">
@@ -1257,16 +1319,16 @@ footer {
       </div>
 
       <div>
-        <div class="section-eyebrow reveal">Чому HairLove</div>
-        <h2 class="section-title reveal">Якість,<br><em>що відчувається</em></h2>
+        <div class="section-eyebrow reveal" data-i18n="why_eyebrow">Чому HairLove</div>
+        <h2 class="section-title reveal" data-i18n-html="why_title">Якість,<br><em>що відчувається</em></h2>
         <ul class="why-list">
           <li class="why-item reveal reveal-delay-1">
             <div class="why-icon">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
             </div>
             <div>
-              <div class="why-item-title">Виготовлено в Італії</div>
-              <div class="why-item-desc">Виробництво HAIR LOVE COMPANY, Viterbo. Строгий контроль якості, перевірені рецептури, сертифіковані компоненти.</div>
+              <div class="why-item-title" data-i18n="why1_title">Виготовлено в Італії</div>
+              <div class="why-item-desc" data-i18n="why1_desc">Виробництво HAIR LOVE COMPANY, Viterbo. Строгий контроль якості, перевірені рецептури, сертифіковані компоненти.</div>
             </div>
           </li>
           <li class="why-item reveal reveal-delay-2">
@@ -1274,8 +1336,8 @@ footer {
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
             </div>
             <div>
-              <div class="why-item-title">Склад без компромісів</div>
-              <div class="why-item-desc">Кератин, шовк, аргана, колаген — активні інгредієнти, що реально працюють. pH 4.5–5.0 зберігає структуру волосся.</div>
+              <div class="why-item-title" data-i18n="why2_title">Склад без компромісів</div>
+              <div class="why-item-desc" data-i18n="why2_desc">Кератин, шовк, аргана, колаген — активні інгредієнти, що реально працюють. pH 4.5–5.0 зберігає структуру волосся.</div>
             </div>
           </li>
           <li class="why-item reveal reveal-delay-3">
@@ -1283,8 +1345,8 @@ footer {
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
             <div>
-              <div class="why-item-title">Результат з першого разу</div>
-              <div class="why-item-desc">Видимий ефект вже після першого застосування. Понад 4000 флаконів продано — і кожен клієнт повертається.</div>
+              <div class="why-item-title" data-i18n="why3_title">Результат з першого разу</div>
+              <div class="why-item-desc" data-i18n="why3_desc">Видимий ефект вже після першого застосування. Понад 4000 флаконів продано — і кожен клієнт повертається.</div>
             </div>
           </li>
           <li class="why-item reveal reveal-delay-4">
@@ -1292,8 +1354,17 @@ footer {
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg>
             </div>
             <div>
-              <div class="why-item-title">Підтримка для партнерів</div>
-              <div class="why-item-desc">Тестери, маркетингові матеріали, гнучкі умови для салонів і дистриб'юторів. Ростемо разом.</div>
+              <div class="why-item-title" data-i18n="why4_title">Підтримка для партнерів</div>
+              <div class="why-item-desc" data-i18n="why4_desc">Тестери, маркетингові матеріали, гнучкі умови для салонів і дистриб'юторів. Ростемо разом.</div>
+            </div>
+          </li>
+          <li class="why-item reveal reveal-delay-4">
+            <div class="why-icon">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M20 7H4a1 1 0 00-1 1v10a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16" stroke="currentColor" stroke-width="1.5"/><line x1="10" y1="14" x2="14" y2="14" stroke="currentColor" stroke-width="1.5"/></svg>
+            </div>
+            <div>
+              <div class="why-item-title" data-i18n="why5_title">Преміальне пакування</div>
+              <div class="why-item-desc" data-i18n="why5_desc">Етикетки надруковані на Constellation Jade Raster — перламутровому FSC™-сертифікованому папері з ніжним нефритовим відблиском.</div>
             </div>
           </li>
         </ul>
@@ -1307,8 +1378,8 @@ footer {
   <div class="section-inner">
     <div class="reviews-header reveal">
       <div>
-        <div class="section-eyebrow">Відгуки</div>
-        <h2 class="section-title">Що кажуть<br><em>клієнти та майстри</em></h2>
+        <div class="section-eyebrow" data-i18n="reviews_eyebrow">Відгуки</div>
+        <h2 class="section-title" data-i18n-html="reviews_title">Що кажуть<br><em>клієнти та майстри</em></h2>
       </div>
     </div>
 
@@ -1424,56 +1495,56 @@ footer {
   <div class="section-inner">
     <div class="partners-grid">
       <div class="partners-content reveal">
-        <div class="section-eyebrow">Партнерам</div>
-        <h2 class="section-title">Стати<br><em>дистриб'ютором</em></h2>
-        <p class="partners-lead">
+        <div class="section-eyebrow" data-i18n="partners_eyebrow">Партнерам</div>
+        <h2 class="section-title" data-i18n-html="partners_title">Стати<br><em>дистриб'ютором</em></h2>
+        <p class="partners-lead" data-i18n="partners_lead">
           Ми шукаємо партнерів по всій Україні — салони, майстрів і дистриб'юторів, які хочуть працювати з якісним продуктом Made in Italy.
         </p>
         <ul class="partners-benefits">
           <li>
             <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
-            Тестери для кожного продукту при першому замовленні
+            <span data-i18n="pb1">Тестери для кожного продукту при першому замовленні</span>
           </li>
           <li>
             <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
-            Гнучка система цін: дистриб'ютор → салон → РРЦ
+            <span data-i18n="pb2">Гнучка система цін: дистриб'ютор → салон → РРЦ</span>
           </li>
           <li>
             <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
-            Маркетингові матеріали та підтримка продажів
+            <span data-i18n="pb3">Маркетингові матеріали та підтримка продажів</span>
           </li>
           <li>
             <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
-            Прямий зв'язок із командою бренду
+            <span data-i18n="pb4">Прямий зв'язок із командою бренду</span>
           </li>
           <li>
             <span class="benefit-check"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
-            Виріб сертифікований, відповідає вимогам MOH України
+            <span data-i18n="pb5">Виріб сертифікований, відповідає вимогам MOH України</span>
           </li>
         </ul>
       </div>
 
       <!-- FORM -->
       <div class="partner-form-wrap reveal reveal-delay-2" id="contact">
-        <div class="form-title">Залишити заявку</div>
-        <div class="form-subtitle">Напишіть нам — відповімо протягом доби</div>
+        <div class="form-title" data-i18n="form_title">Залишити заявку</div>
+        <div class="form-subtitle" data-i18n="form_subtitle">Напишіть нам — відповімо протягом доби</div>
         <form onsubmit="submitForm(event)">
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Ім'я</label>
-              <input class="form-input" type="text" placeholder="Ваше ім'я" required>
+              <label class="form-label" data-i18n="form_name_label">Ім'я</label>
+              <input class="form-input" type="text" placeholder="Ваше ім'я" data-i18n-ph="form_name_ph" required>
             </div>
             <div class="form-group">
-              <label class="form-label">Телефон</label>
+              <label class="form-label" data-i18n="form_phone_label">Телефон</label>
               <input class="form-input" type="tel" placeholder="+380 __ ___ ____">
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Місто</label>
-            <input class="form-input" type="text" placeholder="Ваше місто">
+            <label class="form-label" data-i18n="form_city_label">Місто</label>
+            <input class="form-input" type="text" placeholder="Ваше місто" data-i18n-ph="form_city_ph">
           </div>
           <div class="form-group">
-            <label class="form-label">Тип співпраці</label>
+            <label class="form-label" data-i18n="form_type_label">Тип співпраці</label>
             <select class="form-select">
               <option value="">Оберіть тип</option>
               <option>Дистриб'ютор</option>
@@ -1483,10 +1554,10 @@ footer {
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Коментар</label>
-            <textarea class="form-textarea" placeholder="Розкажіть трохи про себе..."></textarea>
+            <label class="form-label" data-i18n="form_comment_label">Коментар</label>
+            <textarea class="form-textarea" placeholder="Розкажіть трохи про себе..." data-i18n-ph="form_comment_ph"></textarea>
           </div>
-          <button type="submit" class="form-submit">Надіслати заявку →</button>
+          <button type="submit" class="form-submit" data-i18n="form_submit">Надіслати заявку →</button>
         </form>
       </div>
     </div>
@@ -1494,12 +1565,12 @@ footer {
 </section>
 
 <!-- INSTAGRAM -->
-<section class="section insta-section">
+<section class="section insta-section pearl-section">
   <div class="section-inner">
     <div class="insta-header reveal">
       <div>
         <div class="section-eyebrow">Instagram</div>
-        <h2 class="section-title" style="margin-bottom:0;">Ми в<br><em>соціальних мережах</em></h2>
+        <h2 class="section-title" style="margin-bottom:0;" data-i18n-html="insta_title">Ми в<br><em>соціальних мережах</em></h2>
       </div>
       <a href="https://instagram.com/hair_love_company" target="_blank" class="insta-handle">
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
@@ -1532,7 +1603,7 @@ footer {
     <div class="insta-cta reveal">
       <a href="https://instagram.com/hair_love_company" target="_blank" class="btn-insta">
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1" fill="white"/></svg>
-        Підписатися на Instagram
+        <span data-i18n="insta_btn">Підписатися на Instagram</span>
       </a>
     </div>
   </div>
@@ -1544,7 +1615,7 @@ footer {
     <div class="footer-top">
       <div>
         <div class="footer-brand-name">HairLove</div>
-        <p class="footer-brand-desc">Професійний догляд за волоссям, виготовлений в Італії. Для тих, хто закохує себе у своє волосся щодня.</p>
+        <p class="footer-brand-desc" data-i18n="footer_brand_desc">Професійний догляд за волоссям, виготовлений в Італії. Для тих, хто закохує себе у своє волосся щодня.</p>
         <div class="footer-made">
           <svg width="14" height="14" viewBox="0 0 20 14" fill="none">
             <rect width="20" height="14" rx="2" fill="#009246"/>
@@ -1576,7 +1647,7 @@ footer {
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="footer-copy">© 2025 HairLove. Всі права захищені.</div>
+      <div class="footer-copy" data-i18n="footer_copy">© 2025 HairLove. Всі права захищені.</div>
       <div class="footer-copy">HAIR LOVE COMPANY · Viterbo, Italia</div>
     </div>
   </div>
@@ -1632,7 +1703,7 @@ function slideReviews(dir) {
 function submitForm(e) {
   e.preventDefault();
   const btn = e.target.querySelector('.form-submit');
-  btn.textContent = '✓ Заявку надіслано!';
+  btn.textContent = window._formSuccessText || '✓ Заявку надіслано!';
   btn.style.background = '#2A9D96';
   setTimeout(() => {
     btn.textContent = 'Надіслати заявку →';
@@ -1647,6 +1718,184 @@ window.addEventListener('scroll', () => {
   const y = window.scrollY;
   if (heroBgText) heroBgText.style.transform = `translate(-50%, calc(-50% + ${y * 0.15}px))`;
 });
+
+// ─── TRANSLATIONS ───────────────────────────────────────────────────
+const T = {
+  uk: {
+    nav_products:'Продукти', nav_about:'Про бренд', nav_reviews:'Відгуки',
+    nav_partners:'Партнерам', nav_cta:'Стати партнером', mob_contact:'Контакти',
+    hero_eyebrow:'Зроблено в Італії',
+    hero_title:`Волосся,<br>що <em>закохує</em><br><span class="line-accent">в себе знову</span>`,
+    hero_desc:'Професійний догляд італійської якості — тепер доступний кожній. Три продукти, що перетворюють рутину на ритуал.',
+    hero_stat_label:'флаконів продано',
+    strip_weightless:'Без обтяження', strip_keratin:'Кератин і шовк',
+    strip_thermo:'Захист до 220°C', strip_pro:'Професійний рівень',
+    products_eyebrow:'Лінійка',
+    products_title:'Три продукти —<br><em>повний цикл догляду</em>',
+    products_subtitle:'Кожен продукт вирішує конкретну задачу. Разом — повноцінний догляд від миття до укладки.',
+    c1_desc:'Живить, зволожує, прибирає пухнастість, надає слухняність. Не обтяжує, не жирнить. Наноси на вологе волосся — і все.',
+    c2_desc:'Захист до 220°C, від сонця і морозу. Розгладжує, додає блиск, не склеює. Наноси до або після укладки.',
+    c3_desc:'Два режими: 15–30 сек — щоденний бальзам, до 30 хв — інтенсивна маска-філлер. Відновлює, зволожує, надає блиск.',
+    c_btn:'Замовити →',
+    why_eyebrow:'Чому HairLove',
+    why_title:'Якість,<br><em>що відчувається</em>',
+    why_visual_label:'Роки у красі',
+    why1_title:'Виготовлено в Італії', why1_desc:'Виробництво HAIR LOVE COMPANY, Viterbo. Строгий контроль якості, перевірені рецептури, сертифіковані компоненти.',
+    why2_title:'Склад без компромісів', why2_desc:'Кератин, шовк, аргана, колаген — активні інгредієнти, що реально працюють. pH 4.5–5.0 зберігає структуру волосся.',
+    why3_title:'Результат з першого разу', why3_desc:'Видимий ефект вже після першого застосування. Понад 4000 флаконів продано — і кожен клієнт повертається.',
+    why4_title:'Підтримка для партнерів', why4_desc:"Тестери, маркетингові матеріали, гнучкі умови для салонів і дистриб'юторів. Ростемо разом.",
+    why5_title:'Преміальне пакування', why5_desc:'Етикетки надруковані на Constellation Jade Raster — перламутровому FSC™-сертифікованому папері з ніжним нефритовим відблиском.',
+    reviews_eyebrow:'Відгуки',
+    reviews_title:'Що кажуть<br><em>клієнти та майстри</em>',
+    partners_eyebrow:'Партнерам',
+    partners_title:"Стати<br><em>дистриб'ютором</em>",
+    partners_lead:"Ми шукаємо партнерів по всій Україні — салони, майстрів і дистриб'юторів, які хочуть працювати з якісним продуктом Made in Italy.",
+    pb1:'Тестери для кожного продукту при першому замовленні',
+    pb2:"Гнучка система цін: дистриб'ютор → салон → РРЦ",
+    pb3:'Маркетингові матеріали та підтримка продажів',
+    pb4:"Прямий зв'язок із командою бренду",
+    pb5:'Виріб сертифікований, відповідає вимогам MOH України',
+    form_title:'Залишити заявку', form_subtitle:'Напишіть нам — відповімо протягом доби',
+    form_name_label:"Ім'я", form_name_ph:"Ваше ім'я",
+    form_phone_label:'Телефон',
+    form_city_label:'Місто', form_city_ph:'Ваше місто',
+    form_type_label:'Тип співпраці',
+    form_comment_label:'Коментар', form_comment_ph:'Розкажіть трохи про себе...',
+    form_submit:'Надіслати заявку →', form_success:'✓ Заявку надіслано!',
+    insta_title:'Ми в<br><em>соціальних мережах</em>',
+    insta_btn:'Підписатися на Instagram',
+    footer_brand_desc:'Професійний догляд за волоссям, виготовлений в Італії. Для тих, хто закохує себе у своє волосся щодня.',
+    footer_copy:'© 2025 HairLove. Всі права захищені.'
+  },
+  ru: {
+    nav_products:'Продукты', nav_about:'О бренде', nav_reviews:'Отзывы',
+    nav_partners:'Партнёрам', nav_cta:'Стать партнёром', mob_contact:'Контакты',
+    hero_eyebrow:'Сделано в Италии',
+    hero_title:`Волосы,<br>которые <em>влюбляют</em><br><span class="line-accent">в себя снова</span>`,
+    hero_desc:'Профессиональный уход итальянского качества — теперь доступен каждой. Три продукта, превращающих рутину в ритуал.',
+    hero_stat_label:'флаконов продано',
+    strip_weightless:'Без утяжеления', strip_keratin:'Кератин и шёлк',
+    strip_thermo:'Защита до 220°C', strip_pro:'Профессиональный уровень',
+    products_eyebrow:'Линейка',
+    products_title:'Три продукта —<br><em>полный цикл ухода</em>',
+    products_subtitle:'Каждый продукт решает конкретную задачу. Вместе — полноценный уход от мытья до укладки.',
+    c1_desc:'Питает, увлажняет, убирает пушистость, добавляет послушность. Не утяжеляет, не жирнит. Нанеси на влажные волосы — и всё.',
+    c2_desc:'Защита до 220°C, от солнца и мороза. Разглаживает, добавляет блеск, не склеивает. Нанеси до или после укладки.',
+    c3_desc:'Два режима: 15–30 сек — ежедневный бальзам, до 30 мин — интенсивная маска-филлер. Восстанавливает, увлажняет, придаёт блеск.',
+    c_btn:'Заказать →',
+    why_eyebrow:'Почему HairLove',
+    why_title:'Качество,<br><em>которое чувствуется</em>',
+    why_visual_label:'Года в красоте',
+    why1_title:'Произведено в Италии', why1_desc:'Производство HAIR LOVE COMPANY, Viterbo. Строгий контроль качества, проверенные рецептуры, сертифицированные компоненты.',
+    why2_title:'Состав без компромиссов', why2_desc:'Кератин, шёлк, аргана, коллаген — активные ингредиенты, которые реально работают. pH 4.5–5.0 сохраняет структуру волос.',
+    why3_title:'Результат с первого раза', why3_desc:'Видимый эффект уже после первого применения. Более 4000 флаконов продано — и каждый клиент возвращается.',
+    why4_title:'Поддержка для партнёров', why4_desc:'Тестеры, маркетинговые материалы, гибкие условия для салонов и дистрибьюторов. Растём вместе.',
+    why5_title:'Упаковка премиум-класса', why5_desc:'Этикетки выполнены на бумаге Constellation Jade Raster — перламутровой, с тонкой рельефной текстурой, FSC™-сертифицированной.',
+    reviews_eyebrow:'Отзывы',
+    reviews_title:'Что говорят<br><em>клиенты и мастера</em>',
+    partners_eyebrow:'Партнёрам',
+    partners_title:'Стать<br><em>дистрибьютором</em>',
+    partners_lead:'Мы ищем партнёров по всей Украине — салоны, мастеров и дистрибьюторов, которые хотят работать с качественным продуктом Made in Italy.',
+    pb1:'Тестеры для каждого продукта при первом заказе',
+    pb2:'Гибкая система цен: дистрибьютор → салон → РРЦ',
+    pb3:'Маркетинговые материалы и поддержка продаж',
+    pb4:'Прямая связь с командой бренда',
+    pb5:'Продукция сертифицирована, соответствует требованиям MOH Украины',
+    form_title:'Оставить заявку', form_subtitle:'Напишите нам — ответим в течение суток',
+    form_name_label:'Имя', form_name_ph:'Ваше имя',
+    form_phone_label:'Телефон',
+    form_city_label:'Город', form_city_ph:'Ваш город',
+    form_type_label:'Тип сотрудничества',
+    form_comment_label:'Комментарий', form_comment_ph:'Расскажите немного о себе...',
+    form_submit:'Отправить заявку →', form_success:'✓ Заявка отправлена!',
+    insta_title:'Мы в<br><em>социальных сетях</em>',
+    insta_btn:'Подписаться на Instagram',
+    footer_brand_desc:'Профессиональный уход за волосами, произведённый в Италии. Для тех, кто влюбляет себя в свои волосы каждый день.',
+    footer_copy:'© 2025 HairLove. Все права защищены.'
+  },
+  en: {
+    nav_products:'Products', nav_about:'About', nav_reviews:'Reviews',
+    nav_partners:'Partners', nav_cta:'Become a Partner', mob_contact:'Contact',
+    hero_eyebrow:'Made in Italy',
+    hero_title:`Hair that makes<br>you <em>fall in love</em><br><span class="line-accent">with yourself again</span>`,
+    hero_desc:'Professional Italian-quality care — now accessible to everyone. Three products that turn your routine into a ritual.',
+    hero_stat_label:'bottles sold',
+    strip_weightless:'Weightless', strip_keratin:'Keratin & Silk',
+    strip_thermo:'Protection up to 220°C', strip_pro:'Professional grade',
+    products_eyebrow:'Products',
+    products_title:'Three products —<br><em>complete care cycle</em>',
+    products_subtitle:'Each product solves a specific task. Together — complete care from washing to styling.',
+    c1_desc:'Nourishes, moisturizes, tames frizz, adds manageability. Weightless, non-greasy. Apply to damp hair — that\'s it.',
+    c2_desc:'Protection up to 220°C, from sun and frost. Smooths, adds shine, doesn\'t clump. Apply before or after styling.',
+    c3_desc:'Two modes: 15–30 sec — daily conditioner, up to 30 min — intensive filler mask. Restores, moisturizes, adds shine.',
+    c_btn:'Order →',
+    why_eyebrow:'Why HairLove',
+    why_title:'Quality<br><em>you can feel</em>',
+    why_visual_label:'Years in beauty',
+    why1_title:'Made in Italy', why1_desc:'Produced by HAIR LOVE COMPANY, Viterbo. Strict quality control, tested formulas, certified ingredients.',
+    why2_title:'Uncompromising formula', why2_desc:'Keratin, silk, argan, collagen — active ingredients that actually work. pH 4.5–5.0 preserves hair structure.',
+    why3_title:'Results from first use', why3_desc:'Visible effect after the very first application. Over 4,000 bottles sold — and every customer comes back.',
+    why4_title:'Partner support', why4_desc:'Testers, marketing materials, flexible terms for salons and distributors. Growing together.',
+    why5_title:'Premium packaging', why5_desc:'Labels printed on Constellation Jade Raster — a pearlescent FSC™-certified paper with a subtle jade iridescent shimmer.',
+    reviews_eyebrow:'Reviews',
+    reviews_title:'What clients<br><em>and stylists say</em>',
+    partners_eyebrow:'Partners',
+    partners_title:'Become a<br><em>distributor</em>',
+    partners_lead:'We are looking for partners across Ukraine — salons, stylists and distributors who want to work with a quality Made in Italy product.',
+    pb1:'Testers for each product with first order',
+    pb2:'Flexible pricing: distributor → salon → RRP',
+    pb3:'Marketing materials and sales support',
+    pb4:'Direct communication with the brand team',
+    pb5:'Product is certified, compliant with MoH Ukraine requirements',
+    form_title:'Leave a request', form_subtitle:'Write to us — we\'ll respond within 24 hours',
+    form_name_label:'Name', form_name_ph:'Your name',
+    form_phone_label:'Phone',
+    form_city_label:'City', form_city_ph:'Your city',
+    form_type_label:'Partnership type',
+    form_comment_label:'Comment', form_comment_ph:'Tell us a bit about yourself...',
+    form_submit:'Send request →', form_success:'✓ Request sent!',
+    insta_title:'We\'re on<br><em>social media</em>',
+    insta_btn:'Follow on Instagram',
+    footer_brand_desc:'Professional hair care, made in Italy. For those who fall in love with their hair every day.',
+    footer_copy:'© 2025 HairLove. All rights reserved.'
+  }
+};
+
+function setLang(lang) {
+  if (!T[lang]) return;
+  localStorage.setItem('hl_lang', lang);
+  document.documentElement.lang = lang === 'uk' ? 'uk' : lang === 'ru' ? 'ru' : 'en';
+  const d = T[lang];
+  // text nodes
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    if (d[el.dataset.i18n] !== undefined) el.textContent = d[el.dataset.i18n];
+  });
+  // html nodes
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    if (d[el.dataset.i18nHtml] !== undefined) el.innerHTML = d[el.dataset.i18nHtml];
+  });
+  // placeholders
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    if (d[el.dataset.i18nPh] !== undefined) el.placeholder = d[el.dataset.i18nPh];
+  });
+  // active button
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  // form success text
+  window._formSuccessText = d.form_success;
+}
+
+// Auto-detect on first load
+(function() {
+  const saved = localStorage.getItem('hl_lang');
+  if (saved && T[saved]) { setLang(saved); return; }
+  const nav = navigator.language || 'uk';
+  if (nav.startsWith('ru')) setLang('ru');
+  else if (nav.startsWith('en')) setLang('en');
+  else setLang('uk');
+})();
+
 </script>
 </body>
 </html>
