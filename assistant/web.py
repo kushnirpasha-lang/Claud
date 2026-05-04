@@ -225,23 +225,59 @@ def instagram_session_post(session_id):
         s = _ig_sessions.get(session_id)
     if not s:
         return jsonify({"error": "not found"}), 404
-    try:
-        import instagram_client
-        result = instagram_client.post_photo(s["image_url"], s["caption"])
-        with _ig_lock:
-            _ig_sessions.pop(session_id, None)
-            _save_sessions(_ig_sessions)
-        return jsonify({"ok": True, "id": result.get("id")})
-    except Exception as e:
-        detail = str(e)
-        # Try to extract Instagram API JSON error body
-        try:
-            import requests as req_lib
-            if hasattr(e, 'response') and e.response is not None:
-                detail = e.response.json()
-        except Exception:
-            pass
-        return jsonify({"error": detail}), 500
+
+    import requests as req_lib
+    gh_token = os.environ.get("MY_PAT", "")
+    payload = {
+        "event_type": "instagram_publish",
+        "client_payload": {
+            "session_id": session_id,
+            "image_url": s["image_url"],
+            "caption": s["caption"],
+        }
+    }
+    r = req_lib.post(
+        "https://api.github.com/repos/kushnirpasha-lang/Claud/dispatches",
+        json=payload,
+        headers={"Authorization": f"token {gh_token}", "Accept": "application/vnd.github.v3+json"},
+        timeout=10,
+    )
+    if r.status_code not in (200, 204):
+        return jsonify({"error": f"Failed to trigger workflow: {r.text}"}), 500
+
+    with _ig_lock:
+        _ig_sessions[session_id]["status"] = "publishing"
+        _save_sessions(_ig_sessions)
+    return jsonify({"ok": True, "status": "publishing"})
+
+
+@app.route("/api/instagram/session/<session_id>/mark-result", methods=["POST"])
+def instagram_session_mark_result(session_id):
+    data = request.get_json(silent=True) or {}
+    with _ig_lock:
+        if session_id not in _ig_sessions:
+            return jsonify({"error": "not found"}), 404
+        if data.get("ok"):
+            _ig_sessions[session_id]["status"] = "published"
+            _ig_sessions[session_id]["post_id"] = data.get("id", "")
+        else:
+            _ig_sessions[session_id]["status"] = "error"
+            _ig_sessions[session_id]["error"] = data.get("error", "unknown")
+        _save_sessions(_ig_sessions)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/instagram/session/<session_id>/status", methods=["GET"])
+def instagram_session_status(session_id):
+    with _ig_lock:
+        s = _ig_sessions.get(session_id)
+    if not s:
+        return jsonify({"status": "not_found"}), 404
+    return jsonify({
+        "status": s.get("status", "ready"),
+        "post_id": s.get("post_id", ""),
+        "error": s.get("error", ""),
+    })
 
 
 @app.route("/api/instagram/session/<session_id>/regen", methods=["POST"])
