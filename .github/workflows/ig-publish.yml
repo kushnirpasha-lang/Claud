@@ -1,0 +1,66 @@
+name: Publish to Instagram
+
+on:
+  repository_dispatch:
+    types: [instagram_publish]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Post to Instagram and notify VPS
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          VPS_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          SESSION_ID="${{ github.event.client_payload.session_id }}"
+          IMAGE_URL="${{ github.event.client_payload.image_url }}"
+          CAPTION="${{ github.event.client_payload.caption }}"
+
+          echo "Posting session: $SESSION_ID"
+          echo "Image: $IMAGE_URL"
+
+          # Step 1: create media container
+          CONTAINER=$(curl -s -X POST \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media" \
+            -d "image_url=${IMAGE_URL}" \
+            --data-urlencode "caption=${CAPTION}" \
+            -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Container response: $CONTAINER"
+
+          CONTAINER_ID=$(echo "$CONTAINER" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id', ''))" 2>/dev/null)
+
+          if [ -z "$CONTAINER_ID" ]; then
+            ERROR=$(echo "$CONTAINER" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('error',{}).get('message','unknown'))" 2>/dev/null)
+            echo "Failed to create container: $ERROR"
+            curl -s -X POST "http://${VPS_HOST}/api/instagram/session/${SESSION_ID}/mark-result" \
+              -H "Content-Type: application/json" \
+              -d "{\"ok\": false, \"error\": \"${ERROR}\"}"
+            exit 1
+          fi
+
+          # Step 2: publish
+          RESULT=$(curl -s -X POST \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media_publish" \
+            -d "creation_id=${CONTAINER_ID}" \
+            -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Publish response: $RESULT"
+
+          POST_ID=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',''))" 2>/dev/null)
+
+          if [ -n "$POST_ID" ]; then
+            echo "✅ Published! Post ID: $POST_ID"
+            curl -s -X POST "http://${VPS_HOST}/api/instagram/session/${SESSION_ID}/mark-result" \
+              -H "Content-Type: application/json" \
+              -d "{\"ok\": true, \"id\": \"${POST_ID}\"}"
+          else
+            ERROR=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('error',{}).get('message','unknown'))" 2>/dev/null)
+            echo "❌ Publish failed: $ERROR"
+            curl -s -X POST "http://${VPS_HOST}/api/instagram/session/${SESSION_ID}/mark-result" \
+              -H "Content-Type: application/json" \
+              -d "{\"ok\": false, \"error\": \"${ERROR}\"}"
+            exit 1
+          fi
