@@ -105,6 +105,22 @@ from nacl.public import PublicKey, SealedBox
 - Через Issue #1: `kushnirpasha-lang/Claud/issues/1`
 - Workflow `tg-check.yml` постит результаты туда
 
+## Правило форматирования ответов (ОБЯЗАТЕЛЬНО)
+
+Всё что Павел может захотеть скопировать — ВСЕГДА оборачивать в `backticks`:
+- URL и домены: `deeply.com.ua`, `https://example.com`
+- Команды терминала: `git push origin main`
+- Пути к файлам: `/opt/assistant/config.py`
+- Email: `info@example.com`
+- Телефоны, ID, токены (когда нужно использовать)
+- Имена пользователей: `@Pavel_Kus`, `@hair_love_company`
+- Любая строка которую нужно вставить куда-либо без изменений
+
+Это работает и в Claude Code (MacBook), и в Telegram — везде.
+Правило распространяется на ВСЕ темы, не только HairLove.
+
+---
+
 ## Правило памяти между сессиями (ОБЯЗАТЕЛЬНО)
 В конце каждой сессии или при значительных изменениях — обновить `MEMORY.md`:
 1. Что нового сделано и работает
