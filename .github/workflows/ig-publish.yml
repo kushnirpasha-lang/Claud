@@ -24,11 +24,10 @@ jobs:
           echo "Session: $SESSION_ID"
           echo "Image: $IMAGE_URL"
           echo "User ID: $INSTAGRAM_USER_ID"
-          echo "Token length: ${#INSTAGRAM_ACCESS_TOKEN}"
 
-          # Step 1: create media container (using graph.facebook.com for Business API)
+          # Step 1: create media container (Instagram Login token uses graph.instagram.com)
           CONTAINER=$(curl -s -X POST \
-            "https://graph.facebook.com/v21.0/${INSTAGRAM_USER_ID}/media" \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media" \
             -d "image_url=${IMAGE_URL}" \
             --data-urlencode "caption=${CAPTION}" \
             -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
@@ -52,9 +51,9 @@ jobs:
 
           echo "Container ID: $CONTAINER_ID"
 
-          # Step 2: publish (using graph.facebook.com)
+          # Step 2: publish
           RESULT=$(curl -s -X POST \
-            "https://graph.facebook.com/v21.0/${INSTAGRAM_USER_ID}/media_publish" \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media_publish" \
             -d "creation_id=${CONTAINER_ID}" \
             -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
           echo "Publish response: $RESULT"
