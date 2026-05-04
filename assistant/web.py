@@ -45,6 +45,11 @@ def index():
     return send_from_directory("static", "index.html")
 
 
+@app.route("/agents")
+def agents_dashboard():
+    return send_from_directory("static", "agents.html")
+
+
 @app.route("/api/chat", methods=["POST"])
 def chat():
     data = request.get_json(silent=True) or {}
