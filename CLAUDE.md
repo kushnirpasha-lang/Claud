@@ -89,6 +89,22 @@ from nacl.public import PublicKey, SealedBox
 - Через Issue #1: `kushnirpasha-lang/Claud/issues/1`
 - Workflow `tg-check.yml` постит результаты туда
 
+## Правило памяти между сессиями (ОБЯЗАТЕЛЬНО)
+В конце каждой сессии или при значительных изменениях — обновить `MEMORY.md`:
+1. Что нового сделано и работает
+2. Какие задачи остались незавершёнными
+3. Какие решения приняты
+4. Любые важные детали для следующей сессии
+
+Затем закоммитить:
+```bash
+git add MEMORY.md
+git commit -m "memory: обновить состояние после сессии"
+git push -u origin claude/update-nodejs-actions-M3RLv
+```
+
+При старте новой сессии — первым делом читать `MEMORY.md` и `CLAUDE.md`.
+
 ---
 
 ## Instagram — Настройки (исходная точка, май 2026)
