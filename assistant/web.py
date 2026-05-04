@@ -374,42 +374,68 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
 const AGENTS = {
   strategy: {
     icon:'🎯', name:'Стратегия', cmd:'/hairlove-strategy',
-    updated:'04.05.2026 в 21:00',
-    done:['Анализ конкурентов: deeply, jNOWA, SEKTA, K18, Olaplex','Таблица цен: 9 SKU, 4 уровня (дистр/салон/РРЦ мастер/РРЦ интернет)','Структура сайта: 5 страниц, B2B витрина','Instagram: 6 рубрик с частотой и форматами','Дорожная карта: 3 этапа, роли Павел/Максим','Продажи: крем-спрей ~3500-4000 шт., термозащита 2-я партия'],
+    updated:'04.05.2026',
+    done:[
+      {t:'Анализ конкурентов: deeply, jNOWA, SEKTA, K18, Olaplex', d:'01.05.2026'},
+      {t:'Таблица цен: 9 SKU, 4 уровня (дистр/салон/РРЦ мастер/РРЦ интернет)', d:'01.05.2026'},
+      {t:'Структура сайта: 5 страниц, B2B витрина', d:'02.05.2026'},
+      {t:'Instagram: 6 рубрик с частотой и форматами', d:'02.05.2026'},
+      {t:'Дорожная карта: 3 этапа, роли Павел/Максим', d:'03.05.2026'},
+      {t:'Продажи: крем-спрей ~3500-4000 шт., термозащита 2-я партия', d:'04.05.2026'},
+    ],
     progress:['Сайт — следующий приоритет, Tilda vs Shopify','Прямой B2B Одесса — стартует Максим'],
     next:['Решить: Tilda или Shopify','Данные по продажам Ламелярной маски','Список активных дистрибуторов для ABC-анализа'],
   },
   texts: {
     icon:'✍️', name:'Тексты бренда', cmd:'/hairlove-texts',
-    updated:'04.05.2026 в 21:00',
-    done:['База знаний: составы, pH, объёмы всех продуктов','Голос бренда: живой, тёплый, экспертный','Список запрещённых слов и шаблонов','Форматы: Instagram, сайт, реклама, email'],
+    updated:'04.05.2026',
+    done:[
+      {t:'База знаний: составы, pH, объёмы всех 4 продуктов', d:'02.05.2026'},
+      {t:'Голос бренда: живой, тёплый, экспертный', d:'02.05.2026'},
+      {t:'Список запрещённых слов и шаблонов', d:'02.05.2026'},
+      {t:'Форматы: Instagram, сайт, реклама, email', d:'03.05.2026'},
+    ],
     progress:['Первые посты для Instagram — в очереди'],
     next:['Пост: представление термозащиты (2-я партия)','Карточки продуктов для сайта (4 шт.)','Текст раздела "О бренде": Made in Italy, история'],
   },
   competitors: {
     icon:'🔍', name:'Конкуренты', cmd:'/hairlove-competitors',
-    updated:'04.05.2026 в 21:00',
-    done:['deeply.com.ua: минимализм, простые составы','jnowaprofessional.ua: B2B, обучение','hairsekta.com: Pro-программа (идея HairLove Pro)','K18hair.com и Olaplex.com — международные ориентиры'],
+    updated:'04.05.2026',
+    done:[
+      {t:'deeply.com.ua: минимализм, простые составы', d:'01.05.2026'},
+      {t:'jnowaprofessional.ua: B2B, обучение', d:'01.05.2026'},
+      {t:'hairsekta.com: Pro-программа (идея HairLove Pro)', d:'01.05.2026'},
+      {t:'K18hair.com и Olaplex.com — международные ориентиры', d:'01.05.2026'},
+    ],
     progress:[],
     next:['Ценовые стратегии конкурентов (акции, скидки)','Мониторинг Instagram — что работает у них','Новые игроки на рынке Украины'],
   },
   insta: {
     icon:'📸', name:'Instagram', cmd:'/hairlove-insta',
-    updated:'04.05.2026 в 14:20',
-    done:['Токен настроен, публикация работает','Workflow ig-publish.yml через GitHub Actions','Превью-страница перед постингом','Последний пост: ID 17926264809292098'],
+    updated:'04.05.2026',
+    done:[
+      {t:'Токен настроен, публикация работает', d:'25.04.2026'},
+      {t:'Workflow ig-publish.yml через GitHub Actions', d:'25.04.2026'},
+      {t:'Превью-страница перед постингом', d:'28.04.2026'},
+      {t:'Последний пост: ID 17926264809292098', d:'04.05.2026'},
+    ],
     progress:['Контент-план есть, посты не запущены','Токен обновлять каждые ~60 дней'],
     next:['Пост: термозащита (2-я партия — повод)','Пост: Made in Italy — что это значит','Reels: применение крем-спрея'],
   },
   site: {
     icon:'🌐', name:'Сайт', cmd:'/hairlove-site',
-    updated:'04.05.2026 в 21:00',
-    done:['Структура: 5 страниц в стратегии','Дизайн-требования: цвет, шрифт, mobile-first','Tilda (витрина) vs Shopify (магазин) — сравнение'],
+    updated:'04.05.2026',
+    done:[
+      {t:'Структура: 5 страниц в стратегии', d:'02.05.2026'},
+      {t:'Дизайн-требования: цвет, шрифт, mobile-first', d:'02.05.2026'},
+      {t:'Tilda (витрина) vs Shopify (магазин) — сравнение', d:'03.05.2026'},
+    ],
     progress:['Решение о платформе ждёт Павла'],
     next:['Выбрать: Tilda или Shopify','Главная: Hero + 4 продукта + УТП + CTA','B2B страница: условия + прайс + форма'],
   },
   ads: {
     icon:'📣', name:'Реклама', cmd:'/hairlove-ads',
-    updated:'03.05.2026 в 12:00',
+    updated:'04.05.2026',
     done:[],
     progress:[],
     next:['Этап 2 — после создания сайта','Подобрать подрядчика по Meta Ads','Подготовить креативы (фото + тексты)','Настроить пиксель Facebook на сайте'],
@@ -423,16 +449,30 @@ Object.entries(AGENTS).forEach(([id,a]) => {
 
 // ── Копирование ──
 let toastTimer = null;
+function _doCopyVisual(el, cmd) {
+  el.classList.add('copied');
+  const t = document.getElementById('copy-toast');
+  t.textContent = '📋 ' + cmd + ' — скопировано!';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); el.classList.remove('copied'); }, 2000);
+}
 function copyCmd(el, cmd, event) {
   event.stopPropagation();
-  navigator.clipboard.writeText(cmd).then(() => {
-    el.classList.add('copied');
-    const t = document.getElementById('copy-toast');
-    t.textContent = '📋 '+cmd+' — скопировано!';
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.classList.remove('show'); el.classList.remove('copied'); }, 2000);
-  });
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(cmd).then(() => _doCopyVisual(el, cmd)).catch(() => _fallbackCopy(el, cmd));
+  } else {
+    _fallbackCopy(el, cmd);
+  }
+}
+function _fallbackCopy(el, cmd) {
+  const ta = document.createElement('textarea');
+  ta.value = cmd;
+  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); _doCopyVisual(el, cmd); } catch(e) {}
+  document.body.removeChild(ta);
 }
 
 // ── Панель ──
@@ -445,8 +485,8 @@ function openPanel(id, event) {
   document.getElementById('panel-icon').textContent = a.icon;
   document.getElementById('panel-name').textContent = a.name;
   document.getElementById('panel-cmd').textContent = a.cmd;
-  document.getElementById('panel-updated-text').textContent = 'Обновлён '+a.updated;
-  renderItems('items-done', a.done, '✓');
+  document.getElementById('panel-updated-text').textContent = 'Обновлён ' + a.updated;
+  renderDoneItems('items-done', a.done);
   renderItems('items-progress', a.progress, '◐');
   renderItems('items-next', a.next, '→');
   document.getElementById('detail-panel').classList.add('open');
@@ -455,6 +495,15 @@ function renderItems(cid, items, bullet) {
   const el = document.getElementById(cid);
   if(!items||items.length===0){ el.innerHTML='<div class="panel-empty">Пусто</div>'; return; }
   el.innerHTML = items.map(t=>`<div class="panel-item"><span class="item-bullet">${bullet}</span><span>${t}</span></div>`).join('');
+}
+function renderDoneItems(cid, items) {
+  const el = document.getElementById(cid);
+  if(!items||items.length===0){ el.innerHTML='<div class="panel-empty">Пусто</div>'; return; }
+  el.innerHTML = items.map(item => {
+    const text = typeof item === 'string' ? item : item.t;
+    const date = typeof item === 'object' && item.d ? `<span style="font-size:9px;color:var(--muted2);margin-left:4px;white-space:nowrap">${item.d}</span>` : '';
+    return `<div class="panel-item"><span class="item-bullet">✓</span><span style="flex:1">${text}</span>${date}</div>`;
+  }).join('');
 }
 function closePanel() {
   document.getElementById('detail-panel').classList.remove('open');
