@@ -11,6 +11,9 @@ import claude_client
 
 app = Flask(__name__, static_folder="static")
 
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads")
+VPS_URL = f"http://{os.environ.get('SSH_HOST', '188.166.67.237')}"
+
 _ig_lock = threading.Lock()
 _IG_SESSIONS_FILE = os.path.join(os.path.dirname(__file__), "ig_sessions.json")
 
