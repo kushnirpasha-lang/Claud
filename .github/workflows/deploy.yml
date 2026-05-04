@@ -45,6 +45,12 @@ jobs:
             # Always update bot token in case it changed
             sed -i '/^TELEGRAM_BOT_TOKEN=/d' /opt/assistant/.env
             echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> /opt/assistant/.env
+            # Always update MY_PAT for GitHub API access
+            sed -i '/^MY_PAT=/d' /opt/assistant/.env
+            echo "MY_PAT=${{ secrets.MY_PAT }}" >> /opt/assistant/.env
+
+            # Ensure uploads directory exists
+            mkdir -p /opt/assistant/static/uploads
 
             # Authorize Telethon (only if session doesn't exist yet)
             if [ ! -f /opt/assistant/user_session.session ]; then
