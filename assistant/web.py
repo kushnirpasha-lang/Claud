@@ -132,7 +132,12 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
 .agent-card.selected { background:var(--card-selected); border-color:var(--card-selected-border); box-shadow:0 0 24px rgba(167,139,250,0.2); }
 .agent-icon { font-size:22px; margin-bottom:5px; }
 .agent-name { font-size:11px; font-weight:600; color:var(--text); }
-.agent-cmd { font-size:9px; color:#6366f1; font-family:monospace; margin-top:3px; }
+.agent-cmd { font-size:9px; color:#6366f1; font-family:monospace; margin-top:3px; display:inline-block; padding:2px 6px; border-radius:5px; border:1px solid transparent; transition:all 0.15s; position:relative; }
+.agent-cmd:hover { background:rgba(99,102,241,0.15); border-color:rgba(99,102,241,0.4); color:#818cf8; cursor:copy; }
+.agent-cmd.copied { background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.4); color:#10b981; }
+/* Тост "Скопировано" */
+.copy-toast { position:fixed; bottom:70px; left:50%; transform:translateX(-50%) translateY(10px); background:#1e1b4b; border:1px solid rgba(99,102,241,0.4); color:#a5b4fc; font-size:12px; padding:8px 18px; border-radius:10px; opacity:0; transition:all 0.25s; pointer-events:none; z-index:200; white-space:nowrap; box-shadow:0 4px 20px rgba(0,0,0,0.4); }
+.copy-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 .agent-focus { font-size:9px; color:var(--muted); margin-top:4px; line-height:1.3; font-style:italic; }
 .agent-updated { font-size:8px; color:var(--muted2); margin-top:3px; }
 .agent-badge { display:inline-block; margin-top:5px; padding:2px 6px; border-radius:8px; font-size:9px; font-weight:600; }
@@ -263,7 +268,7 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
     <div class="agent-card" onclick="openPanel('texts')">
       <div class="agent-icon">✍️</div>
       <div class="agent-name">Тексты бренда</div>
-      <div class="agent-cmd">/hairlove-texts</div>
+      <div class="agent-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(this,'/hairlove-texts',event)">/hairlove-texts</div>
       <div class="agent-focus">Голос бренда, Instagram, сайт, реклама</div>
       <div class="agent-updated" id="upd-texts">—</div>
       <span class="agent-badge badge-active">● Активен</span>
@@ -273,7 +278,7 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
     <div class="agent-card" onclick="openPanel('insta')">
       <div class="agent-icon">📸</div>
       <div class="agent-name">Instagram</div>
-      <div class="agent-cmd">/hairlove-insta</div>
+      <div class="agent-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(this,'/hairlove-insta',event)">/hairlove-insta</div>
       <div class="agent-focus">Публикация постов, превью, контент-план</div>
       <div class="agent-updated" id="upd-insta">—</div>
       <span class="agent-badge badge-active">● Активен</span>
@@ -283,7 +288,7 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
     <div class="agent-card" onclick="openPanel('strategy')">
       <div class="agent-icon">🎯</div>
       <div class="agent-name">Стратегия</div>
-      <div class="agent-cmd">/hairlove-strategy</div>
+      <div class="agent-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(this,'/hairlove-strategy',event)">/hairlove-strategy</div>
       <div class="agent-focus">Дорожная карта, сайт, конкуренты, B2B</div>
       <div class="agent-updated" id="upd-strategy">—</div>
       <span class="agent-badge badge-building">◐ В работе</span>
@@ -293,7 +298,7 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
     <div class="agent-card" onclick="openPanel('competitors')">
       <div class="agent-icon">🔍</div>
       <div class="agent-name">Конкуренты</div>
-      <div class="agent-cmd">/hairlove-competitors</div>
+      <div class="agent-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(this,'/hairlove-competitors',event)">/hairlove-competitors</div>
       <div class="agent-focus">Анализ рынка Украины — ждёт задачи</div>
       <div class="agent-updated" id="upd-competitors">—</div>
       <span class="agent-badge badge-pending">○ Ждёт задачи</span>
@@ -303,7 +308,7 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
     <div class="agent-card" onclick="openPanel('ads')">
       <div class="agent-icon">📣</div>
       <div class="agent-name">Реклама</div>
-      <div class="agent-cmd">/hairlove-ads</div>
+      <div class="agent-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(this,'/hairlove-ads',event)">/hairlove-ads</div>
       <div class="agent-focus">Meta Ads / Google — этап 2 после сайта</div>
       <div class="agent-updated" id="upd-ads">—</div>
       <span class="agent-badge badge-pending">○ Этап 2</span>
@@ -313,7 +318,7 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
     <div class="agent-card" onclick="openPanel('site')">
       <div class="agent-icon">🌐</div>
       <div class="agent-name">Сайт</div>
-      <div class="agent-cmd">/hairlove-site</div>
+      <div class="agent-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(this,'/hairlove-site',event)">/hairlove-site</div>
       <div class="agent-focus">B2B витрина — в планах, следующий приоритет</div>
       <div class="agent-updated" id="upd-site">—</div>
       <span class="agent-badge badge-pending">○ Следующий</span>
@@ -327,6 +332,9 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
     <span><span class="kbd">/hairlove-strategy</span> Стратегия</span>
   </div>
 </div>
+
+<!-- Тост "Скопировано" -->
+<div class="copy-toast" id="copy-toast">📋 Скопировано в буфер</div>
 
 <!-- Детальная панель -->
 <div class="detail-panel" id="detail-panel">
@@ -361,6 +369,23 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
 </div>
 
 <script>
+// ── Копирование команды ──
+let toastTimer = null;
+function copyCmd(el, cmd, event) {
+  event.stopPropagation();
+  navigator.clipboard.writeText(cmd).then(() => {
+    el.classList.add('copied');
+    const toast = document.getElementById('copy-toast');
+    toast.textContent = '📋 ' + cmd + ' — скопировано!';
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+      el.classList.remove('copied');
+    }, 2000);
+  });
+}
+
 // ── Данные агентов ──
 const AGENTS = {
   texts: {
