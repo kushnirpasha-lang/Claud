@@ -26,6 +26,25 @@ def _get_client() -> Anthropic:
         return _client
 
 
+def _sanitize_messages(messages: list) -> list:
+    """Remove empty text blocks that cause cache_control API errors."""
+    result = []
+    for msg in messages:
+        content = msg.get("content", "")
+        if isinstance(content, list):
+            cleaned = [
+                blk for blk in content
+                if not (blk.get("type") == "text" and not (blk.get("text") or "").strip())
+            ]
+            if cleaned:
+                result.append({**msg, "content": cleaned})
+        elif isinstance(content, str) and content.strip():
+            result.append(msg)
+        else:
+            result.append(msg)
+    return result
+
+
 def chat(conversation_id: str, message: str) -> str:
     if not (message or "").strip():
         raise ValueError("message must not be empty")
@@ -39,7 +58,7 @@ def chat(conversation_id: str, message: str) -> str:
         model=CLAUDE_MODEL,
         max_tokens=MAX_TOKENS,
         system=_CACHED_SYSTEM,
-        messages=history,
+        messages=_sanitize_messages(history),
     )
 
     reply = response.content[0].text
@@ -107,6 +126,9 @@ def generate_instagram_caption(image_bytes: bytes, mime_type: str, hint: str = "
     if hint:
         text += f" Пожелание: {hint}"
     user_content.append({"type": "text", "text": text})
+
+    if not user_content:
+        raise ValueError("No content to send (image_bytes is empty)")
 
     response = client.messages.create(
         model=CLAUDE_MODEL,
