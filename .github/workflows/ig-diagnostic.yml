@@ -1,0 +1,33 @@
+name: Instagram Token Diagnostic
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Check token permissions
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        run: |
+          echo "User ID: $INSTAGRAM_USER_ID"
+          echo "Token length: ${#INSTAGRAM_ACCESS_TOKEN}"
+
+          ME=$(curl -s "https://graph.instagram.com/v21.0/me?fields=id,username,account_type&access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Me: $ME"
+
+          DEBUG=$(curl -s "https://graph.facebook.com/debug_token?input_token=${INSTAGRAM_ACCESS_TOKEN}&access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Token debug: $DEBUG"
+
+          SCOPES=$(echo "$DEBUG" | python3 -c "import sys,json; d=json.load(sys.stdin); data=d.get('data',{}); print('expires:', data.get('expires_at',0), 'scopes:', data.get('scopes',[]), 'error:', data.get('error',{}))" 2>/dev/null || echo "parse error")
+
+          curl -s -X POST \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/kushnirpasha-lang/Claud/issues/1/comments" \
+            -d "{\"body\": \"Token diagnostic:\nMe: ${ME}\nScopes: ${SCOPES}\"}" || true
