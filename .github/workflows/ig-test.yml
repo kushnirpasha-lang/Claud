@@ -1,0 +1,30 @@
+name: Test Instagram Token
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test token and post
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+        run: |
+          echo "Testing token validity..."
+          INFO=$(curl -s "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}?fields=username,account_type&access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Account info: $INFO"
+
+          echo "Testing token debug..."
+          DEBUG=$(curl -s "https://graph.instagram.com/debug_token?input_token=${INSTAGRAM_ACCESS_TOKEN}&access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Token debug: $DEBUG"
+
+          echo "Trying to create media container..."
+          IMAGE_URL="https://raw.githubusercontent.com/${{ github.repository }}/claude/update-nodejs-actions-M3RLv/_ig_pending/image.jpg"
+          CONTAINER=$(curl -s -X POST \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media" \
+            -d "image_url=${IMAGE_URL}" \
+            -d "caption=test" \
+            -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Container response: $CONTAINER"
