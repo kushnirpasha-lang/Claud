@@ -47,6 +47,7 @@ def index():
 
 _AGENTS_HTML = r"""<!DOCTYPE html>
 <html lang="ru" data-theme="dark">
+<!-- updated: 04.05.2026 18:30 -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,6 +59,7 @@ _AGENTS_HTML = r"""<!DOCTYPE html>
   --text:#e8e8f0; --text2:#94a3b8; --muted:#6b7280; --muted2:#4b5563;
   --card-bg:rgba(255,255,255,0.04); --card-border:rgba(255,255,255,0.09);
   --card-hover:rgba(167,139,250,0.07); --card-hover-border:rgba(167,139,250,0.35);
+  --card-selected:rgba(167,139,250,0.12); --card-selected-border:rgba(167,139,250,0.6);
   --dir-active-bg:rgba(167,139,250,0.08); --dir-active-border:rgba(167,139,250,0.45);
   --dir-pending-bg:rgba(255,255,255,0.02); --dir-pending-border:rgba(255,255,255,0.1);
   --dir-pending-text:#374151;
@@ -67,12 +69,15 @@ _AGENTS_HTML = r"""<!DOCTYPE html>
   --ring:rgba(99,102,241,0.15);
   --pavel-bg1:#1e1b4b; --pavel-bg2:#312e81; --pavel-border:#6366f1; --pavel-glow:rgba(99,102,241,0.35);
   --theme-btn-bg:rgba(255,255,255,0.06); --theme-btn-border:rgba(255,255,255,0.12); --theme-btn-active:rgba(167,139,250,0.2);
+  --panel-bg:#0f0f1e; --panel-border:rgba(167,139,250,0.2); --panel-shadow:rgba(0,0,0,0.5);
+  --section-done:#10b981; --section-progress:#f59e0b; --section-next:#6366f1;
 }
 [data-theme="light"] {
   --bg:#f0f0f8; --bg2:rgba(0,0,0,0.02); --border:rgba(0,0,0,0.1);
   --text:#1e1b4b; --text2:#4b5563; --muted:#6b7280; --muted2:#9ca3af;
   --card-bg:rgba(255,255,255,0.85); --card-border:rgba(0,0,0,0.1);
   --card-hover:rgba(99,102,241,0.06); --card-hover-border:rgba(99,102,241,0.4);
+  --card-selected:rgba(99,102,241,0.1); --card-selected-border:rgba(99,102,241,0.6);
   --dir-active-bg:rgba(99,102,241,0.08); --dir-active-border:rgba(99,102,241,0.4);
   --dir-pending-bg:rgba(0,0,0,0.03); --dir-pending-border:rgba(0,0,0,0.12);
   --dir-pending-text:#9ca3af;
@@ -82,6 +87,7 @@ _AGENTS_HTML = r"""<!DOCTYPE html>
   --ring:rgba(99,102,241,0.12);
   --pavel-bg1:#e0e7ff; --pavel-bg2:#c7d2fe; --pavel-border:#6366f1; --pavel-glow:rgba(99,102,241,0.2);
   --theme-btn-bg:rgba(0,0,0,0.05); --theme-btn-border:rgba(0,0,0,0.12); --theme-btn-active:rgba(99,102,241,0.15);
+  --panel-bg:#ffffff; --panel-border:rgba(99,102,241,0.25); --panel-shadow:rgba(0,0,0,0.15);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:-apple-system,'Segoe UI',sans-serif; height:100vh; overflow:hidden; transition:background 0.3s,color 0.3s; }
@@ -90,7 +96,6 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Segoe
 .dot { width:7px; height:7px; background:#a78bfa; border-radius:50%; box-shadow:0 0 6px #a78bfa; animation:pulse 2s infinite; flex-shrink:0; }
 .header-sub { font-size:11px; color:var(--muted2); flex:1; text-align:center; }
 .header-right { display:flex; align-items:center; gap:10px; }
-/* Переключатель темы */
 .theme-switcher { display:flex; background:var(--theme-btn-bg); border:1px solid var(--theme-btn-border); border-radius:20px; padding:2px; gap:2px; }
 .theme-btn { padding:4px 10px; border-radius:16px; font-size:10px; cursor:pointer; border:none; background:transparent; color:var(--muted); transition:all 0.2s; white-space:nowrap; }
 .theme-btn:hover { color:var(--text); }
@@ -124,6 +129,7 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
 .agent-node { position:absolute; transform:translate(-50%,-50%); z-index:10; }
 .agent-card { width:132px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:13px; padding:11px 10px; text-align:center; transition:all 0.2s; cursor:pointer; backdrop-filter:blur(4px); }
 .agent-card:hover { background:var(--card-hover); border-color:var(--card-hover-border); transform:scale(1.05); box-shadow:0 0 18px rgba(99,102,241,0.12); }
+.agent-card.selected { background:var(--card-selected); border-color:var(--card-selected-border); box-shadow:0 0 24px rgba(167,139,250,0.2); }
 .agent-icon { font-size:22px; margin-bottom:5px; }
 .agent-name { font-size:11px; font-weight:600; color:var(--text); }
 .agent-cmd { font-size:9px; color:#6366f1; font-family:monospace; margin-top:3px; }
@@ -133,9 +139,66 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
 .badge-active { background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.25); }
 .badge-building { background:rgba(245,158,11,0.12); color:#f59e0b; border:1px solid rgba(245,158,11,0.25); }
 .badge-pending { background:rgba(107,114,128,0.1); color:var(--muted); border:1px solid rgba(107,114,128,0.15); }
+/* ── Детальная панель ── */
+.detail-panel {
+  position:fixed; top:53px; right:0; bottom:0; width:360px;
+  background:var(--panel-bg); border-left:1px solid var(--panel-border);
+  box-shadow:-8px 0 32px var(--panel-shadow);
+  z-index:100; overflow-y:auto;
+  transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  display:flex; flex-direction:column;
+}
+.detail-panel.open { transform:translateX(0); }
+.panel-header {
+  padding:18px 20px 14px; border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  position:sticky; top:0; background:var(--panel-bg); z-index:1;
+}
+.panel-header-left { display:flex; align-items:center; gap:10px; }
+.panel-agent-icon { font-size:28px; }
+.panel-agent-info {}
+.panel-agent-name { font-size:15px; font-weight:700; color:var(--text); }
+.panel-agent-cmd { font-size:10px; color:#6366f1; font-family:monospace; margin-top:2px; }
+.panel-close {
+  width:28px; height:28px; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:14px; color:var(--muted); transition:all 0.15s; flex-shrink:0;
+}
+.panel-close:hover { background:var(--card-hover); color:var(--text); }
+.panel-updated {
+  padding:10px 20px; font-size:11px; color:var(--muted);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:6px;
+}
+.panel-updated-dot { width:6px; height:6px; border-radius:50%; background:#a78bfa; flex-shrink:0; }
+.panel-body { padding:16px 20px; display:flex; flex-direction:column; gap:16px; }
+.panel-section {}
+.panel-section-title {
+  font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  margin-bottom:10px; display:flex; align-items:center; gap:7px;
+}
+.section-icon { font-size:13px; }
+.section-done .panel-section-title { color:var(--section-done); }
+.section-progress .panel-section-title { color:var(--section-progress); }
+.section-next .panel-section-title { color:var(--section-next); }
+.panel-items { display:flex; flex-direction:column; gap:6px; }
+.panel-item {
+  font-size:12px; color:var(--text2); line-height:1.45;
+  padding:7px 10px; border-radius:8px; background:var(--card-bg);
+  border-left:2px solid transparent; display:flex; align-items:flex-start; gap:8px;
+}
+.section-done .panel-item { border-left-color:var(--section-done); }
+.section-progress .panel-item { border-left-color:var(--section-progress); }
+.section-next .panel-item { border-left-color:var(--section-next); }
+.item-bullet { flex-shrink:0; font-size:11px; margin-top:1px; }
+.panel-empty { font-size:11px; color:var(--muted2); font-style:italic; padding:6px 0; }
 /* Bottom bar */
-.bottom-bar { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); background:var(--bar-bg); border:1px solid var(--bar-border); border-radius:12px; padding:10px 18px; font-size:11px; color:var(--muted); display:flex; gap:20px; backdrop-filter:blur(20px); white-space:nowrap; z-index:20; }
+.bottom-bar { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); background:var(--bar-bg); border:1px solid var(--bar-border); border-radius:12px; padding:10px 18px; font-size:11px; color:var(--muted); display:flex; gap:20px; backdrop-filter:blur(20px); white-space:nowrap; z-index:20; transition:left 0.3s,transform 0.3s; }
 .kbd { background:var(--kbd-bg); border:1px solid var(--kbd-border); padding:1px 6px; border-radius:4px; font-size:10px; color:#8b5cf6; font-family:monospace; }
+/* SVG line styles */
+.line-dir { stroke:var(--line-dir); stroke-width:1.5; stroke-dasharray:6 4; animation:dash 3s linear infinite; }
+.line-agent { stroke:var(--line-agent); stroke-width:1; stroke-dasharray:4 5; animation:dash 4s linear infinite; }
+.line-pending { stroke:var(--line-pending); stroke-width:1; stroke-dasharray:3 6; }
 @keyframes dash { to { stroke-dashoffset:-100; } }
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 @keyframes ring-pulse { 0%{transform:translate(-50%,-50%)scale(1);opacity:.4}100%{transform:translate(-50%,-50%)scale(2.2);opacity:0} }
@@ -197,32 +260,266 @@ svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:
 
   <!-- Агенты HairLove -->
   <div class="agent-node" style="left:5%;top:17%">
-    <div class="agent-card"><div class="agent-icon">✍️</div><div class="agent-name">Тексты бренда</div><div class="agent-cmd">/hairlove-texts</div><div class="agent-focus">Голос бренда, Instagram, сайт, реклама</div><div class="agent-updated">обновлён 04.05.2026</div><span class="agent-badge badge-active">● Активен</span></div>
+    <div class="agent-card" onclick="openPanel('texts')">
+      <div class="agent-icon">✍️</div>
+      <div class="agent-name">Тексты бренда</div>
+      <div class="agent-cmd">/hairlove-texts</div>
+      <div class="agent-focus">Голос бренда, Instagram, сайт, реклама</div>
+      <div class="agent-updated" id="upd-texts">—</div>
+      <span class="agent-badge badge-active">● Активен</span>
+    </div>
   </div>
   <div class="agent-node" style="left:5%;top:37%">
-    <div class="agent-card"><div class="agent-icon">📸</div><div class="agent-name">Instagram</div><div class="agent-cmd">/hairlove-insta</div><div class="agent-focus">Публикация постов, превью, контент-план</div><div class="agent-updated">обновлён 04.05.2026</div><span class="agent-badge badge-active">● Активен</span></div>
+    <div class="agent-card" onclick="openPanel('insta')">
+      <div class="agent-icon">📸</div>
+      <div class="agent-name">Instagram</div>
+      <div class="agent-cmd">/hairlove-insta</div>
+      <div class="agent-focus">Публикация постов, превью, контент-план</div>
+      <div class="agent-updated" id="upd-insta">—</div>
+      <span class="agent-badge badge-active">● Активен</span>
+    </div>
   </div>
   <div class="agent-node" style="left:5%;top:57%">
-    <div class="agent-card"><div class="agent-icon">🎯</div><div class="agent-name">Стратегия</div><div class="agent-cmd">/hairlove-strategy</div><div class="agent-focus">Дорожная карта, сайт, конкуренты, B2B</div><div class="agent-updated">обновлён 04.05.2026</div><span class="agent-badge badge-building">◐ В работе</span></div>
+    <div class="agent-card" onclick="openPanel('strategy')">
+      <div class="agent-icon">🎯</div>
+      <div class="agent-name">Стратегия</div>
+      <div class="agent-cmd">/hairlove-strategy</div>
+      <div class="agent-focus">Дорожная карта, сайт, конкуренты, B2B</div>
+      <div class="agent-updated" id="upd-strategy">—</div>
+      <span class="agent-badge badge-building">◐ В работе</span>
+    </div>
   </div>
   <div class="agent-node" style="left:5%;top:77%">
-    <div class="agent-card"><div class="agent-icon">🔍</div><div class="agent-name">Конкуренты</div><div class="agent-cmd">/hairlove-competitors</div><div class="agent-focus">Анализ рынка Украины — ждёт задачи</div><div class="agent-updated">обновлён 03.05.2026</div><span class="agent-badge badge-pending">○ Ждёт задачи</span></div>
+    <div class="agent-card" onclick="openPanel('competitors')">
+      <div class="agent-icon">🔍</div>
+      <div class="agent-name">Конкуренты</div>
+      <div class="agent-cmd">/hairlove-competitors</div>
+      <div class="agent-focus">Анализ рынка Украины — ждёт задачи</div>
+      <div class="agent-updated" id="upd-competitors">—</div>
+      <span class="agent-badge badge-pending">○ Ждёт задачи</span>
+    </div>
   </div>
   <div class="agent-node" style="left:22%;top:83%">
-    <div class="agent-card"><div class="agent-icon">📣</div><div class="agent-name">Реклама</div><div class="agent-cmd">/hairlove-ads</div><div class="agent-focus">Meta Ads / Google — этап 2 после сайта</div><div class="agent-updated">обновлён 03.05.2026</div><span class="agent-badge badge-pending">○ Этап 2</span></div>
+    <div class="agent-card" onclick="openPanel('ads')">
+      <div class="agent-icon">📣</div>
+      <div class="agent-name">Реклама</div>
+      <div class="agent-cmd">/hairlove-ads</div>
+      <div class="agent-focus">Meta Ads / Google — этап 2 после сайта</div>
+      <div class="agent-updated" id="upd-ads">—</div>
+      <span class="agent-badge badge-pending">○ Этап 2</span>
+    </div>
   </div>
   <div class="agent-node" style="left:22%;top:17%">
-    <div class="agent-card"><div class="agent-icon">🌐</div><div class="agent-name">Сайт</div><div class="agent-cmd">/hairlove-site</div><div class="agent-focus">B2B витрина — в планах, следующий приоритет</div><div class="agent-updated">обновлён 03.05.2026</div><span class="agent-badge badge-pending">○ Следующий</span></div>
+    <div class="agent-card" onclick="openPanel('site')">
+      <div class="agent-icon">🌐</div>
+      <div class="agent-name">Сайт</div>
+      <div class="agent-cmd">/hairlove-site</div>
+      <div class="agent-focus">B2B витрина — в планах, следующий приоритет</div>
+      <div class="agent-updated" id="upd-site">—</div>
+      <span class="agent-badge badge-pending">○ Следующий</span>
+    </div>
   </div>
 
-  <div class="bottom-bar">
-    <span>Направление → Агент → Задача</span>
+  <div class="bottom-bar" id="bottom-bar">
+    <span>Нажми на агента → детали</span>
     <span><span class="kbd">/hairlove-texts</span> Тексты</span>
     <span><span class="kbd">/hairlove-insta</span> Instagram</span>
     <span><span class="kbd">/hairlove-strategy</span> Стратегия</span>
   </div>
 </div>
+
+<!-- Детальная панель -->
+<div class="detail-panel" id="detail-panel">
+  <div class="panel-header">
+    <div class="panel-header-left">
+      <div class="panel-agent-icon" id="panel-icon">🤖</div>
+      <div class="panel-agent-info">
+        <div class="panel-agent-name" id="panel-name">Агент</div>
+        <div class="panel-agent-cmd" id="panel-cmd">/command</div>
+      </div>
+    </div>
+    <div class="panel-close" onclick="closePanel()">✕</div>
+  </div>
+  <div class="panel-updated">
+    <div class="panel-updated-dot"></div>
+    <span id="panel-updated-text">Обновлён —</span>
+  </div>
+  <div class="panel-body">
+    <div class="panel-section section-done" id="section-done">
+      <div class="panel-section-title"><span class="section-icon">✅</span> Сделано</div>
+      <div class="panel-items" id="items-done"></div>
+    </div>
+    <div class="panel-section section-progress" id="section-progress">
+      <div class="panel-section-title"><span class="section-icon">🔄</span> В работе</div>
+      <div class="panel-items" id="items-progress"></div>
+    </div>
+    <div class="panel-section section-next" id="section-next">
+      <div class="panel-section-title"><span class="section-icon">⏭️</span> Следующий шаг</div>
+      <div class="panel-items" id="items-next"></div>
+    </div>
+  </div>
+</div>
+
 <script>
+// ── Данные агентов ──
+const AGENTS = {
+  texts: {
+    icon:'✍️', name:'Тексты бренда', cmd:'/hairlove-texts',
+    updated:'04.05.2026 в 16:45',
+    done:[
+      'База знаний продуктов: составы, pH, объёмы, эффекты',
+      'Гайд по голосу бренда: живой, тёплый, экспертный',
+      'Список запрещённых слов и шаблонов',
+      'Форматы по каналам: Instagram, сайт, реклама, email',
+      'Данные Made in Italy — Viterbo, Italy',
+    ],
+    progress:[
+      'Тексты для Instagram ещё не написаны — первые посты в очереди',
+    ],
+    next:[
+      'Написать первый пост: представление термозащиты (вышла 2-я партия)',
+      'Написать карточки продуктов для сайта (4 продукта)',
+      'Подготовить текст для раздела "О бренде" (Made in Italy, история)',
+    ],
+  },
+  insta: {
+    icon:'📸', name:'Instagram', cmd:'/hairlove-insta',
+    updated:'04.05.2026 в 14:20',
+    done:[
+      'Токен Instagram User Token настроен и работает',
+      'Workflow ig-publish.yml — публикация через GitHub Actions',
+      'Превью-страница перед публикацией (VPS, порт 8080)',
+      'Архитектура: Claude → _ig_pending → VPS → Instagram API',
+      'Последний пост: ID 17926264809292098',
+    ],
+    progress:[
+      'Контент-план в очереди — посты ещё не запущены',
+      'Токен нужно обновлять каждые ~60 дней',
+    ],
+    next:[
+      'Опубликовать первый пост из контент-плана (термозащита)',
+      'Пост "Made in Italy — что это значит для твоих волос"',
+      'Reels: применение крем-спрея 20в1 (видео/фото)',
+    ],
+  },
+  strategy: {
+    icon:'🎯', name:'Стратегия', cmd:'/hairlove-strategy',
+    updated:'04.05.2026 в 18:30',
+    done:[
+      'Анализ конкурентов: deeply, jNOWA, SEKTA, K18, Olaplex',
+      'Таблица цен: 9 SKU, 4 уровня (дистр / салон / РРЦ мастер / РРЦ интернет)',
+      'Структура сайта: 5 страниц, B2B витрина',
+      'Instagram: 6 рубрик с частотой и форматами',
+      'Дорожная карта: 3 этапа, роли Павел/Максим',
+      'ТЗ для фотографа: 4 типа контента',
+      'Продажи: крем-спрей ~3500-4000 шт., термозащита 2-я партия 500 шт.',
+    ],
+    progress:[
+      'Сайт — следующий приоритет, решение Tilda vs Shopify',
+      'Прямой B2B Одесса — стартует Максим',
+      'Сертификация Украина — приоритет #1 для Максима',
+    ],
+    next:[
+      'Решить: Tilda или Shopify (витрина vs магазин)',
+      'Получить данные по продажам Ламелярной маски',
+      'Список активных дистрибуторов для ABC-анализа',
+      'Запустить платную рекламу (Этап 2 — после сайта)',
+    ],
+  },
+  competitors: {
+    icon:'🔍', name:'Конкуренты', cmd:'/hairlove-competitors',
+    updated:'04.05.2026 в 16:45',
+    done:[
+      'Анализ deeply.com.ua: минимализм, простые составы',
+      'Анализ jnowaprofessional.ua: B2B, обучение, тяжёлый сайт',
+      'Анализ hairsekta.com: Pro-программа для салонов (идея HairLove Pro)',
+      'Ориентиры: K18hair.com (дизайн), Olaplex.com (навигация)',
+      'Вывод: позиционирование между deeply и K18',
+    ],
+    progress:[],
+    next:[
+      'Расширить анализ: изучить ценовые стратегии конкурентов',
+      'Мониторинг Instagram конкурентов — что работает в контенте',
+      'Поиск новых игроков на рынке Украины',
+    ],
+  },
+  ads: {
+    icon:'📣', name:'Реклама', cmd:'/hairlove-ads',
+    updated:'03.05.2026 в 12:00',
+    done:[],
+    progress:[],
+    next:[
+      'Запуск рекламы — Этап 2 (после создания сайта)',
+      'Подобрать подрядчика по Meta Ads',
+      'Подготовить рекламные креативы (фото + тексты)',
+      'Настроить пиксель Facebook на сайте',
+    ],
+  },
+  site: {
+    icon:'🌐', name:'Сайт', cmd:'/hairlove-site',
+    updated:'03.05.2026 в 12:00',
+    done:[
+      'Структура сайта: 5 страниц определены в стратегии',
+      'Требования к дизайну: цветовая схема, шрифт, mobile-first',
+      'Сравнение: Tilda (витрина) vs Shopify (магазин)',
+      'Рекомендация: Tilda на старте → Shopify при добавлении оплаты',
+    ],
+    progress:[
+      'Решение о платформе — ждёт Павла',
+    ],
+    next:[
+      'Выбрать платформу: Tilda или Shopify',
+      'Создать главную страницу: Hero + 4 продукта + УТП',
+      'Страница B2B/Партнёрам: условия + прайс + форма заявки',
+      'Подготовить тексты для всех страниц (через /hairlove-texts)',
+    ],
+  },
+};
+
+// ── Заполнить agent-updated на карточках ──
+Object.entries(AGENTS).forEach(([id, a]) => {
+  const el = document.getElementById('upd-' + id);
+  if(el) el.textContent = 'обновлён ' + a.updated;
+});
+
+// ── Панель ──
+let currentAgent = null;
+function openPanel(id) {
+  const a = AGENTS[id];
+  if(!a) return;
+  currentAgent = id;
+  document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+
+  document.getElementById('panel-icon').textContent = a.icon;
+  document.getElementById('panel-name').textContent = a.name;
+  document.getElementById('panel-cmd').textContent = a.cmd;
+  document.getElementById('panel-updated-text').textContent = 'Обновлён ' + a.updated;
+
+  renderItems('items-done', a.done, '✓');
+  renderItems('items-progress', a.progress, '◐');
+  renderItems('items-next', a.next, '→');
+
+  document.getElementById('detail-panel').classList.add('open');
+}
+function renderItems(containerId, items, bullet) {
+  const el = document.getElementById(containerId);
+  if(!items || items.length === 0) {
+    el.innerHTML = '<div class="panel-empty">Пусто</div>';
+    return;
+  }
+  el.innerHTML = items.map(t =>
+    `<div class="panel-item"><span class="item-bullet">${bullet}</span><span>${t}</span></div>`
+  ).join('');
+}
+function closePanel() {
+  document.getElementById('detail-panel').classList.remove('open');
+  document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));
+  currentAgent = null;
+}
+// Закрыть по Escape
+document.addEventListener('keydown', e => { if(e.key==='Escape') closePanel(); });
+
 // ── Тема ──
 const DARK_MQ = window.matchMedia('(prefers-color-scheme: dark)');
 function applyTheme(t){
@@ -249,13 +546,10 @@ function drawLines(){
     l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
     l.setAttribute('class',cls);sv.appendChild(l);
   }
-  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
   sv.innerHTML='';
-  // Pavel → направления
   ln(px,py, cw*0.22,ch*0.5, 'line-dir');
   ln(px,py, cw*0.78,ch*0.3, 'line-pending');
   ln(px,py, cw*0.78,ch*0.7, 'line-pending');
-  // HairLove → агенты
   const hx=cw*0.22,hy=ch*0.5;
   [[0.05,0.17],[0.05,0.37],[0.05,0.57],[0.05,0.77],[0.22,0.83],[0.22,0.17]].forEach(([ax,ay])=>{
     ln(hx,hy,cw*ax,ch*ay,'line-agent');
@@ -263,7 +557,6 @@ function drawLines(){
 }
 drawLines();
 window.addEventListener('resize',drawLines);
-// перерисовать линии при смене темы (цвета берутся из CSS, но stroke инлайновый — ок)
 new MutationObserver(drawLines).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 </script>
 </body>
