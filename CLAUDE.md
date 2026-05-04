@@ -88,3 +88,75 @@ from nacl.public import PublicKey, SealedBox
 ## Как проверить результат на сервере
 - Через Issue #1: `kushnirpasha-lang/Claud/issues/1`
 - Workflow `tg-check.yml` постит результаты туда
+
+---
+
+## Instagram — Настройки (исходная точка, май 2026)
+
+### Аккаунт
+- **Instagram:** `@hair_love_company`
+- **Instagram User ID:** `17841424039191195`
+- **Тип аккаунта:** Business ✅
+
+### Meta Developer Portal
+- **Facebook App:** HairLove (`ID: 26870095375982242`)
+- **Instagram App:** HairLove-IG (`ID: 35214006608243743`)
+- **App Secret Instagram:** в GitHub Secret — не хранить в коде
+- **Портал:** `developers.facebook.com/apps/26870095375982242`
+- **Статус приложения:** Не опубликовано (Development Mode)
+
+### Токен доступа
+- **Тип:** Instagram User Token (новый Instagram Login API)
+- **GitHub Secret:** `INSTAGRAM_ACCESS_TOKEN`
+- **Срок действия:** ~60 дней (нужно обновлять!)
+- **Где обновить:** `developers.facebook.com/apps/26870095375982242/use_cases/customize/?use_case_enum=INSTAGRAM_BUSINESS`
+  → раздел "Настройка API для входа в Inst..." → "2. Сгенерируйте маркеры доступа" → "Сгенерировать маркер" рядом с `hair_love_company`
+
+### Разрешения (добавлены в приложении)
+- `instagram_content_publish` ✅ — публикация постов
+- `instagram_business_basic` ✅ — базовый доступ
+- `instagram_business_content_publish` ✅ — публикация (новый API)
+- `instagram_business_manage_insights` ✅ — статистика
+- `instagram_manage_insights` ✅ — аналитика
+- `instagram_manage_comments` ✅ — комментарии
+- `pages_show_list` ✅ — список страниц
+- `pages_read_engagement` ✅ — статистика страницы
+- `ads_management` ✅ — управление рекламой
+- `ads_read` ✅ — отчёты по рекламе
+
+### GitHub Secrets (Instagram)
+- `INSTAGRAM_ACCESS_TOKEN` — Instagram User Token (обновлять каждые ~60 дней)
+- `INSTAGRAM_USER_ID` — `17841424039191195`
+
+### API Endpoint
+- **Base URL:** `https://graph.instagram.com/v21.0`
+- **Создать контейнер:** `POST /v21.0/{INSTAGRAM_USER_ID}/media`
+- **Опубликовать:** `POST /v21.0/{INSTAGRAM_USER_ID}/media_publish`
+
+### Workflow файлы (все на ветке `main`)
+- `ig-publish.yml` — публикация по `repository_dispatch` (event: `instagram_publish`)
+- `ig-prepare.yml` — подготовка превью сессии
+- `ig-diagnostic.yml` — диагностика токена (запускать вручную)
+- `ig-find-id.yml` — поиск Instagram ID (запускать вручную)
+
+### Архитектура публикации (Claude Code → Instagram)
+```
+1. Павел отправляет фото в Claude Code
+2. Claude извлекает фото из сессии JSONL
+3. Фото + caption.txt + session_id.txt → пушатся в _ig_pending/
+4. ig-prepare.yml (GitHub Actions):
+   - Копирует фото на VPS через SCP
+   - Создаёт сессию через POST /api/instagram/session-create
+5. Claude отправляет превью ссылку: http://188.166.67.237/instagram/preview/{session_id}
+6. Павел открывает ссылку, нажимает "Опубликовать"
+7. Браузер вызывает POST /api/instagram/session/{id}/post на VPS
+8. VPS (web.py) триггерит repository_dispatch → ig-publish.yml
+9. ig-publish.yml постит в Instagram через graph.instagram.com
+10. Результат возвращается на VPS через mark-result endpoint
+11. Браузер показывает ✅ или ❌
+```
+
+### Сессии (VPS)
+- **Файл:** `/opt/assistant/ig_sessions.json` — персистентные сессии
+- **Загрузки:** `/opt/assistant/static/uploads/` — фото для превью
+- **Превью страница:** `http://188.166.67.237/instagram/preview/{session_id}`
