@@ -46,142 +46,223 @@ def index():
 
 
 _AGENTS_HTML = r"""<!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HairLove — Agent System</title>
+<title>Система агентов — Pavel</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0a0a14; color: #e8e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; overflow: hidden; }
-  .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 28px; border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02); }
-  .header-brand { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; }
-  .header-brand .dot { width: 8px; height: 8px; background: #a78bfa; border-radius: 50%; box-shadow: 0 0 8px #a78bfa; animation: pulse 2s infinite; }
-  .header-time { font-size: 13px; color: #6b7280; font-variant-numeric: tabular-nums; }
-  .header-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(16,185,129,0.2); }
-  .header-status::before { content: ''; width: 6px; height: 6px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
-  .canvas { position: relative; width: 100vw; height: calc(100vh - 57px); }
-  svg.lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-  .line { stroke: rgba(167,139,250,0.25); stroke-width: 1.5; fill: none; stroke-dasharray: 6 4; animation: dash 20s linear infinite; }
-  .line.active { stroke: rgba(167,139,250,0.55); stroke-width: 2; }
-  @keyframes dash { to { stroke-dashoffset: -100; } }
-  .node { position: absolute; transform: translate(-50%, -50%); z-index: 10; cursor: pointer; }
-  .node-center { left: 50%; top: 50%; }
-  .node-center .card { width: 140px; background: linear-gradient(135deg, #1e1b4b, #312e81); border: 2px solid #6366f1; border-radius: 20px; padding: 20px 16px; text-align: center; box-shadow: 0 0 40px rgba(99,102,241,0.3), 0 0 80px rgba(99,102,241,0.1); transition: all 0.2s; }
-  .node-center .card:hover { box-shadow: 0 0 60px rgba(99,102,241,0.5); transform: scale(1.03); }
-  .node-center .avatar { width: 52px; height: 52px; background: linear-gradient(135deg, #6366f1, #a78bfa); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 10px; box-shadow: 0 0 20px rgba(167,139,250,0.4); }
-  .node-center .name { font-size: 14px; font-weight: 700; color: #fff; }
-  .node-center .role { font-size: 10px; color: #a5b4fc; margin-top: 3px; text-transform: uppercase; letter-spacing: 1px; }
-  .node .card { width: 148px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px 12px; text-align: center; transition: all 0.2s; backdrop-filter: blur(10px); }
-  .node .card:hover { background: rgba(255,255,255,0.08); border-color: rgba(167,139,250,0.5); transform: scale(1.04); box-shadow: 0 0 30px rgba(167,139,250,0.15); }
-  .node .icon { font-size: 28px; margin-bottom: 6px; display: block; }
-  .node .agent-name { font-size: 12px; font-weight: 600; color: #e2e8f0; margin-bottom: 3px; }
-  .node .agent-cmd { font-size: 10px; color: #6366f1; font-family: monospace; margin-bottom: 6px; }
-  .node .agent-desc { font-size: 10px; color: #94a3b8; line-height: 1.4; margin-bottom: 8px; }
-  .node .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
-  .badge-active { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-  .badge-pending { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.2); }
-  .badge-building { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
-  .node-texts { left: 22%; top: 22%; }
-  .node-insta { left: 78%; top: 22%; }
-  .node-strategy { left: 14%; top: 50%; }
-  .node-site { left: 86%; top: 50%; }
-  .node-competitors { left: 22%; top: 78%; }
-  .node-ads { left: 78%; top: 78%; }
-  .detail-panel { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(15,15,30,0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px 20px; font-size: 12px; color: #94a3b8; z-index: 20; backdrop-filter: blur(20px); display: flex; gap: 24px; align-items: center; white-space: nowrap; }
-  .detail-panel .hint { display: flex; align-items: center; gap: 6px; }
-  .detail-panel .hint span { color: #e2e8f0; }
-  .kbd { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 5px; font-size: 11px; font-family: monospace; color: #a78bfa; }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-  .tooltip { position: absolute; background: rgba(15,15,30,0.97); border: 1px solid rgba(167,139,250,0.3); border-radius: 10px; padding: 10px 14px; font-size: 11px; color: #cbd5e1; pointer-events: none; z-index: 100; min-width: 200px; display: none; }
-  .tooltip.show { display: block; }
-  .tooltip .t-title { color: #a78bfa; font-weight: 600; margin-bottom: 6px; font-size: 12px; }
-  .tooltip .t-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 4px; }
-  .tooltip .t-label { color: #6b7280; }
-  .pulse-ring { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; border: 1px solid rgba(99,102,241,0.2); border-radius: 50%; pointer-events: none; z-index: 0; animation: ring-pulse 3s ease-out infinite; }
-  .pulse-ring:nth-child(2) { animation-delay: 1s; }
-  .pulse-ring:nth-child(3) { animation-delay: 2s; }
-  @keyframes ring-pulse { 0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; } 100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; } }
+/* ── CSS-переменные тем ── */
+:root {
+  --bg:#0a0a14; --bg2:rgba(255,255,255,0.02); --border:rgba(255,255,255,0.07);
+  --text:#e8e8f0; --text2:#94a3b8; --muted:#6b7280; --muted2:#4b5563;
+  --card-bg:rgba(255,255,255,0.04); --card-border:rgba(255,255,255,0.09);
+  --card-hover:rgba(167,139,250,0.07); --card-hover-border:rgba(167,139,250,0.35);
+  --dir-active-bg:rgba(167,139,250,0.08); --dir-active-border:rgba(167,139,250,0.45);
+  --dir-pending-bg:rgba(255,255,255,0.02); --dir-pending-border:rgba(255,255,255,0.1);
+  --dir-pending-text:#374151;
+  --line-dir:rgba(167,139,250,0.45); --line-agent:rgba(167,139,250,0.18); --line-pending:rgba(255,255,255,0.06);
+  --bar-bg:rgba(10,10,20,0.92); --bar-border:rgba(255,255,255,0.08);
+  --kbd-bg:rgba(255,255,255,0.07); --kbd-border:rgba(255,255,255,0.12);
+  --ring:rgba(99,102,241,0.15);
+  --pavel-bg1:#1e1b4b; --pavel-bg2:#312e81; --pavel-border:#6366f1; --pavel-glow:rgba(99,102,241,0.35);
+  --theme-btn-bg:rgba(255,255,255,0.06); --theme-btn-border:rgba(255,255,255,0.12); --theme-btn-active:rgba(167,139,250,0.2);
+}
+[data-theme="light"] {
+  --bg:#f0f0f8; --bg2:rgba(0,0,0,0.02); --border:rgba(0,0,0,0.1);
+  --text:#1e1b4b; --text2:#4b5563; --muted:#6b7280; --muted2:#9ca3af;
+  --card-bg:rgba(255,255,255,0.85); --card-border:rgba(0,0,0,0.1);
+  --card-hover:rgba(99,102,241,0.06); --card-hover-border:rgba(99,102,241,0.4);
+  --dir-active-bg:rgba(99,102,241,0.08); --dir-active-border:rgba(99,102,241,0.4);
+  --dir-pending-bg:rgba(0,0,0,0.03); --dir-pending-border:rgba(0,0,0,0.12);
+  --dir-pending-text:#9ca3af;
+  --line-dir:rgba(99,102,241,0.5); --line-agent:rgba(99,102,241,0.2); --line-pending:rgba(0,0,0,0.08);
+  --bar-bg:rgba(240,240,248,0.95); --bar-border:rgba(0,0,0,0.1);
+  --kbd-bg:rgba(0,0,0,0.05); --kbd-border:rgba(0,0,0,0.12);
+  --ring:rgba(99,102,241,0.12);
+  --pavel-bg1:#e0e7ff; --pavel-bg2:#c7d2fe; --pavel-border:#6366f1; --pavel-glow:rgba(99,102,241,0.2);
+  --theme-btn-bg:rgba(0,0,0,0.05); --theme-btn-border:rgba(0,0,0,0.12); --theme-btn-active:rgba(99,102,241,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,'Segoe UI',sans-serif; height:100vh; overflow:hidden; transition:background 0.3s,color 0.3s; }
+.header { display:flex; align-items:center; justify-content:space-between; padding:12px 22px; border-bottom:1px solid var(--border); background:var(--bg2); gap:12px; }
+.header-brand { font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; white-space:nowrap; }
+.dot { width:7px; height:7px; background:#a78bfa; border-radius:50%; box-shadow:0 0 6px #a78bfa; animation:pulse 2s infinite; flex-shrink:0; }
+.header-sub { font-size:11px; color:var(--muted2); flex:1; text-align:center; }
+.header-right { display:flex; align-items:center; gap:10px; }
+/* Переключатель темы */
+.theme-switcher { display:flex; background:var(--theme-btn-bg); border:1px solid var(--theme-btn-border); border-radius:20px; padding:2px; gap:2px; }
+.theme-btn { padding:4px 10px; border-radius:16px; font-size:10px; cursor:pointer; border:none; background:transparent; color:var(--muted); transition:all 0.2s; white-space:nowrap; }
+.theme-btn:hover { color:var(--text); }
+.theme-btn.active { background:var(--theme-btn-active); color:var(--text); font-weight:600; }
+.header-time { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+/* Canvas */
+.canvas { position:relative; width:100%; height:calc(100vh - 53px); }
+svg.lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+/* Pavel */
+.pavel-node { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:10; }
+.pavel-card { width:130px; background:linear-gradient(135deg,var(--pavel-bg1),var(--pavel-bg2)); border:2px solid var(--pavel-border); border-radius:18px; padding:18px 14px; text-align:center; box-shadow:0 0 40px var(--pavel-glow); transition:background 0.3s,box-shadow 0.3s; }
+.pavel-avatar { width:48px; height:48px; background:linear-gradient(135deg,#6366f1,#a78bfa); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; margin:0 auto 10px; }
+.pavel-name { font-size:14px; font-weight:700; color:var(--text); }
+.pavel-role { font-size:9px; color:#a5b4fc; margin-top:2px; letter-spacing:1px; text-transform:uppercase; }
+.pulse-ring { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:155px; height:155px; border:1px solid var(--ring); border-radius:50%; pointer-events:none; z-index:0; animation:ring-pulse 3s ease-out infinite; }
+.pulse-ring:nth-child(2){animation-delay:1s;} .pulse-ring:nth-child(3){animation-delay:2s;}
+/* Direction nodes */
+.dir-node { position:absolute; transform:translate(-50%,-50%); z-index:10; }
+.dir-card { width:158px; border-radius:14px; padding:13px 14px; text-align:center; transition:all 0.2s; }
+.dir-card.active { background:var(--dir-active-bg); border:1.5px solid var(--dir-active-border); box-shadow:0 0 24px rgba(167,139,250,0.1); }
+.dir-card.pending { background:var(--dir-pending-bg); border:1.5px dashed var(--dir-pending-border); }
+.dir-icon { font-size:24px; margin-bottom:6px; }
+.dir-name { font-size:13px; font-weight:600; }
+.dir-card.active .dir-name { color:#8b5cf6; }
+.dir-card.pending .dir-name { color:var(--dir-pending-text); }
+.dir-count { font-size:10px; color:var(--muted); margin-top:2px; }
+.dir-badge { display:inline-block; margin-top:7px; padding:2px 9px; border-radius:10px; font-size:10px; }
+.dir-badge.active { background:rgba(167,139,250,0.15); color:#a78bfa; }
+.dir-badge.pending { background:rgba(107,114,128,0.1); color:var(--dir-pending-text); }
+/* Agent nodes */
+.agent-node { position:absolute; transform:translate(-50%,-50%); z-index:10; }
+.agent-card { width:132px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:13px; padding:11px 10px; text-align:center; transition:all 0.2s; cursor:pointer; backdrop-filter:blur(4px); }
+.agent-card:hover { background:var(--card-hover); border-color:var(--card-hover-border); transform:scale(1.05); box-shadow:0 0 18px rgba(99,102,241,0.12); }
+.agent-icon { font-size:22px; margin-bottom:5px; }
+.agent-name { font-size:11px; font-weight:600; color:var(--text); }
+.agent-cmd { font-size:9px; color:#6366f1; font-family:monospace; margin-top:3px; }
+.agent-badge { display:inline-block; margin-top:5px; padding:2px 6px; border-radius:8px; font-size:9px; font-weight:600; }
+.badge-active { background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.25); }
+.badge-building { background:rgba(245,158,11,0.12); color:#f59e0b; border:1px solid rgba(245,158,11,0.25); }
+.badge-pending { background:rgba(107,114,128,0.1); color:var(--muted); border:1px solid rgba(107,114,128,0.15); }
+/* Bottom bar */
+.bottom-bar { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); background:var(--bar-bg); border:1px solid var(--bar-border); border-radius:12px; padding:10px 18px; font-size:11px; color:var(--muted); display:flex; gap:20px; backdrop-filter:blur(20px); white-space:nowrap; z-index:20; }
+.kbd { background:var(--kbd-bg); border:1px solid var(--kbd-border); padding:1px 6px; border-radius:4px; font-size:10px; color:#8b5cf6; font-family:monospace; }
+@keyframes dash { to { stroke-dashoffset:-100; } }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+@keyframes ring-pulse { 0%{transform:translate(-50%,-50%)scale(1);opacity:.4}100%{transform:translate(-50%,-50%)scale(2.2);opacity:0} }
 </style>
 </head>
 <body>
 <div class="header">
-  <div class="header-brand"><div class="dot"></div>HairLove Agent System</div>
-  <div class="header-status">Система активна</div>
-  <div class="header-time" id="clock">--:--:--</div>
+  <div class="header-brand"><div class="dot"></div>Система агентов — Pavel</div>
+  <div class="header-sub">Направления бизнеса → Агенты → Команды</div>
+  <div class="header-right">
+    <div class="theme-switcher">
+      <button class="theme-btn" data-t="light" onclick="setTheme('light')">☀️ Светлая</button>
+      <button class="theme-btn active" data-t="dark" onclick="setTheme('dark')">🌙 Тёмная</button>
+      <button class="theme-btn" data-t="auto" onclick="setTheme('auto')">⚙️ Авто</button>
+    </div>
+    <div class="header-time" id="clock">--:--:--</div>
+  </div>
 </div>
 <div class="canvas" id="canvas">
   <div class="pulse-ring"></div><div class="pulse-ring"></div><div class="pulse-ring"></div>
   <svg class="lines" id="lines"></svg>
-  <div class="node node-center">
-    <div class="card"><div class="avatar">👤</div><div class="name">Павел</div><div class="role">Orchestrator</div></div>
+
+  <!-- Pavel в центре -->
+  <div class="pavel-node">
+    <div class="pavel-card">
+      <div class="pavel-avatar">👤</div>
+      <div class="pavel-name">Павел</div>
+      <div class="pavel-role">Владелец</div>
+    </div>
   </div>
-  <div class="node node-texts" data-id="texts">
-    <div class="card"><span class="icon">✍️</span><div class="agent-name">Тексты бренда</div><div class="agent-cmd">/hairlove-texts</div><div class="agent-desc">Instagram, сайт, реклама, email</div><span class="badge badge-active">● Активен</span></div>
+
+  <!-- Направление 1: HairLove -->
+  <div class="dir-node" style="left:22%;top:50%">
+    <div class="dir-card active">
+      <div class="dir-icon">💇‍♀️</div>
+      <div class="dir-name">HairLove</div>
+      <div class="dir-count">6 агентов</div>
+      <span class="dir-badge active">● Активно</span>
+    </div>
   </div>
-  <div class="node node-insta" data-id="insta">
-    <div class="card"><span class="icon">📸</span><div class="agent-name">Instagram</div><div class="agent-cmd">/hairlove-insta</div><div class="agent-desc">Публикация постов, контент-план</div><span class="badge badge-active">● Активен</span></div>
+
+  <!-- Направление 2: заглушка -->
+  <div class="dir-node" style="left:78%;top:30%">
+    <div class="dir-card pending">
+      <div class="dir-icon" style="opacity:0.25">📦</div>
+      <div class="dir-name">Новое направление</div>
+      <span class="dir-badge pending">○ Скоро</span>
+    </div>
   </div>
-  <div class="node node-strategy" data-id="strategy">
-    <div class="card"><span class="icon">🎯</span><div class="agent-name">Стратегия</div><div class="agent-cmd">/hairlove-strategy</div><div class="agent-desc">Рост, контент-план, позиционирование</div><span class="badge badge-building">◐ Развивается</span></div>
+
+  <!-- Направление 3: заглушка -->
+  <div class="dir-node" style="left:78%;top:70%">
+    <div class="dir-card pending">
+      <div class="dir-icon" style="opacity:0.25">📦</div>
+      <div class="dir-name">Новое направление</div>
+      <span class="dir-badge pending">○ Скоро</span>
+    </div>
   </div>
-  <div class="node node-site" data-id="site">
-    <div class="card"><span class="icon">🌐</span><div class="agent-name">Сайт</div><div class="agent-cmd">/hairlove-site</div><div class="agent-desc">Создание, тексты, SEO</div><span class="badge badge-pending">○ Предстоит</span></div>
+
+  <!-- Агенты HairLove -->
+  <div class="agent-node" style="left:5%;top:17%">
+    <div class="agent-card"><div class="agent-icon">✍️</div><div class="agent-name">Тексты бренда</div><div class="agent-cmd">/hairlove-texts</div><span class="agent-badge badge-active">● Активен</span></div>
   </div>
-  <div class="node node-competitors" data-id="competitors">
-    <div class="card"><span class="icon">🔍</span><div class="agent-name">Конкуренты</div><div class="agent-cmd">/hairlove-competitors</div><div class="agent-desc">Анализ рынка, тренды, идеи</div><span class="badge badge-pending">○ Предстоит</span></div>
+  <div class="agent-node" style="left:5%;top:37%">
+    <div class="agent-card"><div class="agent-icon">📸</div><div class="agent-name">Instagram</div><div class="agent-cmd">/hairlove-insta</div><span class="agent-badge badge-active">● Активен</span></div>
   </div>
-  <div class="node node-ads" data-id="ads">
-    <div class="card"><span class="icon">📣</span><div class="agent-name">Реклама</div><div class="agent-cmd">/hairlove-ads</div><div class="agent-desc">Meta Ads, Google Ads, таргетинг</div><span class="badge badge-pending">○ Предстоит</span></div>
+  <div class="agent-node" style="left:5%;top:57%">
+    <div class="agent-card"><div class="agent-icon">🎯</div><div class="agent-name">Стратегия</div><div class="agent-cmd">/hairlove-strategy</div><span class="agent-badge badge-building">◐ В работе</span></div>
   </div>
-  <div class="tooltip" id="tooltip">
-    <div class="t-title" id="t-title"></div>
-    <div class="t-row"><span class="t-label">Команда</span><span id="t-cmd"></span></div>
-    <div class="t-row"><span class="t-label">Статус</span><span id="t-status"></span></div>
-    <div class="t-row"><span class="t-label">Вызов</span><span id="t-usage"></span></div>
+  <div class="agent-node" style="left:5%;top:77%">
+    <div class="agent-card"><div class="agent-icon">🔍</div><div class="agent-name">Конкуренты</div><div class="agent-cmd">/hairlove-competitors</div><span class="agent-badge badge-pending">○ Предстоит</span></div>
   </div>
-  <div class="detail-panel">
-    <div class="hint">Новая сессия → агент → задача</div>
-    <div class="hint"><span class="kbd">/hairlove-texts</span><span>Написать текст</span></div>
-    <div class="hint"><span class="kbd">/hairlove-insta</span><span>Опубликовать пост</span></div>
-    <div class="hint"><span class="kbd">/hairlove-strategy</span><span>Контент-план</span></div>
+  <div class="agent-node" style="left:22%;top:83%">
+    <div class="agent-card"><div class="agent-icon">📣</div><div class="agent-name">Реклама</div><div class="agent-cmd">/hairlove-ads</div><span class="agent-badge badge-pending">○ Предстоит</span></div>
+  </div>
+  <div class="agent-node" style="left:22%;top:17%">
+    <div class="agent-card"><div class="agent-icon">🌐</div><div class="agent-name">Сайт</div><div class="agent-cmd">/hairlove-site</div><span class="agent-badge badge-pending">○ Предстоит</span></div>
+  </div>
+
+  <div class="bottom-bar">
+    <span>Направление → Агент → Задача</span>
+    <span><span class="kbd">/hairlove-texts</span> Тексты</span>
+    <span><span class="kbd">/hairlove-insta</span> Instagram</span>
+    <span><span class="kbd">/hairlove-strategy</span> Стратегия</span>
   </div>
 </div>
 <script>
+// ── Тема ──
+const DARK_MQ = window.matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(t){
+  const actual = t==='auto' ? (DARK_MQ.matches?'dark':'light') : t;
+  document.documentElement.setAttribute('data-theme', actual);
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active', b.dataset.t===t));
+}
+function setTheme(t){ localStorage.setItem('theme',t); applyTheme(t); }
+DARK_MQ.addEventListener('change', ()=>{ if(localStorage.getItem('theme')==='auto') applyTheme('auto'); });
+applyTheme(localStorage.getItem('theme')||'dark');
+
+// ── Часы ──
 function updateClock(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
 setInterval(updateClock,1000);updateClock();
+
+// ── Линии ──
 function drawLines(){
   const cv=document.getElementById('canvas'),sv=document.getElementById('lines');
   const cw=cv.offsetWidth,ch=cv.offsetHeight;
-  const cx=cw*0.5,cy=ch*0.5;
-  const pos={texts:{x:cw*0.22,y:ch*0.22},insta:{x:cw*0.78,y:ch*0.22},strategy:{x:cw*0.14,y:ch*0.50},site:{x:cw*0.86,y:ch*0.50},competitors:{x:cw*0.22,y:ch*0.78},ads:{x:cw*0.78,y:ch*0.78}};
-  const active=['texts','insta'];
+  const px=cw*0.5,py=ch*0.5;
   sv.innerHTML='';
-  Object.entries(pos).forEach(([id,p])=>{
+  function ln(x1,y1,x2,y2,cls){
     const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l.setAttribute('x1',cx);l.setAttribute('y1',cy);l.setAttribute('x2',p.x);l.setAttribute('y2',p.y);
-    l.setAttribute('class','line'+(active.includes(id)?' active':''));
-    sv.appendChild(l);
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('class',cls);sv.appendChild(l);
+  }
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  sv.innerHTML='';
+  // Pavel → направления
+  ln(px,py, cw*0.22,ch*0.5, 'line-dir');
+  ln(px,py, cw*0.78,ch*0.3, 'line-pending');
+  ln(px,py, cw*0.78,ch*0.7, 'line-pending');
+  // HairLove → агенты
+  const hx=cw*0.22,hy=ch*0.5;
+  [[0.05,0.17],[0.05,0.37],[0.05,0.57],[0.05,0.77],[0.22,0.83],[0.22,0.17]].forEach(([ax,ay])=>{
+    ln(hx,hy,cw*ax,ch*ay,'line-agent');
   });
 }
-drawLines();window.addEventListener('resize',drawLines);
-const td={texts:{title:'Тексты бренда',cmd:'/hairlove-texts',status:'✅ Активен',usage:'/hairlove-texts Instagram Lamellar Water'},insta:{title:'Instagram постинг',cmd:'/hairlove-insta',status:'✅ Активен',usage:'/hairlove-insta + фото'},strategy:{title:'Стратегия',cmd:'/hairlove-strategy',status:'◐ В разработке',usage:'/hairlove-strategy контент-план май'},site:{title:'Сайт',cmd:'/hairlove-site',status:'○ Не начат',usage:'/hairlove-site старт'},competitors:{title:'Конкуренты',cmd:'/hairlove-competitors',status:'○ Не начат',usage:'/hairlove-competitors @brandname'},ads:{title:'Реклама',cmd:'/hairlove-ads',status:'○ Не запущена',usage:'/hairlove-ads продажи 100$'}};
-const tip=document.getElementById('tooltip');
-document.querySelectorAll('.node[data-id]').forEach(node=>{
-  const d=td[node.dataset.id];
-  node.addEventListener('mouseenter',()=>{
-    document.getElementById('t-title').textContent=d.title;
-    document.getElementById('t-cmd').textContent=d.cmd;
-    document.getElementById('t-status').textContent=d.status;
-    document.getElementById('t-usage').textContent=d.usage;
-    const r=node.getBoundingClientRect(),cr=document.getElementById('canvas').getBoundingClientRect();
-    let x=r.left-cr.left+r.width/2-100,y=r.top-cr.top-110;
-    if(y<10)y=r.bottom-cr.top+10;
-    if(x<10)x=10;if(x+210>cr.width)x=cr.width-215;
-    tip.style.left=x+'px';tip.style.top=y+'px';tip.classList.add('show');
-  });
-  node.addEventListener('mouseleave',()=>tip.classList.remove('show'));
-});
+drawLines();
+window.addEventListener('resize',drawLines);
+// перерисовать линии при смене темы (цвета берутся из CSS, но stroke инлайновый — ок)
+new MutationObserver(drawLines).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 </script>
 </body>
 </html>"""
