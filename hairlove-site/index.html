@@ -387,8 +387,26 @@ nav.scrolled .nav-burger span { background: var(--teal-dark); }
 
 /* ─── BRAND STRIP ──────────────────────────────────────────────────── */
 .brand-strip {
-  background: var(--teal-dark);
-  overflow: hidden; padding: 20px 0;
+  overflow: hidden; padding: 14px 0;
+  background: linear-gradient(90deg, #FAFFFE 0%, #E4F8F2 18%, #F0FBF7 36%, #E8FAF4 54%, #F4FBF9 72%, #EDFAF5 90%, #FAFFFE 100%);
+  background-size: 300% 100%;
+  animation: pearlBand 9s ease infinite;
+  border-top: 1px solid rgba(91,191,185,0.22);
+  border-bottom: 1px solid rgba(91,191,185,0.22);
+  position: relative;
+}
+.brand-strip::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 20%, rgba(201,236,230,0.5) 40%, rgba(240,252,248,0.7) 50%, rgba(201,236,230,0.5) 60%, transparent 80%);
+  background-size: 200% 100%;
+  animation: shimmerSlide 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes pearlBand {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 .strip-track {
   display: flex; gap: 64px;
@@ -400,11 +418,12 @@ nav.scrolled .nav-burger span { background: var(--teal-dark); }
   white-space: nowrap;
   font-size: 0.72rem; font-weight: 500;
   letter-spacing: 0.2em; text-transform: uppercase;
-  color: rgba(255,255,255,0.6);
+  color: var(--teal-dark);
+  position: relative; z-index: 1;
 }
 .strip-dot {
   width: 4px; height: 4px;
-  border-radius: 50%; background: var(--teal-light);
+  border-radius: 50%; background: var(--teal);
   flex-shrink: 0;
 }
 @keyframes marquee {
@@ -986,6 +1005,66 @@ nav.scrolled .lang-sep { color: rgba(26,26,26,0.2); }
   .lang-switch { margin-left: 8px; }
   .lang-btn { font-size: 0.65rem; }
 }
+
+/* ─── PRODUCT INSTRUCTIONS ─────────────────────────────────────────── */
+.product-instr-toggle {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--teal); background: none; border: none;
+  cursor: pointer; padding: 0; margin-top: 12px;
+  transition: color 0.2s;
+}
+.product-instr-toggle:hover { color: var(--teal-dark); }
+.instr-arrow {
+  display: inline-block;
+  transition: transform 0.3s var(--ease-out);
+}
+.product-instr-toggle.open .instr-arrow { transform: rotate(90deg); }
+.product-instructions {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.45s var(--ease-out), padding 0.3s;
+  padding: 0 0;
+}
+.product-instructions.open {
+  max-height: 700px;
+  padding: 16px 0 4px;
+}
+.instr-inner {
+  border-top: 1px solid rgba(27,107,104,0.1);
+  padding-top: 16px;
+}
+.instr-badges {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 14px;
+}
+.instr-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.68rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--teal-pale); color: var(--teal-dark);
+  padding: 5px 10px; border-radius: 100px;
+}
+.instr-badge svg { flex-shrink: 0; }
+.instr-steps {
+  list-style: none; padding: 0; margin: 0;
+}
+.instr-step {
+  display: flex; gap: 12px; padding: 8px 0;
+  border-bottom: 1px solid rgba(27,107,104,0.06);
+  font-size: 0.83rem; font-weight: 300; line-height: 1.55;
+  color: var(--ink-soft);
+}
+.instr-step:last-child { border-bottom: none; }
+.instr-num {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  background: var(--teal);
+  color: white; font-size: 0.65rem; font-weight: 600;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 2px;
+}
 </style>
 </head>
 <body>
@@ -1217,6 +1296,26 @@ nav.scrolled .lang-sep { color: rgba(26,26,26,0.2); }
           <div class="product-price">490 ₴ <span>/ 200 мл</span></div>
           <a href="#partners" class="btn-card" data-i18n="c_btn">Замовити →</a>
         </div>
+        <button class="product-instr-toggle" onclick="toggleInstr(this,'instr1')" data-i18n="instr_btn">
+          <svg class="instr-arrow" width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M9 18l6-6-6-6"/></svg>
+          Як наносити
+        </button>
+        <div class="product-instructions" id="instr1">
+          <div class="instr-inner">
+            <div class="instr-badges">
+              <span class="instr-badge"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg><span data-i18n="badge_norinse">Не змивати</span></span>
+              <span class="instr-badge"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2" d="M12 8v4l3 3"/></svg><span data-i18n="badge_daily">Щодня</span></span>
+              <span class="instr-badge"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 3.5 3 7.5 7 11 4-3.5 7-7.5 7-11 0-3.87-3.13-7-7-7z"/></svg><span data-i18n="badge_midends">Від середини до кінців</span></span>
+            </div>
+            <ol class="instr-steps">
+              <li class="instr-step"><span class="instr-num">1</span><span data-i18n="c1s1">Вимий голову шампунем і злегка просуши рушником. Волосся має бути вологим.</span></li>
+              <li class="instr-step"><span class="instr-num">2</span><span data-i18n="c1s2">Натисни 2–3 рази на помпу (для довгого волосся — 4–5 разів) і нанеси на долоню.</span></li>
+              <li class="instr-step"><span class="instr-num">3</span><span data-i18n="c1s3">Рівномірно розподіли від середини до кінців. На корені наносити не обов'язково.</span></li>
+              <li class="instr-step"><span class="instr-num">4</span><span data-i18n="c1s4">Не змивай. Укладай волосся як зазвичай — феном, плойкою або залиш сушитися.</span></li>
+              <li class="instr-step"><span class="instr-num">5</span><span data-i18n="c1s5">Результат: послух, зволоженість, блиск і нуль пухнастості.</span></li>
+            </ol>
+          </div>
+        </div>
       </div>
 
       <!-- Card 2: Thermo -->
@@ -1257,6 +1356,26 @@ nav.scrolled .lang-sep { color: rgba(26,26,26,0.2); }
           <div class="product-price">520 ₴ <span>/ 200 мл</span></div>
           <a href="#partners" class="btn-card" data-i18n="c_btn">Замовити →</a>
         </div>
+        <button class="product-instr-toggle" onclick="toggleInstr(this,'instr2')" data-i18n="instr_btn">
+          <svg class="instr-arrow" width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M9 18l6-6-6-6"/></svg>
+          Як наносити
+        </button>
+        <div class="product-instructions" id="instr2">
+          <div class="instr-inner">
+            <div class="instr-badges">
+              <span class="instr-badge"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg><span data-i18n="badge_norinse">Не змивати</span></span>
+              <span class="instr-badge"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M13 2L4.5 13.5H11L10 22l8.5-11.5H13L13 2z"/></svg><span data-i18n="badge_heat">До 220°C</span></span>
+              <span class="instr-badge"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2" d="M12 8v4l3 3"/></svg><span data-i18n="badge_anytime">Вологе або сухе</span></span>
+            </div>
+            <ol class="instr-steps">
+              <li class="instr-step"><span class="instr-num">1</span><span data-i18n="c2s1">Наноси на вологе волосся перед феном або на сухе — перед плойкою/праскою.</span></li>
+              <li class="instr-step"><span class="instr-num">2</span><span data-i18n="c2s2">Тримай флакон на відстані 20–25 см від волосся, рівномірно розпиляй по всій довжині.</span></li>
+              <li class="instr-step"><span class="instr-num">3</span><span data-i18n="c2s3">Особливу увагу приділи кінцям — вони найбільш пошкоджені термічно.</span></li>
+              <li class="instr-step"><span class="instr-num">4</span><span data-i18n="c2s4">Не змивай. Одразу приступай до укладки.</span></li>
+              <li class="instr-step"><span class="instr-num">5</span><span data-i18n="c2s5">Можна також нанести після укладки для блиску та захисту від вологості.</span></li>
+            </ol>
+          </div>
+        </div>
       </div>
 
       <!-- Card 3: Lamellar -->
@@ -1295,6 +1414,30 @@ nav.scrolled .lang-sep { color: rgba(26,26,26,0.2); }
         <div class="product-card-footer">
           <div class="product-price">630 ₴ <span>/ 200 мл</span></div>
           <a href="#partners" class="btn-card" data-i18n="c_btn">Замовити →</a>
+        </div>
+        <button class="product-instr-toggle" onclick="toggleInstr(this,'instr3')" data-i18n="instr_btn">
+          <svg class="instr-arrow" width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" d="M9 18l6-6-6-6"/></svg>
+          Як наносити
+        </button>
+        <div class="product-instructions" id="instr3">
+          <div class="instr-inner">
+            <div class="instr-badges">
+              <span class="instr-badge"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M20 6H4a2 2 0 00-2 2v8a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2z"/><path stroke="currentColor" stroke-width="2" d="M8 6V4h8v2"/></svg><span data-i18n="badge_rinse">Змивати</span></span>
+              <span class="instr-badge"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2" d="M3 9h18"/></svg><span data-i18n="badge_2modes">2 режими</span></span>
+              <span class="instr-badge"><svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 3.5 3 7.5 7 11 4-3.5 7-7.5 7-11 0-3.87-3.13-7-7-7z"/></svg><span data-i18n="badge_roots">Корінь → кінці</span></span>
+            </div>
+            <div style="font-size:0.78rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;" data-i18n="mode1_label">Режим 1 — Бальзам (15–30 сек)</div>
+            <ol class="instr-steps" style="margin-bottom:14px;">
+              <li class="instr-step"><span class="instr-num">1</span><span data-i18n="c3s1">Нанеси на чисте вологе волосся після шампуню від кореня до кінців.</span></li>
+              <li class="instr-step"><span class="instr-num">2</span><span data-i18n="c3s2">Витримай 15–30 секунд. Добре змий.</span></li>
+            </ol>
+            <div style="font-size:0.78rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;" data-i18n="mode2_label">Режим 2 — Маска-філлер (до 30 хв)</div>
+            <ol class="instr-steps">
+              <li class="instr-step"><span class="instr-num">1</span><span data-i18n="c3s3">Нанеси щедро на чисте вологе волосся від кореня до кінців.</span></li>
+              <li class="instr-step"><span class="instr-num">2</span><span data-i18n="c3s4">Витримай від 10 до 30 хвилин — чим довше, тим глибше відновлення.</span></li>
+              <li class="instr-step"><span class="instr-num">3</span><span data-i18n="c3s5">Добре змий теплою водою. Рекомендовано 1–3 рази на тиждень.</span></li>
+            </ol>
+          </div>
         </div>
       </div>
 
@@ -1363,8 +1506,8 @@ nav.scrolled .lang-sep { color: rgba(26,26,26,0.2); }
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M20 7H4a1 1 0 00-1 1v10a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16" stroke="currentColor" stroke-width="1.5"/><line x1="10" y1="14" x2="14" y2="14" stroke="currentColor" stroke-width="1.5"/></svg>
             </div>
             <div>
-              <div class="why-item-title" data-i18n="why5_title">Преміальне пакування</div>
-              <div class="why-item-desc" data-i18n="why5_desc">Етикетки надруковані на Constellation Jade Raster — перламутровому FSC™-сертифікованому папері з ніжним нефритовим відблиском.</div>
+              <div class="why-item-title" data-i18n="why5_title">Увага до деталей</div>
+              <div class="why-item-desc" data-i18n="why5_desc">Кожна деталь бренду продумана до дрібниць — від складу до пакування. Якість, яку відчуваєш ще до першого нанесення.</div>
             </div>
           </li>
         </ul>
@@ -1691,6 +1834,13 @@ reveals.forEach(el => observer.observe(el));
 // Reviews slider
 let reviewIdx = 0;
 const track = document.getElementById('reviewsTrack');
+
+function toggleInstr(btn, id) {
+  btn.classList.toggle('open');
+  const panel = document.getElementById(id);
+  panel.classList.toggle('open');
+}
+
 function slideReviews(dir) {
   const cards = track.querySelectorAll('.review-card');
   const cardW = cards[0].offsetWidth + 24;
@@ -1744,7 +1894,7 @@ const T = {
     why2_title:'Склад без компромісів', why2_desc:'Кератин, шовк, аргана, колаген — активні інгредієнти, що реально працюють. pH 4.5–5.0 зберігає структуру волосся.',
     why3_title:'Результат з першого разу', why3_desc:'Видимий ефект вже після першого застосування. Понад 4000 флаконів продано — і кожен клієнт повертається.',
     why4_title:'Підтримка для партнерів', why4_desc:"Тестери, маркетингові матеріали, гнучкі умови для салонів і дистриб'юторів. Ростемо разом.",
-    why5_title:'Преміальне пакування', why5_desc:'Етикетки надруковані на Constellation Jade Raster — перламутровому FSC™-сертифікованому папері з ніжним нефритовим відблиском.',
+    why5_title:'Увага до деталей', why5_desc:'Кожна деталь бренду продумана до дрібниць — від складу до пакування. Якість, яку відчуваєш ще до першого нанесення.',
     reviews_eyebrow:'Відгуки',
     reviews_title:'Що кажуть<br><em>клієнти та майстри</em>',
     partners_eyebrow:'Партнерам',
@@ -1765,6 +1915,27 @@ const T = {
     insta_title:'Ми в<br><em>соціальних мережах</em>',
     insta_btn:'Підписатися на Instagram',
     footer_brand_desc:'Професійний догляд за волоссям, виготовлений в Італії. Для тих, хто закохує себе у своє волосся щодня.',
+
+    instr_btn:'Як наносити',
+    badge_norinse:'Не змивати', badge_daily:'Щодня', badge_midends:'Від середини до кінців',
+    badge_heat:'До 220°C', badge_anytime:'Вологе або сухе',
+    badge_rinse:'Змивати', badge_2modes:'2 режими', badge_roots:'Корінь → кінці',
+    mode1_label:'Режим 1 — Бальзам (15–30 сек)', mode2_label:'Режим 2 — Маска-філлер (до 30 хв)',
+    c1s1:"Вимий голову шампунем і злегка просуши рушником. Волосся має бути вологим.",
+    c1s2:"Натисни 2–3 рази на помпу (для довгого волосся — 4–5 разів) і нанеси на долоню.",
+    c1s3:"Рівномірно розподіли від середини до кінців. На корені наносити не обов'язково.",
+    c1s4:"Не змивай. Укладай волосся як зазвичай — феном, плойкою або залиш сушитися.",
+    c1s5:"Результат: послух, зволоженість, блиск і нуль пухнастості.",
+    c2s1:"Наноси на вологе волосся перед феном або на сухе — перед плойкою/праскою.",
+    c2s2:"Тримай флакон на відстані 20–25 см від волосся, рівномірно розпиляй по всій довжині.",
+    c2s3:"Особливу увагу приділи кінцям — вони найбільш пошкоджені термічно.",
+    c2s4:"Не змивай. Одразу приступай до укладки.",
+    c2s5:"Можна також нанести після укладки для блиску та захисту від вологості.",
+    c3s1:"Нанеси на чисте вологе волосся після шампуню від кореня до кінців.",
+    c3s2:"Витримай 15–30 секунд. Добре змий.",
+    c3s3:"Нанеси щедро на чисте вологе волосся від кореня до кінців.",
+    c3s4:"Витримай від 10 до 30 хвилин — чим довше, тим глибше відновлення.",
+    c3s5:"Добре змий теплою водою. Рекомендовано 1–3 рази на тиждень.",
     footer_copy:'© 2025 HairLove. Всі права захищені.'
   },
   ru: {
@@ -1790,7 +1961,7 @@ const T = {
     why2_title:'Состав без компромиссов', why2_desc:'Кератин, шёлк, аргана, коллаген — активные ингредиенты, которые реально работают. pH 4.5–5.0 сохраняет структуру волос.',
     why3_title:'Результат с первого раза', why3_desc:'Видимый эффект уже после первого применения. Более 4000 флаконов продано — и каждый клиент возвращается.',
     why4_title:'Поддержка для партнёров', why4_desc:'Тестеры, маркетинговые материалы, гибкие условия для салонов и дистрибьюторов. Растём вместе.',
-    why5_title:'Упаковка премиум-класса', why5_desc:'Этикетки выполнены на бумаге Constellation Jade Raster — перламутровой, с тонкой рельефной текстурой, FSC™-сертифицированной.',
+    why5_title:'Внимание к деталям', why5_desc:'Каждая деталь бренда продумана до мелочей — от состава до упаковки. Качество, которое чувствуешь ещё до первого нанесения.',
     reviews_eyebrow:'Отзывы',
     reviews_title:'Что говорят<br><em>клиенты и мастера</em>',
     partners_eyebrow:'Партнёрам',
@@ -1811,6 +1982,27 @@ const T = {
     insta_title:'Мы в<br><em>социальных сетях</em>',
     insta_btn:'Подписаться на Instagram',
     footer_brand_desc:'Профессиональный уход за волосами, произведённый в Италии. Для тех, кто влюбляет себя в свои волосы каждый день.',
+
+    instr_btn:'Как наносить',
+    badge_norinse:'Не смывать', badge_daily:'Ежедневно', badge_midends:'Со середины до концов',
+    badge_heat:'До 220°C', badge_anytime:'Влажные или сухие',
+    badge_rinse:'Смывать', badge_2modes:'2 режима', badge_roots:'Корень → концы',
+    mode1_label:'Режим 1 — Бальзам (15–30 сек)', mode2_label:'Режим 2 — Маска-филлер (до 30 мин)',
+    c1s1:"Вымой голову шампунем и слегка просуши полотенцем. Волосы должны быть влажными.",
+    c1s2:"Нажми 2–3 раза на помпу (для длинных волос — 4–5 раз) и нанеси на ладонь.",
+    c1s3:"Равномерно распредели от середины до концов. На корни наносить необязательно.",
+    c1s4:"Не смывай. Укладывай волосы как обычно — феном, плойкой или оставь сохнуть.",
+    c1s5:"Результат: послушность, увлажнённость, блеск и ноль пушистости.",
+    c2s1:"Наноси на влажные волосы перед феном или на сухие — перед плойкой/утюжком.",
+    c2s2:"Держи флакон на расстоянии 20–25 см от волос, равномерно распыляй по всей длине.",
+    c2s3:"Особое внимание уделяй концам — они наиболее повреждены термически.",
+    c2s4:"Не смывай. Сразу приступай к укладке.",
+    c2s5:"Можно также нанести после укладки для блеска и защиты от влажности.",
+    c3s1:"Нанеси на чистые влажные волосы после шампуня от корня до концов.",
+    c3s2:"Выдержи 15–30 секунд. Хорошо смой.",
+    c3s3:"Нанеси щедро на чистые влажные волосы от корня до концов.",
+    c3s4:"Выдержи от 10 до 30 минут — чем дольше, тем глубже восстановление.",
+    c3s5:"Хорошо смой тёплой водой. Рекомендуется 1–3 раза в неделю.",
     footer_copy:'© 2025 HairLove. Все права защищены.'
   },
   en: {
@@ -1836,7 +2028,7 @@ const T = {
     why2_title:'Uncompromising formula', why2_desc:'Keratin, silk, argan, collagen — active ingredients that actually work. pH 4.5–5.0 preserves hair structure.',
     why3_title:'Results from first use', why3_desc:'Visible effect after the very first application. Over 4,000 bottles sold — and every customer comes back.',
     why4_title:'Partner support', why4_desc:'Testers, marketing materials, flexible terms for salons and distributors. Growing together.',
-    why5_title:'Premium packaging', why5_desc:'Labels printed on Constellation Jade Raster — a pearlescent FSC™-certified paper with a subtle jade iridescent shimmer.',
+    why5_title:'Attention to detail', why5_desc:'Labels printed on Constellation Jade Raster — a pearlescent FSC™-certified paper with a subtle jade iridescent shimmer.',
     reviews_eyebrow:'Reviews',
     reviews_title:'What clients<br><em>and stylists say</em>',
     partners_eyebrow:'Partners',
@@ -1857,6 +2049,27 @@ const T = {
     insta_title:'We\'re on<br><em>social media</em>',
     insta_btn:'Follow on Instagram',
     footer_brand_desc:'Professional hair care, made in Italy. For those who fall in love with their hair every day.',
+
+    instr_btn:'How to apply',
+    badge_norinse:'Leave-in', badge_daily:'Daily', badge_midends:'Mid-length to ends',
+    badge_heat:'Up to 220°C', badge_anytime:'Wet or dry hair',
+    badge_rinse:'Rinse out', badge_2modes:'2 modes', badge_roots:'Roots to ends',
+    mode1_label:'Mode 1 — Conditioner (15–30 sec)', mode2_label:'Mode 2 — Filler mask (up to 30 min)',
+    c1s1:"Wash hair with shampoo and lightly towel-dry. Hair should be damp.",
+    c1s2:"Press the pump 2–3 times (4–5 for long hair) and apply to your palm.",
+    c1s3:"Distribute evenly from mid-length to ends. No need to apply to roots.",
+    c1s4:"Do not rinse. Style as usual — blow-dry, curl, or air-dry.",
+    c1s5:"Result: manageability, moisture, shine and zero frizz.",
+    c2s1:"Apply to damp hair before blow-drying or to dry hair before straightening/curling.",
+    c2s2:"Hold the bottle 20–25 cm from hair and spray evenly along the length.",
+    c2s3:"Pay extra attention to the ends — they're most thermally damaged.",
+    c2s4:"Do not rinse. Proceed with styling immediately.",
+    c2s5:"Can also be applied after styling for shine and humidity protection.",
+    c3s1:"Apply to clean, damp hair after shampooing from roots to ends.",
+    c3s2:"Leave for 15–30 seconds. Rinse thoroughly.",
+    c3s3:"Apply generously to clean, damp hair from roots to ends.",
+    c3s4:"Leave for 10–30 minutes — the longer, the deeper the restoration.",
+    c3s5:"Rinse thoroughly with warm water. Recommended 1–3 times per week.",
     footer_copy:'© 2025 HairLove. All rights reserved.'
   }
 };
