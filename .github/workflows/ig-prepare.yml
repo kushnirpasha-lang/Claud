@@ -23,27 +23,6 @@ jobs:
           target: /tmp/ig_pending/
           strip_components: 1
 
-      - name: Diagnose Instagram token
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /opt/assistant && export $(grep -v '^#' .env | xargs)
-            python3 - << 'PYEOF'
-            import os, requests
-
-            token = os.environ.get('INSTAGRAM_ACCESS_TOKEN', '')
-            uid   = os.environ.get('INSTAGRAM_USER_ID', '')
-            print(f"Token prefix: {token[:20]}...")
-            print(f"User ID: {uid}")
-
-            r = requests.get(f'https://graph.instagram.com/v21.0/{uid}',
-                params={'fields': 'username,account_type', 'access_token': token})
-            print(f"Account info: {r.status_code} {r.text}")
-            PYEOF
-
       - name: Create preview session on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -59,8 +38,8 @@ jobs:
             cp /tmp/ig_pending/image.jpg /opt/assistant/static/uploads/${SESSION_ID}.jpg
             echo "Image copied"
 
-            # Build JSON payload safely via python
-            python3 - << PYEOF
+            # Build JSON payload safely via virtualenv python
+            /opt/assistant/venv/bin/python3 - << PYEOF
             import requests
 
             session_id = open('/tmp/ig_pending/session_id.txt').read().strip()
