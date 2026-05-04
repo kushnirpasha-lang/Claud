@@ -1,0 +1,55 @@
+name: Find Instagram ID v2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  find-id:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Find Instagram account
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        run: |
+          python3 - << 'PYEOF'
+          import os, json, requests
+
+          token = os.environ['INSTAGRAM_ACCESS_TOKEN']
+          ig_id = os.environ['INSTAGRAM_USER_ID']
+          gh_token = os.environ['GH_TOKEN']
+
+          results = {}
+
+          # Try direct access to Instagram account via known ID
+          r1 = requests.get(
+              f"https://graph.facebook.com/v21.0/{ig_id}",
+              params={"fields": "id,username,account_type,name", "access_token": token}
+          ).json()
+          results['direct_id'] = r1
+
+          # Try me with all fields
+          r2 = requests.get(
+              "https://graph.facebook.com/v21.0/me",
+              params={"fields": "id,name,accounts,businesses", "access_token": token}
+          ).json()
+          results['me_with_businesses'] = r2
+
+          # Try getting pages with business token
+          r3 = requests.get(
+              "https://graph.facebook.com/v21.0/me/accounts",
+              params={"access_token": token, "fields": "id,name,instagram_business_account,access_token"}
+          ).json()
+          results['pages'] = r3
+
+          body = json.dumps(results, ensure_ascii=False, indent=2)
+          requests.post(
+              "https://api.github.com/repos/kushnirpasha-lang/Claud/issues/1/comments",
+              headers={"Authorization": f"token {gh_token}"},
+              json={"body": body[:4000]}
+          )
+          print(body[:2000])
+          PYEOF
