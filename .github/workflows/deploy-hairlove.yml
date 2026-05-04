@@ -1,0 +1,42 @@
+name: Deploy HairLove Site
+
+on:
+  workflow_dispatch:
+    inputs:
+      html_gz_b64:
+        description: "Gzipped base64 HTML content"
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore site HTML
+        run: |
+          mkdir -p hairlove-site
+          printf '%s' "${{ inputs.html_gz_b64 }}" | base64 -d | gunzip > hairlove-site/index.html
+          echo "Restored: $(wc -c < hairlove-site/index.html) bytes"
+
+      - name: Copy to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "hairlove-site/index.html"
+          target: /var/www
+          strip_components: 0
+
+      - name: Configure nginx
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p /var/www/hairlove-site
+            chmod 644 /var/www/hairlove-site/index.html
+            printf 'server { listen 8090; server_name _; root /var/www/hairlove-site; index index.html; location / { try_files $uri /index.html; } }\n' > /etc/nginx/sites-available/hairlove
+            ln -sf /etc/nginx/sites-available/hairlove /etc/nginx/sites-enabled/hairlove
+            nginx -t && systemctl reload nginx
+            echo "Done! Site at: http://188.166.67.237:8090/"
