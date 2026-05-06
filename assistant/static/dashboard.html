@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Центр управления</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+
+:root {
+  --bg: #0d0d14;
+  --surface: #13131e;
+  --surface2: #1a1a28;
+  --border: rgba(255,255,255,.06);
+  --text: #e8e8f0;
+  --muted: #6b6b88;
+  --accent: #7c6af7;
+  --accent2: #5fd8c4;
+  --green: #3dd68c;
+  --amber: #f5a623;
+  --red: #f05c5c;
+  --radius: 14px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 -apple-system, 'Segoe UI', sans-serif;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header h1 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -.3px;
+}
+
+.sidebar-header .subtitle {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.live-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1 }
+  50% { opacity: .3 }
+}
+
+.projects-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.projects-list::-webkit-scrollbar { width: 4px }
+.projects-list::-webkit-scrollbar-track { background: transparent }
+.projects-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px }
+
+.project-item {
+  padding: 11px 18px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all .18s ease;
+  position: relative;
+}
+
+.project-item:hover { background: var(--surface2) }
+.project-item.active {
+  background: var(--surface2);
+  border-left-color: var(--accent);
+}
+
+.project-item-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite }
+.status-dot.idle { background: var(--muted) }
+.status-dot.error { background: var(--red) }
+
+.project-name {
+  font-weight: 600;
+  font-size: 13px;
+  flex: 1;
+}
+
+.project-last {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  padding-left: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-footer {
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Main */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.4px;
+}
+
+.topbar-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.topbar-actions a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 5px 12px;
+  border: 1px solid rgba(124,106,247,.3);
+  border-radius: 6px;
+  transition: all .18s;
+}
+
+.topbar-actions a:hover { background: rgba(124,106,247,.1) }
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  grid-template-rows: auto 1fr;
+  gap: 20px;
+  align-content: start;
+}
+
+.content::-webkit-scrollbar { width: 5px }
+.content::-webkit-scrollbar-track { background: transparent }
+.content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px }
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-header h2 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.card-body { padding: 16px 18px }
+
+/* Agents grid */
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.agent-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.agent-card:hover { border-color: rgba(124,106,247,.4); transform: translateY(-1px) }
+.agent-card.active-agent { border-color: var(--green); background: rgba(61,214,140,.05) }
+
+.agent-icon { font-size: 20px; margin-bottom: 6px }
+.agent-name { font-size: 12px; font-weight: 600 }
+.agent-status { font-size: 10px; color: var(--muted); margin-top: 2px }
+
+/* Events feed */
+.events-feed { display: flex; flex-direction: column; gap: 0 }
+
+.event-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  animation: fadeIn .3s ease;
+}
+
+.event-item:last-child { border-bottom: none }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px) }
+  to { opacity: 1; transform: none }
+}
+
+.event-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.event-type {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.event-type.start { background: rgba(124,106,247,.2); color: var(--accent) }
+.event-type.complete { background: rgba(61,214,140,.15); color: var(--green) }
+.event-type.step { background: rgba(255,255,255,.06); color: var(--muted) }
+.event-type.handoff { background: rgba(245,166,35,.15); color: var(--amber) }
+.event-type.error { background: rgba(240,92,92,.15); color: var(--red) }
+.event-type.wait { background: rgba(255,255,255,.06); color: var(--muted) }
+
+.event-agent { font-size: 11px; font-weight: 600; color: var(--accent2) }
+.event-time { font-size: 10px; color: var(--muted); margin-left: auto }
+.event-msg { font-size: 12px; color: var(--text); line-height: 1.4 }
+
+/* Route card */
+.route-steps { display: flex; flex-direction: column; gap: 8px }
+
+.route-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.step-num {
+  width: 22px; height: 22px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.step-num.done { background: rgba(61,214,140,.15); border-color: var(--green); color: var(--green) }
+.step-num.current { background: rgba(124,106,247,.2); border-color: var(--accent); color: var(--accent) }
+
+.step-info { flex: 1 }
+.step-name { font-size: 12px; font-weight: 600 }
+.step-desc { font-size: 11px; color: var(--muted) }
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.empty-icon { font-size: 32px; margin-bottom: 10px }
+.empty-title { font-size: 14px; font-weight: 600; margin-bottom: 4px }
+.empty-sub { font-size: 12px }
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  padding: 12px 18px;
+  background: var(--surface2);
+  border-radius: 10px;
+  margin-bottom: 0;
+}
+
+.stat { text-align: center }
+.stat-val { font-size: 20px; font-weight: 700; color: var(--text) }
+.stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.badge.active { background: rgba(61,214,140,.15); color: var(--green) }
+.badge.idle { background: rgba(107,107,136,.15); color: var(--muted) }
+
+/* Full width span */
+.span-full { grid-column: 1 / -1 }
+
+/* Scrollable feed container */
+.feed-scroll {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.feed-scroll::-webkit-scrollbar { width: 3px }
+.feed-scroll::-webkit-scrollbar-thumb { background: var(--border) }
+
+.no-project {
+  grid-column: 1/-1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.arrow-hint { font-size: 12px; color: var(--muted); margin-top: 8px }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1><span class="live-dot"></span>Центр управления</h1>
+    <div class="subtitle">Проекты и агенты — в реальном времени</div>
+  </div>
+  <div class="projects-list" id="projectsList">
+    <div class="empty" style="padding:30px 18px">
+      <div class="empty-icon">⏳</div>
+      <div class="empty-title">Загрузка...</div>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <a href="/agents" style="color:var(--accent);text-decoration:none;font-size:11px">← Схема агентов</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar" id="topbar">
+    <div>
+      <div class="topbar-title">Выбери проект</div>
+      <div class="topbar-meta">← нажми на проект слева</div>
+    </div>
+    <div class="topbar-actions">
+      <a href="/agents">Схема агентов</a>
+    </div>
+  </div>
+
+  <div class="content" id="content">
+    <div class="no-project">
+      <div style="font-size:48px">🗺️</div>
+      <div style="font-size:16px;font-weight:700;margin-top:12px">Выбери проект</div>
+      <div class="arrow-hint">← нажми на проект в левой панели</div>
+    </div>
+  </div>
+</main>
+
+<script>
+const AGENTS_META = {
+  coordinator: { icon: '🎯', label: 'Координатор' },
+  planning:    { icon: '📋', label: 'Планирование' },
+  competitors: { icon: '🔍', label: 'Конкуренты' },
+  strategy:    { icon: '🧭', label: 'Стратегия' },
+  site:        { icon: '🌐', label: 'Сайт' },
+  ads:         { icon: '📢', label: 'Реклама' },
+  growth:      { icon: '📈', label: 'Рост' },
+  instagram:   { icon: '📱', label: 'Instagram' },
+  copy:        { icon: '✍️', label: 'Тексты' },
+  'text-editor': { icon: '🖋️', label: 'Корректор' },
+};
+
+let selectedProject = null;
+let allProjects = [];
+let eventSource = null;
+let recentEvents = [];
+let stats = { total: 0, projects: 0 };
+
+function fmtTime(ts) {
+  try {
+    const d = new Date(ts);
+    const now = new Date();
+    const diff = (now - d) / 1000;
+    if (diff < 60) return 'только что';
+    if (diff < 3600) return Math.floor(diff/60) + ' мин назад';
+    if (diff < 86400) return d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
+    return d.toLocaleDateString('ru', {day:'numeric',month:'short'});
+  } catch { return '' }
+}
+
+function fmtTimeShort(ts) {
+  try {
+    return new Date(ts).toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  } catch { return '' }
+}
+
+function getAgentMeta(name) {
+  return AGENTS_META[name] || { icon: '🤖', label: name };
+}
+
+function renderSidebar() {
+  const el = document.getElementById('projectsList');
+  if (!allProjects.length) {
+    el.innerHTML = `<div class="empty" style="padding:30px 18px">
+      <div class="empty-icon">💤</div>
+      <div class="empty-title">Нет проектов</div>
+      <div class="empty-sub">Агенты ещё не присылали события</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = allProjects.map(p => {
+    const isActive = p.active_agent != null;
+    const isSelected = selectedProject === p.name;
+    const last = p.last_event;
+    return `<div class="project-item${isSelected?' active':''}" onclick="selectProject('${p.name}')">
+      <div class="project-item-top">
+        <div class="status-dot ${isActive?'active':'idle'}"></div>
+        <div class="project-name">${p.name}</div>
+      </div>
+      ${last ? `<div class="project-last">${last.message || ''}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderEventItem(e) {
+  const meta = getAgentMeta(e.agent);
+  const type = e.type || 'step';
+  return `<div class="event-item">
+    <div class="event-top">
+      <span class="event-type ${type}">${type}</span>
+      <span class="event-agent">${meta.icon} ${meta.label}</span>
+      <span class="event-time">${fmtTimeShort(e.ts)}</span>
+    </div>
+    <div class="event-msg">${e.message || ''}</div>
+    ${e.artifact ? `<div style="font-size:10px;color:var(--accent);margin-top:3px">📎 ${e.artifact}</div>` : ''}
+  </div>`;
+}
+
+function getProjectAgents(projectName) {
+  const known = Object.keys(AGENTS_META);
+  const seenInEvents = [...new Set(
+    recentEvents.filter(e => e.project === projectName).map(e => e.agent).filter(Boolean)
+  )];
+  const all = [...new Set([...seenInEvents, ...known])];
+  return all;
+}
+
+function renderProjectView(p) {
+  const activeAgent = p.active_agent;
+  const projectEvents = recentEvents.filter(e => e.project === p.name).slice(-50).reverse();
+  const agents = getProjectAgents(p.name);
+  const eventCount = recentEvents.filter(e => e.project === p.name).length;
+
+  document.getElementById('topbar').innerHTML = `
+    <div>
+      <div class="topbar-title">${p.name}</div>
+      <div class="topbar-meta">${activeAgent ? '🟢 Активен: ' + getAgentMeta(activeAgent).label : '⚪ В ожидании задачи'}</div>
+    </div>
+    <div class="topbar-actions">
+      <a href="/agents">Схема агентов</a>
+    </div>`;
+
+  document.getElementById('content').innerHTML = `
+    <div class="span-full">
+      <div class="stats-bar">
+        <div class="stat"><div class="stat-val">${agents.length}</div><div class="stat-lbl">агентов</div></div>
+        <div class="stat"><div class="stat-val">${eventCount}</div><div class="stat-lbl">событий</div></div>
+        <div class="stat"><div class="stat-val">${projectEvents.filter(e=>e.type==='complete').length}</div><div class="stat-lbl">завершено</div></div>
+        <div class="stat"><div class="stat-val">${activeAgent ? '<span style="color:var(--green)">●</span>' : '○'}</div><div class="stat-lbl">статус</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Агенты команды</h2>
+        ${activeAgent ? `<span class="badge active">● Активен</span>` : `<span class="badge idle">Свободны</span>`}
+      </div>
+      <div class="card-body">
+        <div class="agents-grid">
+          ${agents.map(name => {
+            const meta = getAgentMeta(name);
+            const isActive = name === activeAgent;
+            const agentEvents = recentEvents.filter(e => e.project === p.name && e.agent === name);
+            const lastAct = agentEvents.length ? agentEvents[agentEvents.length-1] : null;
+            return `<div class="agent-card${isActive?' active-agent':''}" onclick="selectAgent('${p.name}','${name}')">
+              <div class="agent-icon">${meta.icon}</div>
+              <div class="agent-name">${meta.label}</div>
+              <div class="agent-status">${isActive ? '🟢 активен' : lastAct ? fmtTime(lastAct.ts) : 'нет активности'}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h2>Лента событий</h2></div>
+      <div class="card-body" style="padding:0">
+        <div class="feed-scroll" id="eventFeed" style="padding:4px 18px 14px">
+          ${projectEvents.length
+            ? projectEvents.map(renderEventItem).join('')
+            : '<div class="empty"><div class="empty-title">Событий нет</div><div class="empty-sub">Запусти агента через слеш-команду</div></div>'}
+        </div>
+      </div>
+    </div>`;
+}
+
+function selectProject(name) {
+  selectedProject = name;
+  document.querySelectorAll('.project-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.project-item').forEach(el => {
+    if (el.querySelector('.project-name')?.textContent === name) el.classList.add('active');
+  });
+  startStream(name);
+  const p = allProjects.find(x => x.name === name);
+  if (p) renderProjectView(p);
+}
+
+function selectAgent(project, agent) {
+  const agentEvents = recentEvents.filter(e => e.project === project && e.agent === agent).reverse();
+  const meta = getAgentMeta(agent);
+  const p = allProjects.find(x => x.name === project);
+
+  document.getElementById('topbar').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="selectProject('${project}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--muted);cursor:pointer;font-size:12px">← ${project}</button>
+      <div>
+        <div class="topbar-title">${meta.icon} ${meta.label}</div>
+        <div class="topbar-meta">Агент проекта ${project}</div>
+      </div>
+    </div>
+    <div class="topbar-actions"><a href="/agents">Схема агентов</a></div>`;
+
+  const artifacts = agentEvents.filter(e => e.artifact).map(e => e.artifact);
+
+  document.getElementById('content').innerHTML = `
+    <div class="card span-full">
+      <div class="card-header"><h2>История агента ${meta.icon} ${meta.label}</h2></div>
+      <div class="card-body" style="padding:0">
+        <div class="feed-scroll" style="padding:4px 18px 14px;max-height:600px">
+          ${agentEvents.length
+            ? agentEvents.map(renderEventItem).join('')
+            : '<div class="empty"><div class="empty-title">Событий нет</div><div class="empty-sub">Этот агент ещё не работал</div></div>'}
+        </div>
+      </div>
+    </div>
+    ${artifacts.length ? `
+    <div class="card span-full">
+      <div class="card-header"><h2>Артефакты</h2></div>
+      <div class="card-body">
+        ${[...new Set(artifacts)].map(a => `<div style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:var(--accent)">📎 ${a}</div>`).join('')}
+      </div>
+    </div>` : ''}`;
+}
+
+function startStream(project) {
+  if (eventSource) eventSource.close();
+  const since = recentEvents.length ? recentEvents[recentEvents.length-1]?.ts || '' : '';
+  eventSource = new EventSource(`/api/agents/stream?project=${encodeURIComponent(project)}&since=${encodeURIComponent(since)}`);
+  eventSource.onmessage = (e) => {
+    try {
+      const event = JSON.parse(e.data);
+      recentEvents.push(event);
+      if (recentEvents.length > 500) recentEvents = recentEvents.slice(-500);
+      updateWithEvent(event);
+    } catch {}
+  };
+}
+
+function updateWithEvent(event) {
+  const proj = allProjects.find(p => p.name === event.project);
+  if (proj) {
+    proj.last_event = event;
+    if (event.type === 'start' || event.type === 'step') proj.active_agent = event.agent;
+    else if (event.type === 'complete' || event.type === 'error') proj.active_agent = null;
+    proj.recent_events = [...(proj.recent_events || []), event].slice(-5);
+  } else {
+    allProjects.unshift({ name: event.project, active_agent: null, last_event: event, recent_events: [event] });
+  }
+
+  renderSidebar();
+  if (selectedProject === event.project) {
+    const p = allProjects.find(x => x.name === event.project);
+    if (p) {
+      renderProjectView(p);
+      const feed = document.getElementById('eventFeed');
+      if (feed) feed.scrollTop = 0;
+    }
+  }
+}
+
+async function loadAll() {
+  try {
+    const [projRes, evRes] = await Promise.all([
+      fetch('/api/agents/projects'),
+      fetch('/api/agents/events?limit=500')
+    ]);
+    allProjects = await projRes.json();
+    recentEvents = await evRes.json();
+    renderSidebar();
+  } catch (err) {
+    console.error('Load error:', err);
+  }
+}
+
+loadAll();
+setInterval(async () => {
+  try {
+    const res = await fetch('/api/agents/projects');
+    allProjects = await res.json();
+    renderSidebar();
+    if (selectedProject) {
+      const p = allProjects.find(x => x.name === selectedProject);
+      if (p) renderProjectView(p);
+    }
+  } catch {}
+}, 10000);
+</script>
+</body>
+</html>

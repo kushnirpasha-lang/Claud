@@ -87,6 +87,37 @@ def agents_dashboard():
     return send_from_directory("static", "agents.html")
 
 
+@app.route("/dashboard")
+def new_dashboard():
+    return send_from_directory("static", "dashboard.html")
+
+
+@app.route("/api/agents/stream")
+def api_stream():
+    project = request.args.get("project")
+    agent_filter = request.args.get("agent")
+    last_ts = request.args.get("since", "")
+
+    def generate():
+        current_last = last_ts
+        import time
+        while True:
+            all_events = _read_all_events()
+            new_events = [
+                e for e in all_events
+                if e.get("ts", "") > current_last
+                and (not project or e.get("project") == project)
+                and (not agent_filter or e.get("agent") == agent_filter)
+            ]
+            for e in new_events:
+                current_last = max(current_last, e.get("ts", ""))
+                yield f"data: {json.dumps(e, ensure_ascii=False)}\n\n"
+            time.sleep(1.5)
+
+    return Response(generate(), mimetype="text/event-stream",
+                    headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
 @app.route("/events", methods=["POST"])
 def receive_event():
     if DASHBOARD_TOKEN:
