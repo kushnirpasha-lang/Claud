@@ -1,90 +1,68 @@
-# CLAUDE.md — Контекст проекта
+# CLAUDE.md — HairLove
 
-## Владелец
-- **Имя:** Pavel (@Pavel_Kus)
-- **Телефон:** +380637353733
-- **Язык общения:** русский
+Ты работаешь над проектом **HairLove** — итальянский бренд профессиональной косметики для волос.
+Владелец: **Павел** (@Pavel_Kus, +380637353733). Язык общения: русский.
 
-## Сервер
-- **Провайдер:** DigitalOcean VPS
-- **IP:** 188.166.67.237
-- **Путь к проекту:** `/opt/assistant/`
-- **Сервис:** `systemctl restart assistant`
-- **Файл окружения:** `/opt/assistant/.env`
-
-## Репозиторий
-- **GitHub:** `kushnirpasha-lang/Claud`
-- **Рабочая ветка:** `claude/setup-digitalocean-vps-4Ij39`
-- **Main ветка:** только для workflow файлов (tg-check.yml, deploy.yml)
-- **Deploy:** автоматически при push в `claude/setup-digitalocean-vps-4Ij39`
-
-## Структура ассистента (`/opt/assistant/`)
+## Рабочая директория проекта
 ```
-main.py          — точка входа, запускает бота + telethon + web
-bot.py           — Telegram бот (основной интерфейс)
-claude_client.py — обёртка над Anthropic API с кэшированием
-config.py        — модель, системный промпт, MAX_HISTORY=15
-telethon_user.py — Telethon клиент (только отправка сообщений)
-trello_client.py — Trello API клиент с кэшем 5 мин
-web.py           — Flask веб-интерфейс на порту 8080
-requirements.txt — зависимости
+projects/hairlove/
+```
+Все артефакты, знания, агенты — там.
+
+## База знаний (читай перед любой задачей)
+```
+projects/hairlove/knowledge/компания.md    — кто мы, производство, рынки
+projects/hairlove/knowledge/продукт.md     — продукты и цены (4 уровня)
+projects/hairlove/knowledge/бренд.md       — позиционирование, голос, стиль
+projects/hairlove/knowledge/аудитория.md   — B2B (салоны, дистрибуторы) и B2C
+projects/hairlove/knowledge/метрики.md     — продажи, Instagram, реклама
+projects/hairlove/knowledge/глоссарий.md   — термины, конкуренты, сокращения
 ```
 
-## Telegram Bot
-- **Токен:** в GitHub Secret `TELEGRAM_BOT_TOKEN`
-- **Функции:** текстовые сообщения, голосовые (Whisper), отправка сообщений контактам с подтверждением
+## Агенты команды
+| Slash-команда | Роль |
+|---|---|
+| `/hairlove` | Оркестратор — точка входа, маршрутизация |
+| `/hairlove-strategy` | Стратегия, дорожная карта, решения |
+| `/hairlove-texts` | Тексты для всех каналов |
+| `/hairlove-insta` | Instagram, публикация, контент-план |
+| `/hairlove-site` | Сайт, B2B витрина |
+| `/hairlove-competitors` | Анализ конкурентов и рынка |
+| `/hairlove-ads` | Meta Ads, Google Ads, таргетинг |
 
-## Telegram Userbot (Telethon)
-- **Аккаунт:** @Pavel_Kus (авторизован)
-- **Сессия:** `/opt/assistant/user_session.session`
-- **Режим:** только отправка сообщений — никаких авто-ответов, не читает Избранное
-- **Re-авторизация:** через workflow `tg-check.yml` → step=request → код → step=signin + 2FA
+Субагенты в `projects/hairlove/.claude/agents/`:
+`coordinator`, `planning`, `competitors`, `strategy`, `site`, `ads`, `growth`, `instagram`, `copy`, `text-editor`
 
-## Правила (ОБЯЗАТЕЛЬНО соблюдать)
-1. **Никаких сообщений контактам без явного ✅ от Павла**
-2. **Не трогать Избранное (Saved Messages)**
-3. **Весь диалог только через Telegram бота**
-4. **Перед любым рискованным действием — спросить**
-5. **Секреты только в GitHub Secrets, никогда в коде**
+## Маршруты
+Актуальные цепочки агентов: `projects/hairlove/routes.md`
 
-## Trello
-- **Рабочая доска:** HairLove (`69f5ee59565cd64f2e9da2ff`)
-- **API Key / Token:** в GitHub Secrets `TRELLO_API_KEY`, `TRELLO_TOKEN`
-- **Кэш:** 5 минут, обновляется при изменениях
-
-## API ключи (в GitHub Secrets и `/opt/assistant/.env`)
-- `ANTHROPIC_API_KEY` — Claude API
-- `OPENAI_API_KEY` — Whisper (голосовые сообщения)
-- `TELEGRAM_BOT_TOKEN` — бот
-- `TELEGRAM_API_ID` / `TELEGRAM_API_HASH` — Telethon
-- `TRELLO_API_KEY` / `TRELLO_TOKEN` — Trello
-- `SSH_HOST`, `SSH_PRIVATE_KEY` — доступ к серверу
-- `MY_PAT` — GitHub Personal Access Token
-
-## Оптимизация токенов
-- Модель: `claude-sonnet-4-6`
-- Системный промпт: кэшируется (`cache_control: ephemeral`)
-- История: 15 сообщений (MAX_HISTORY)
-- Intent detection: сначала keyword pre-filter, Haiku только при совпадении
-- Haiku для: intent detection, Trello команды
-- Sonnet для: основной чат
-
-## Как деплоить изменения
-```bash
-git add <файлы>
-git commit -m "описание"
-git push -u origin claude/setup-digitalocean-vps-4Ij39
-# Deploy запустится автоматически (~2-3 мин)
+## Артефакты (результаты работы)
+```
+projects/hairlove/artifacts/strategy/
+projects/hairlove/artifacts/competitors/
+projects/hairlove/artifacts/instagram/
+projects/hairlove/artifacts/copy/
+projects/hairlove/artifacts/ads/
+projects/hairlove/artifacts/site/
+projects/hairlove/artifacts/planning/
+projects/hairlove/artifacts/_summary/
 ```
 
-## Как добавить GitHub Secret
-```python
-# Шифрование через PyNaCl
-from nacl.public import PublicKey, SealedBox
-# Pub key: JdVbhjlKXocKyyrGc8USxxESqS/53NxyLS23X3s+zzc=
-# Key ID: 3380204578043523366
-```
+## Текущее состояние команды
+`projects/hairlove/team-state.md` — кто активен, на каком шаге, блокеры.
 
-## Как проверить результат на сервере
-- Через Issue #1: `kushnirpasha-lang/Claud/issues/1`
-- Workflow `tg-check.yml` постит результаты туда
+## Правила
+1. Перед любой задачей — читай базу знаний (`knowledge/`)
+2. Каждое действие → событие в дашборд: `bash ~/.claude/событие.sh hairlove <агент> <тип> "<сообщение>"`
+3. Каждое действие → строка в `projects/hairlove/progress.log`
+4. Артефакты сохраняй в соответствующую папку `artifacts/`
+5. Обновляй `team-state.md` при смене активного агента
+6. Не трогай `knowledge/` без явной команды Павла
+
+## Дашборд агентов
+`http://188.166.67.237/agents` — живая карта системы.
+
+## Как запустить работу
+- Полный цикл: `/hairlove` → `/full-cycle`
+- Конкретная задача: вызови нужного агента напрямую
+- Узнать маршрут: спроси `/hairlove` что делать с задачей
