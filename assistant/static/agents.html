@@ -3,92 +3,188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Галактика агентов</title>
+  <title>Система агентов — Pavel</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg-deep: #07070d;
-      --bg: #0b0b14;
-      --surface: rgba(20, 20, 32, 0.85);
-      --surface-solid: #14141f;
-      --border: rgba(120, 120, 180, 0.18);
-      --text: #e8e8f0;
-      --muted: #8a8aa3;
-      --dim: #5a5a72;
+      --bg: #f5f4ff;
+      --bg-grad-1: #f8f6ff;
+      --bg-grad-2: #eee9ff;
+      --surface: #ffffff;
+      --surface-2: #faf9ff;
+      --border: #e5e1f5;
+      --border-strong: #d4cfeb;
+      --text: #1a1a2e;
+      --text-muted: #6b6a85;
+      --text-dim: #9594ad;
       --accent: #6366f1;
+      --accent-soft: #eef0ff;
       --green: #22c55e;
-      --yellow: #eab308;
+      --green-soft: #dcfce7;
       --orange: #f59e0b;
-      --red: #ef4444;
+      --orange-soft: #fef3c7;
       --purple: #a855f7;
+      --purple-soft: #f3e8ff;
+      --red: #ef4444;
+      --red-soft: #fee2e2;
       --blue: #3b82f6;
+      --blue-soft: #dbeafe;
+      --shadow-sm: 0 1px 2px rgba(26, 26, 46, 0.04);
+      --shadow: 0 2px 8px rgba(99, 102, 241, 0.08), 0 1px 2px rgba(26, 26, 46, 0.04);
+      --shadow-lg: 0 8px 24px rgba(99, 102, 241, 0.12), 0 2px 8px rgba(26, 26, 46, 0.06);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0e0e1a;
+      --bg-grad-1: #14142a;
+      --bg-grad-2: #0a0a14;
+      --surface: #1a1a2e;
+      --surface-2: #14142a;
+      --border: rgba(120, 120, 180, 0.2);
+      --border-strong: rgba(120, 120, 180, 0.35);
+      --text: #e8e8f0;
+      --text-muted: #9594ad;
+      --text-dim: #6b6a85;
+      --accent: #818cf8;
+      --accent-soft: rgba(99, 102, 241, 0.15);
+      --green-soft: rgba(34, 197, 94, 0.15);
+      --orange-soft: rgba(245, 158, 11, 0.15);
+      --purple-soft: rgba(168, 85, 247, 0.15);
+      --red-soft: rgba(239, 68, 68, 0.15);
+      --blue-soft: rgba(59, 130, 246, 0.15);
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
     html, body {
       height: 100%;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: radial-gradient(ellipse at center, #14142a 0%, var(--bg) 50%, var(--bg-deep) 100%);
+      background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
       color: var(--text);
       font-size: 14px;
       line-height: 1.5;
       overflow: hidden;
+      transition: background 0.3s, color 0.3s;
     }
 
-    /* ── Звёздный фон ── */
-    .stars {
+    body {
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Декоративный фон с точками */
+    .bg-decor {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 0;
-      background-image:
-        radial-gradient(1px 1px at 20% 30%, white, transparent),
-        radial-gradient(1px 1px at 60% 70%, white, transparent),
-        radial-gradient(1px 1px at 50% 50%, rgba(255,255,255,0.6), transparent),
-        radial-gradient(2px 2px at 80% 10%, rgba(180,180,255,0.8), transparent),
-        radial-gradient(1px 1px at 90% 60%, white, transparent),
-        radial-gradient(1px 1px at 33% 80%, white, transparent),
-        radial-gradient(1px 1px at 15% 65%, rgba(180,200,255,0.7), transparent),
-        radial-gradient(1px 1px at 70% 30%, white, transparent);
-      background-size: 100% 100%;
-      animation: twinkle 6s ease-in-out infinite alternate;
+      background-image: radial-gradient(circle, var(--border-strong) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.4;
     }
-    @keyframes twinkle {
-      from { opacity: 0.6; }
-      to   { opacity: 1; }
+    [data-theme="dark"] .bg-decor { opacity: 0.15; }
+
+    /* Орбиты */
+    .orbits-bg {
+      position: fixed;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+      width: 90vh; height: 90vh;
+      max-width: 90vw; max-height: 90vw;
+      border-radius: 50%;
+      border: 1px dashed var(--border-strong);
+      opacity: 0.6;
     }
+    .orbits-bg::before, .orbits-bg::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px dashed var(--border-strong);
+    }
+    .orbits-bg::before { width: 65%; height: 65%; }
+    .orbits-bg::after { width: 35%; height: 35%; }
 
     /* ── Шапка ── */
     header {
       position: fixed;
       top: 0; left: 0; right: 0;
-      padding: 14px 20px;
+      padding: 16px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 10;
-      background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+      gap: 16px;
     }
     .brand {
-      display: flex; align-items: center; gap: 10px;
-      font-weight: 600; font-size: 16px;
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 600; font-size: 15px;
+      color: var(--text);
     }
     .brand .dot {
       width: 8px; height: 8px; border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 12px var(--green);
-      animation: pulse 2s infinite;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .stats {
-      display: flex; gap: 20px;
-      color: var(--muted);
+
+    .header-center {
+      color: var(--text-muted);
       font-size: 13px;
     }
-    .stats b { color: var(--text); font-weight: 600; }
+    .header-center .sep { color: var(--text-dim); margin: 0 6px; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-switch {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px;
+      box-shadow: var(--shadow-sm);
+    }
+    .theme-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .theme-btn:hover { color: var(--text); }
+    .theme-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .clock {
+      font-variant-numeric: tabular-nums;
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+      padding: 6px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      box-shadow: var(--shadow-sm);
+    }
 
     /* ── Галактика ── */
     .galaxy {
@@ -97,318 +193,274 @@
       height: 100vh;
       z-index: 1;
     }
-    .galaxy svg.orbits {
+    .links {
       position: absolute;
       inset: 0;
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       pointer-events: none;
     }
 
-    /* ── Солнце ── */
-    .sun {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 130px; height: 130px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ffe89b, #f59e0b 50%, #b45309 100%);
-      box-shadow:
-        0 0 60px rgba(245, 158, 11, 0.6),
-        0 0 120px rgba(245, 158, 11, 0.3),
-        inset -10px -20px 40px rgba(0,0,0,0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.3s;
-      z-index: 5;
-    }
-    .sun:hover { transform: translate(-50%, -50%) scale(1.05); }
-    .sun .label {
-      font-weight: 700;
-      color: #1a1a2e;
-      font-size: 16px;
-      text-shadow: 0 1px 2px rgba(255,255,255,0.4);
-    }
-    .sun .role {
-      color: rgba(26,26,46,0.7);
-      font-size: 10px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-
-    /* ── Планета (проект) ── */
-    .planet {
+    /* ── Карточка-планета ── */
+    .node {
       position: absolute;
       transform: translate(-50%, -50%);
       cursor: pointer;
       z-index: 3;
-      transition: transform 0.2s;
+      transition: transform 0.2s ease;
     }
-    .planet:hover { transform: translate(-50%, -50%) scale(1.08); z-index: 6; }
+    .node:hover { transform: translate(-50%, -50%) translateY(-3px); z-index: 6; }
 
-    .planet-body {
-      width: 76px; height: 76px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #6b7cff, #3b4cca 60%, #1e2a78 100%);
-      box-shadow: 0 0 24px rgba(99, 102, 241, 0.4), inset -6px -10px 20px rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      position: relative;
-    }
-    .planet.active .planet-body {
-      background: radial-gradient(circle at 30% 30%, #86efac, #22c55e 60%, #14532d 100%);
-      box-shadow: 0 0 32px rgba(34, 197, 94, 0.6), 0 0 64px rgba(34,197,94,0.2), inset -6px -10px 20px rgba(0,0,0,0.4);
-      animation: planetPulse 2s infinite;
-    }
-    @keyframes planetPulse {
-      0%, 100% { box-shadow: 0 0 32px rgba(34, 197, 94, 0.6), inset -6px -10px 20px rgba(0,0,0,0.4); }
-      50% { box-shadow: 0 0 48px rgba(34, 197, 94, 0.9), 0 0 80px rgba(34,197,94,0.3), inset -6px -10px 20px rgba(0,0,0,0.4); }
-    }
-    .planet-name {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      white-space: nowrap;
-      text-shadow: 0 0 8px rgba(0,0,0,0.8);
-    }
-    .planet-status {
-      position: absolute;
-      top: calc(100% + 28px);
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 11px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    /* ── Спутники (агенты вокруг проекта) ── */
-    .moons {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 200px; height: 200px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .planet:hover .moons,
-    .planet.expanded .moons {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .moon {
-      position: absolute;
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: var(--surface-solid);
-      border: 2px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      transform: translate(-50%, -50%);
-    }
-    .moon:hover {
-      transform: translate(-50%, -50%) scale(1.3);
-      border-color: var(--accent);
-      box-shadow: 0 0 16px rgba(99,102,241,0.5);
-    }
-    .moon.active {
-      border-color: var(--green);
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
-    }
-    .moon-tooltip {
-      position: absolute;
-      bottom: calc(100% + 4px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--surface-solid);
+    .card {
+      background: var(--surface);
       border: 1px solid var(--border);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      width: 200px;
+      transition: all 0.2s ease;
     }
-    .moon:hover .moon-tooltip { opacity: 1; }
+    .node:hover .card {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--accent);
+    }
+    .card-icon {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .card-handle {
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 10px;
+      min-height: 2.8em;
+    }
+    .card-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-weight: 500;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .badge.green { background: var(--green-soft); color: var(--green); }
+    .badge.orange { background: var(--orange-soft); color: var(--orange); }
+    .badge.purple { background: var(--purple-soft); color: var(--purple); }
+    .badge.gray { background: var(--surface-2); color: var(--text-muted); }
+    .badge .dot-mini {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor;
+    }
+    .badge.green.pulse .dot-mini { animation: pulseDot 1.5s infinite; }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
 
-    /* ── Кнопка "новый проект" ── */
-    .planet.add .planet-body {
+    /* Центральная карточка (Pavel — солнце) */
+    .node.sun .card {
+      background: linear-gradient(135deg, #ffe89b 0%, #f59e0b 100%);
+      border: none;
+      box-shadow: 0 0 60px rgba(245, 158, 11, 0.3), 0 0 120px rgba(245, 158, 11, 0.15);
+      width: 220px;
+      text-align: center;
+    }
+    .node.sun .card-title, .node.sun .card-handle, .node.sun .card-sub {
+      color: #1a1a2e;
+    }
+    .node.sun .card-handle { color: rgba(26, 26, 46, 0.7); }
+    [data-theme="dark"] .node.sun .card { box-shadow: 0 0 80px rgba(245, 158, 11, 0.4); }
+
+    /* Карточка "новый проект" */
+    .node.add .card {
       background: transparent;
-      border: 2px dashed var(--dim);
+      border: 2px dashed var(--border-strong);
       box-shadow: none;
-      color: var(--muted);
-      font-size: 24px;
+      opacity: 0.6;
+      text-align: center;
     }
+    .node.add:hover .card { opacity: 1; border-color: var(--accent); }
 
-    /* ── Side панель (детали) ── */
+    /* ── Side панель ── */
     .panel {
       position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 460px;
+      top: 0; right: 0; bottom: 0;
+      width: 480px;
       max-width: 90vw;
       background: var(--surface);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border-left: 1px solid var(--border);
       transform: translateX(100%);
       transition: transform 0.3s ease;
       z-index: 20;
       display: flex;
       flex-direction: column;
+      box-shadow: var(--shadow-lg);
     }
     .panel.open { transform: translateX(0); }
     .panel-header {
-      padding: 18px 20px;
+      padding: 18px 22px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     .panel-title {
-      font-size: 18px; font-weight: 700;
+      font-size: 17px; font-weight: 700;
       display: flex; align-items: center; gap: 10px;
     }
     .panel-close {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 24px;
-      width: 32px; height: 32px;
-      border-radius: 6px;
-    }
-    .panel-close:hover { background: rgba(255,255,255,0.05); color: var(--text); }
-    .panel-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 20px;
-    }
-    .panel-section { margin-bottom: 18px; }
-    .panel-section h4 {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    .agent-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-      gap: 8px;
-    }
-    .agent-chip {
-      background: var(--surface-solid);
-      border: 1px solid var(--border);
+      background: transparent; border: none;
+      color: var(--text-muted); cursor: pointer;
+      font-size: 22px; width: 32px; height: 32px;
       border-radius: 8px;
-      padding: 8px 6px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s;
     }
-    .agent-chip:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .agent-chip.active { border-color: var(--green); box-shadow: 0 0 10px rgba(34,197,94,0.3); }
+    .panel-close:hover { background: var(--surface-2); color: var(--text); }
+    .panel-body { flex: 1; overflow-y: auto; padding: 16px 22px; }
+    .panel-section { margin-bottom: 22px; }
+    .panel-section h4 {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted); margin-bottom: 10px; font-weight: 600;
+    }
+    .agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
+    .agent-chip {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 6px; text-align: center;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .agent-chip:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .agent-chip.active { border-color: var(--green); background: var(--green-soft); }
     .agent-chip .emoji { font-size: 22px; }
-    .agent-chip .name { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .agent-chip .name { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
 
-    .events { display: flex; flex-direction: column; gap: 6px; }
+    .events { display: flex; flex-direction: column; gap: 8px; }
     .event {
-      background: var(--surface-solid);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 12px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent); border-radius: 10px;
+      padding: 10px 12px; font-size: 12px;
     }
     .event .meta {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      color: var(--muted);
-      font-size: 11px;
-      margin-bottom: 4px;
+      display: flex; gap: 8px; align-items: center;
+      color: var(--text-muted); font-size: 11px; margin-bottom: 4px;
     }
     .event .agent-name { color: var(--text); font-weight: 600; }
     .event .msg { color: var(--text); }
     .event.start { border-left-color: var(--blue); }
     .event.step { border-left-color: var(--green); }
-    .event.complete { border-left-color: #4ade80; background: rgba(34,197,94,0.05); }
+    .event.complete { border-left-color: var(--green); background: var(--green-soft); }
     .event.handoff { border-left-color: var(--purple); }
-    .event.error { border-left-color: var(--red); background: rgba(239,68,68,0.05); }
-    .event.wait { border-left-color: var(--yellow); }
+    .event.error { border-left-color: var(--red); background: var(--red-soft); }
+    .event.wait { border-left-color: var(--orange); }
 
     .empty {
-      padding: 24px;
+      padding: 28px;
       text-align: center;
-      color: var(--muted);
+      color: var(--text-muted);
       font-size: 13px;
     }
 
     /* ── Toast ── */
     .toasts {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
+      bottom: 24px; left: 24px;
       z-index: 30;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       gap: 8px;
     }
     .toast {
-      background: var(--surface-solid);
+      background: var(--surface);
       border: 1px solid var(--border);
       border-left: 3px solid var(--accent);
       padding: 10px 14px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 12px;
       max-width: 320px;
+      box-shadow: var(--shadow-lg);
       animation: toastIn 0.3s ease;
+      color: var(--text);
     }
     @keyframes toastIn {
       from { transform: translateX(-20px); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
+
+    /* ── Легенда ── */
+    .legend {
+      position: fixed;
+      bottom: 16px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 11px;
+      color: var(--text-muted);
+      box-shadow: var(--shadow-sm);
+      z-index: 5;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-line {
+      width: 16px; height: 2px;
+      border-radius: 2px;
+    }
+
+    /* ── Адаптив ── */
+    @media (max-width: 720px) {
+      header { flex-direction: column; padding: 10px; gap: 8px; }
+      .header-center { display: none; }
+      .card { width: 160px; padding: 12px; }
+      .legend { font-size: 10px; padding: 6px 12px; gap: 10px; }
+    }
   </style>
 </head>
 <body>
-  <div class="stars"></div>
+  <div class="bg-decor"></div>
+  <div class="orbits-bg"></div>
 
   <header>
     <div class="brand">
       <span class="dot"></span>
-      <span>Галактика агентов</span>
+      <span>Система агентов — Pavel</span>
     </div>
-    <div class="stats">
-      <span>проектов: <b id="stat-projects">0</b></span>
-      <span>событий: <b id="stat-events">0</b></span>
-      <span><a href="/" style="color:var(--muted); text-decoration:none;">→ чат</a></span>
+    <div class="header-center">
+      <span id="hc-stat-projects">0 проектов</span>
+      <span class="sep">—</span>
+      <span id="hc-stat-events">0 событий</span>
+      <span class="sep">—</span>
+      <span>живая лента</span>
+    </div>
+    <div class="header-right">
+      <div class="theme-switch" id="theme-switch">
+        <button class="theme-btn" data-theme="light">☀️ Светлая</button>
+        <button class="theme-btn" data-theme="dark">🌙 Тёмная</button>
+        <button class="theme-btn" data-theme="auto">⚙️ Авто</button>
+      </div>
+      <div class="clock" id="clock">--:--:--</div>
     </div>
   </header>
 
   <div class="galaxy" id="galaxy">
-    <svg class="orbits" id="orbits"></svg>
-    <div class="sun" id="sun" title="Pavel — главный оркестратор">
-      <div style="font-size:34px">🧑</div>
-      <div class="label">Pavel</div>
-      <div class="role">оркестратор</div>
-    </div>
+    <svg class="links" id="links"></svg>
   </div>
 
   <aside class="panel" id="panel">
@@ -420,6 +472,12 @@
   </aside>
 
   <div class="toasts" id="toasts"></div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-line" style="background:var(--green)"></span>активный проект</div>
+    <div class="legend-item"><span class="legend-line" style="background:var(--accent)"></span>обычная связь</div>
+    <div class="legend-item"><span class="legend-line" style="background:var(--purple)"></span>передача</div>
+  </div>
 
   <script>
     const AGENTS = [
@@ -443,121 +501,158 @@
 
     let projects = [];
     let lastEventTs = '';
-    let activePanel = null; // { type: 'project'|'agent'|'sun', project, agent }
+    let activePanel = null;
 
-    // ── API ──
+    // ── Тема ─────────────────────────────────────────────────────
+    function applyTheme(mode) {
+      const actual = mode === 'auto'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : mode;
+      document.documentElement.setAttribute('data-theme', actual);
+      localStorage.setItem('theme-mode', mode);
+      document.querySelectorAll('.theme-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.theme === mode);
+      });
+    }
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.addEventListener('click', () => applyTheme(b.dataset.theme));
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      const mode = localStorage.getItem('theme-mode') || 'light';
+      if (mode === 'auto') applyTheme('auto');
+    });
+    applyTheme(localStorage.getItem('theme-mode') || 'light');
+
+    // ── Часы ─────────────────────────────────────────────────────
+    function tickClock() {
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      const ss = String(d.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
+    }
+    setInterval(tickClock, 1000); tickClock();
+
+    // ── API ──────────────────────────────────────────────────────
     async function api(path) {
-      try {
-        const r = await fetch(path);
-        return await r.json();
-      } catch (e) { return null; }
+      try { const r = await fetch(path); return await r.json(); } catch { return null; }
     }
 
-    // ── Рендер галактики ──
+    // ── Рендер галактики ─────────────────────────────────────────
     function renderGalaxy() {
       const galaxy = document.getElementById('galaxy');
-      const svg = document.getElementById('orbits');
+      const links = document.getElementById('links');
       const w = galaxy.clientWidth, h = galaxy.clientHeight;
       const cx = w / 2, cy = h / 2;
 
-      // очистить старые планеты (но не sun и svg)
-      [...galaxy.querySelectorAll('.planet')].forEach(el => el.remove());
-      svg.innerHTML = '';
+      [...galaxy.querySelectorAll('.node')].forEach(el => el.remove());
+      links.innerHTML = '';
 
-      // выбираем радиус: чем больше проектов — тем больше орбита
-      const n = Math.max(projects.length + 1, 4); // +1 для "добавить"
+      // Sun (Pavel) в центре
+      const sun = document.createElement('div');
+      sun.className = 'node sun';
+      sun.style.left = cx + 'px';
+      sun.style.top = cy + 'px';
+      sun.innerHTML = `
+        <div class="card">
+          <div class="card-icon">🧑</div>
+          <div class="card-title">Pavel</div>
+          <div class="card-handle">/orchestrator</div>
+          <div class="card-sub">главный оркестратор всей системы</div>
+          <span class="badge orange"><span class="dot-mini"></span>владелец</span>
+        </div>
+      `;
+      sun.addEventListener('click', () => openPanel({ type: 'sun' }));
+      galaxy.appendChild(sun);
+
+      // Радиус орбиты
       const R = Math.min(w, h) * 0.32;
 
-      // орбита (линия)
-      const orbit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      orbit.setAttribute('cx', cx);
-      orbit.setAttribute('cy', cy);
-      orbit.setAttribute('r', R);
-      orbit.setAttribute('fill', 'none');
-      orbit.setAttribute('stroke', 'rgba(120,120,180,0.15)');
-      orbit.setAttribute('stroke-dasharray', '2 6');
-      svg.appendChild(orbit);
-
-      // планеты-проекты
+      // Проекты-планеты
       const items = [...projects, { name: '__add__' }];
       items.forEach((p, i) => {
         const angle = (i / items.length) * Math.PI * 2 - Math.PI / 2;
         const x = cx + Math.cos(angle) * R;
         const y = cy + Math.sin(angle) * R;
-        const el = createPlanet(p, x, y);
+
+        // линия к солнцу
+        if (p.name !== '__add__') {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', cx);
+          line.setAttribute('y1', cy);
+          line.setAttribute('x2', x);
+          line.setAttribute('y2', y);
+          line.setAttribute('stroke', p.active_agent ? 'var(--green)' : 'var(--border-strong)');
+          line.setAttribute('stroke-width', p.active_agent ? '2' : '1');
+          line.setAttribute('stroke-dasharray', '4 6');
+          line.setAttribute('opacity', p.active_agent ? '0.8' : '0.5');
+          links.appendChild(line);
+        }
+
+        const el = createNode(p, x, y);
         galaxy.appendChild(el);
       });
     }
 
-    function createPlanet(p, x, y) {
+    function createNode(p, x, y) {
       const el = document.createElement('div');
-      el.className = 'planet';
+      el.className = 'node';
       el.style.left = x + 'px';
       el.style.top = y + 'px';
 
       if (p.name === '__add__') {
         el.classList.add('add');
         el.innerHTML = `
-          <div class="planet-body">+</div>
-          <div class="planet-name">новый проект</div>
+          <div class="card">
+            <div class="card-icon">➕</div>
+            <div class="card-title" style="color:var(--text-muted)">Новое направление</div>
+            <div class="card-handle">/новый-проект</div>
+            <span class="badge gray">скоро</span>
+          </div>
         `;
-        el.addEventListener('click', () => {
-          openPanel({ type: 'add' });
-        });
+        el.addEventListener('click', () => openPanel({ type: 'add' }));
         return el;
       }
 
-      if (p.active_agent) el.classList.add('active');
+      const lastEv = p.last_event;
+      const lastTime = lastEv ? formatTime(lastEv.ts) : '';
+      const isActive = !!p.active_agent;
+      const agentInfo = isActive ? AGENT_MAP[p.active_agent] : null;
+      const subText = lastEv ? (lastEv.message || '').slice(0, 60) : 'нет событий';
 
-      const moonsHtml = AGENTS.map((a, i) => {
-        const angle = (i / AGENTS.length) * Math.PI * 2;
-        const r = 80;
-        const mx = Math.cos(angle) * r + 100; // +100 чтобы внутри 200px контейнера
-        const my = Math.sin(angle) * r + 100;
-        const isActive = p.active_agent === a.key;
-        return `<div class="moon ${isActive ? 'active' : ''}" style="left:${mx}px;top:${my}px"
-                     data-agent="${a.key}" data-project="${p.name}" title="${a.name}">
-                  ${a.emoji}
-                  <div class="moon-tooltip">${a.name}</div>
-                </div>`;
-      }).join('');
+      const badgeHtml = isActive
+        ? `<span class="badge green pulse"><span class="dot-mini"></span>${agentInfo ? agentInfo.emoji + ' ' + agentInfo.name : p.active_agent}</span>`
+        : `<span class="badge gray"><span class="dot-mini"></span>покой</span>`;
 
       el.innerHTML = `
-        <div class="moons">${moonsHtml}</div>
-        <div class="planet-body">🌍</div>
-        <div class="planet-name">${escapeHtml(p.name)}</div>
-        <div class="planet-status">${p.active_agent ? '● ' + p.active_agent : '○ покой'}</div>
+        <div class="card">
+          <div class="card-icon">🌍</div>
+          <div class="card-title">${escapeHtml(p.name)}</div>
+          <div class="card-handle">/${escapeHtml(p.name)}</div>
+          <div class="card-sub">${escapeHtml(subText)}</div>
+          ${lastTime ? `<div class="card-meta">обновлён ${lastTime}</div>` : ''}
+          ${badgeHtml}
+        </div>
       `;
 
-      // клик по планете
-      el.querySelector('.planet-body').addEventListener('click', (e) => {
-        e.stopPropagation();
-        openPanel({ type: 'project', project: p.name });
-      });
-      el.querySelector('.planet-name').addEventListener('click', (e) => {
-        e.stopPropagation();
-        openPanel({ type: 'project', project: p.name });
-      });
-      // клик по луне (агенту)
-      el.querySelectorAll('.moon').forEach(m => {
-        m.addEventListener('click', (e) => {
-          e.stopPropagation();
-          openPanel({
-            type: 'agent',
-            project: m.dataset.project,
-            agent: m.dataset.agent,
-          });
-        });
-      });
-
+      el.addEventListener('click', () => openPanel({ type: 'project', project: p.name }));
       return el;
     }
 
-    // ── Панель ──
+    function formatTime(ts) {
+      if (!ts) return '';
+      try {
+        const d = new Date(ts);
+        const date = d.toLocaleDateString('ru', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        const time = d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+        return `${date} ${time}`;
+      } catch { return ts.slice(0, 16).replace('T', ' '); }
+    }
+
+    // ── Панель ───────────────────────────────────────────────────
     function openPanel(ctx) {
       activePanel = ctx;
-      const panel = document.getElementById('panel');
-      panel.classList.add('open');
+      document.getElementById('panel').classList.add('open');
       renderPanel();
     }
     function closePanel() {
@@ -571,13 +666,12 @@
       const bodyEl = document.getElementById('panel-body');
 
       if (activePanel.type === 'add') {
-        titleEl.innerHTML = `<span>+ Новый проект</span>`;
+        titleEl.innerHTML = `<span>➕ Новый проект</span>`;
         bodyEl.innerHTML = `
           <div class="empty">
             Создание через CLI на сервере:
-            <pre style="margin-top:12px;background:var(--surface-solid);padding:10px;border-radius:6px;text-align:left;font-size:11px;color:var(--text)">~/projects/новый-проект.sh имя-проекта</pre>
-          </div>
-        `;
+            <pre style="margin-top:14px;background:var(--surface-2);border:1px solid var(--border);padding:12px;border-radius:10px;text-align:left;font-size:12px;color:var(--text);font-family:'SF Mono',monospace;">~/projects/новый-проект.sh имя-проекта</pre>
+          </div>`;
         return;
       }
 
@@ -586,13 +680,13 @@
         bodyEl.innerHTML = `
           <div class="panel-section">
             <h4>Роль</h4>
-            <p style="color:var(--muted);font-size:13px">
-              Главный оркестратор всей системы. Каждый проект — это отдельная мини-вселенная
+            <p style="color:var(--text-muted);font-size:13px">
+              Главный оркестратор всей системы. Каждый проект — мини-вселенная
               со своим координатором и 9 агентами.
             </p>
           </div>
           <div class="panel-section">
-            <h4>Все агенты</h4>
+            <h4>Все агенты системы</h4>
             <div class="agent-grid">
               ${AGENTS.map(a => `
                 <div class="agent-chip">
@@ -601,8 +695,7 @@
                 </div>
               `).join('')}
             </div>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
@@ -637,15 +730,14 @@
             <div class="events">
               ${events.length ? events.reverse().map(renderEvent).join('') : '<div class="empty">пока пусто</div>'}
             </div>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
       if (activePanel.type === 'agent') {
         const a = AGENT_MAP[activePanel.agent];
         const proj = activePanel.project;
-        titleEl.innerHTML = `${a.emoji} ${escapeHtml(a.name)} <span style="color:var(--muted);font-weight:400;font-size:13px">· ${escapeHtml(proj)}</span>`;
+        titleEl.innerHTML = `${a.emoji} ${escapeHtml(a.name)} <span style="color:var(--text-muted);font-weight:400;font-size:13px">· ${escapeHtml(proj)}</span>`;
         const events = await api(`/api/agents/events?project=${encodeURIComponent(proj)}&agent=${encodeURIComponent(activePanel.agent)}&limit=50`) || [];
         bodyEl.innerHTML = `
           <div class="panel-section">
@@ -660,8 +752,7 @@
             <div class="events">
               ${events.length ? events.reverse().map(renderEvent).join('') : '<div class="empty">этот агент ещё не работал в проекте</div>'}
             </div>
-          </div>
-        `;
+          </div>`;
         return;
       }
     }
@@ -679,8 +770,7 @@
             <span style="margin-left:auto">${TYPE_LABEL[type] || type}</span>
           </div>
           <div class="msg">${escapeHtml(e.message || '')}</div>
-        </div>
-      `;
+        </div>`;
     }
 
     function escapeHtml(s) {
@@ -689,7 +779,7 @@
       }[c]));
     }
 
-    // ── Polling ──
+    // ── Polling ──────────────────────────────────────────────────
     async function loadProjects() {
       const data = await api('/api/agents/projects');
       if (data) {
@@ -703,8 +793,8 @@
     async function loadStats() {
       const s = await api('/api/agents/stats');
       if (s) {
-        document.getElementById('stat-projects').textContent = s.total_projects || 0;
-        document.getElementById('stat-events').textContent = s.total_events || 0;
+        document.getElementById('hc-stat-projects').textContent = (s.total_projects || 0) + ' проектов';
+        document.getElementById('hc-stat-events').textContent = (s.total_events || 0) + ' событий';
       }
     }
     async function pollNewEvents() {
@@ -714,9 +804,8 @@
       const events = await api(url);
       if (events && events.length) {
         events.forEach(e => {
-          if (e.ts > lastEventTs) lastEventTs = e.ts;
-          if (lastEventTs && Object.keys(AGENT_MAP).length) {
-            // toast только для свежих
+          if (e.ts > lastEventTs) {
+            lastEventTs = e.ts;
             showToast(e);
           }
         });
@@ -732,17 +821,12 @@
       setTimeout(() => div.remove(), 4000);
     }
 
-    // ── Init ──
-    document.getElementById('sun').addEventListener('click', () => openPanel({ type: 'sun' }));
-
     window.addEventListener('resize', () => renderGalaxy());
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
 
-    // первая загрузка + старт поллинга
     (async () => {
       await loadStats();
       await loadProjects();
-      // инициализируем lastEventTs последним событием
       const last = await api('/api/agents/events?limit=1');
       if (last && last.length) lastEventTs = last[last.length - 1].ts;
       setInterval(loadProjects, 5000);
@@ -750,7 +834,6 @@
       setInterval(pollNewEvents, 3000);
     })();
 
-    // экспорт для onclick в строках
     window.openPanel = openPanel;
     window.closePanel = closePanel;
   </script>
