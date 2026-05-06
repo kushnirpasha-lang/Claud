@@ -11,27 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ── Python-файлы ────────────────────────────────────────────────────────
+      # ── Python-файлы + статика дашборда ────────────────────────────────────
       - name: Copy Python files to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py,assistant/instagram_client.py,assistant/google_drive_client.py,assistant/image_processor.py,assistant/image_ai_processor.py"
+          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py,assistant/instagram_client.py,assistant/google_drive_client.py,assistant/image_processor.py,assistant/image_ai_processor.py,assistant/static/agents.html,assistant/static/index.html,assistant/static/instagram.html"
           target: /opt/assistant
           strip_components: 1
-
-      # ── Статика дашборда ────────────────────────────────────────────────────
-      - name: Copy static files to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "assistant/static/"
-          target: /opt/assistant/static
-          strip_components: 2
 
       # ── Шаблон проектов ─────────────────────────────────────────────────────
       - name: Copy project template to server
