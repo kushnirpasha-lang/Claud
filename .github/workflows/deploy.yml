@@ -2,7 +2,7 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [claude/setup-digitalocean-vps-4Ij39]
+    branches: [claude/obshak]
   workflow_dispatch:
 
 jobs:
