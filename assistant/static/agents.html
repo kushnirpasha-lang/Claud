@@ -607,17 +607,32 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 
 function copyCmd(e, cmd) {
   e.stopPropagation();
-  navigator.clipboard.writeText(cmd).then(() => {
-    /* мини-тост рядом с курсором */
+
+  /* Копируем: сначала Clipboard API (https), fallback — execCommand (http) */
+  function doCopy() {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(cmd);
+    }
+    const ta = document.createElement('textarea');
+    ta.value = cmd;
+    ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    return Promise.resolve();
+  }
+
+  doCopy().then(() => {
     const tip = document.createElement('div');
     tip.textContent = '✓ Скопировано';
     tip.style.cssText = `
-      position:fixed; z-index:99;
-      left:${e.clientX + 10}px; top:${e.clientY - 36}px;
+      position:fixed; z-index:999;
+      left:${e.clientX + 10}px; top:${e.clientY - 40}px;
       background:var(--text); color:var(--surface);
       font-size:12px; font-weight:600; font-family:inherit;
-      padding:5px 12px; border-radius:8px;
-      box-shadow:0 4px 16px rgba(0,0,0,.18);
+      padding:5px 13px; border-radius:8px;
+      box-shadow:0 4px 16px rgba(0,0,0,.22);
       pointer-events:none;
       animation:tipIn .18s ease;
       white-space:nowrap;
@@ -625,9 +640,9 @@ function copyCmd(e, cmd) {
     document.body.appendChild(tip);
     setTimeout(() => {
       tip.style.opacity = '0';
-      tip.style.transition = 'opacity .2s';
-      setTimeout(() => tip.remove(), 200);
-    }, 900);
+      tip.style.transition = 'opacity .22s';
+      setTimeout(() => tip.remove(), 220);
+    }, 950);
   });
 }
 
