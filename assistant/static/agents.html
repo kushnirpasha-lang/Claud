@@ -424,12 +424,63 @@
       border-radius: 2px;
     }
 
+    /* ── Луна-агент ── */
+    .moon {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1.5px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 4;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .moon:hover {
+      transform: translate(-50%, -50%) scale(1.25);
+      border-color: var(--accent);
+      box-shadow: var(--shadow);
+      z-index: 7;
+    }
+    .moon.active {
+      border-color: var(--green);
+      background: var(--green-soft);
+      animation: moonPulse 2s infinite;
+    }
+    .moon-emoji { font-size: 16px; line-height: 1; pointer-events: none; }
+    .moon-label {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 4px;
+      transition: opacity 0.15s;
+    }
+    .moon:hover .moon-label { opacity: 1; }
+    @keyframes moonPulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(34, 197, 94, 0.35); }
+      50%       { box-shadow: 0 0 22px rgba(34, 197, 94, 0.65); }
+    }
+
     /* ── Адаптив ── */
     @media (max-width: 720px) {
       header { flex-direction: column; padding: 10px; gap: 8px; }
       .header-center { display: none; }
       .card { width: 160px; padding: 12px; }
       .legend { font-size: 10px; padding: 6px 12px; gap: 10px; }
+      .moon { width: 30px; height: 30px; }
+      .moon-emoji { font-size: 13px; }
     }
   </style>
 </head>
@@ -474,9 +525,10 @@
   <div class="toasts" id="toasts"></div>
 
   <div class="legend">
-    <div class="legend-item"><span class="legend-line" style="background:var(--green)"></span>активный проект</div>
-    <div class="legend-item"><span class="legend-line" style="background:var(--accent)"></span>обычная связь</div>
-    <div class="legend-item"><span class="legend-line" style="background:var(--purple)"></span>передача</div>
+    <div class="legend-item">🧑 <span>Pavel — солнце</span></div>
+    <div class="legend-item">🌍 <span>проект — планета</span></div>
+    <div class="legend-item">🔍 <span>агент — луна (клик = события)</span></div>
+    <div class="legend-item"><span class="legend-line" style="background:var(--green)"></span>активен</div>
   </div>
 
   <script>
@@ -545,7 +597,7 @@
       const w = galaxy.clientWidth, h = galaxy.clientHeight;
       const cx = w / 2, cy = h / 2;
 
-      [...galaxy.querySelectorAll('.node')].forEach(el => el.remove());
+      [...galaxy.querySelectorAll('.node, .moon')].forEach(el => el.remove());
       links.innerHTML = '';
 
       // Sun (Pavel) в центре
@@ -565,8 +617,10 @@
       sun.addEventListener('click', () => openPanel({ type: 'sun' }));
       galaxy.appendChild(sun);
 
-      // Радиус орбиты
-      const R = Math.min(w, h) * 0.32;
+      // Радиус главной орбиты (планеты вокруг солнца)
+      const R = Math.min(w, h) * 0.36;
+      // Радиус лунной орбиты (агенты вокруг планеты)
+      const moonR = Math.min(96, Math.min(w, h) * 0.1);
 
       // Проекты-планеты
       const items = [...projects, { name: '__add__' }];
@@ -587,10 +641,41 @@
           line.setAttribute('stroke-dasharray', '4 6');
           line.setAttribute('opacity', p.active_agent ? '0.8' : '0.5');
           links.appendChild(line);
+
+          // кольцо орбиты лун вокруг планеты
+          const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          ring.setAttribute('cx', x);
+          ring.setAttribute('cy', y);
+          ring.setAttribute('r', moonR);
+          ring.setAttribute('fill', 'none');
+          ring.setAttribute('stroke', 'var(--border-strong)');
+          ring.setAttribute('stroke-width', '1');
+          ring.setAttribute('stroke-dasharray', '3 5');
+          ring.setAttribute('opacity', '0.35');
+          links.appendChild(ring);
         }
 
         const el = createNode(p, x, y);
         galaxy.appendChild(el);
+
+        // луны-агенты вокруг планеты
+        if (p.name !== '__add__') {
+          AGENTS.forEach((a, ai) => {
+            const mAngle = (ai / AGENTS.length) * Math.PI * 2 - Math.PI / 2;
+            const mx = x + Math.cos(mAngle) * moonR;
+            const my = y + Math.sin(mAngle) * moonR;
+            const moon = document.createElement('div');
+            moon.className = 'moon' + (p.active_agent === a.key ? ' active' : '');
+            moon.style.left = mx + 'px';
+            moon.style.top = my + 'px';
+            moon.innerHTML = `<span class="moon-emoji">${a.emoji}</span><span class="moon-label">${a.name}</span>`;
+            moon.addEventListener('click', ev => {
+              ev.stopPropagation();
+              openPanel({ type: 'agent', project: p.name, agent: a.key });
+            });
+            galaxy.appendChild(moon);
+          });
+        }
       });
     }
 
