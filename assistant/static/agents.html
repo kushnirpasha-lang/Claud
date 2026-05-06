@@ -336,7 +336,8 @@ header {
   max-width:280px; box-shadow:var(--shh); color:var(--text);
   animation:sIn .22s ease;
 }
-@keyframes sIn { from{transform:translateX(14px);opacity:0} to{transform:none;opacity:1} }
+@keyframes sIn  { from{transform:translateX(14px);opacity:0} to{transform:none;opacity:1} }
+@keyframes tipIn{ from{transform:translateY(4px);opacity:0} to{transform:none;opacity:1} }
 
 @media(max-width:700px) { .h-mid,.legend{display:none;} }
 </style>
@@ -607,10 +608,26 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 function copyCmd(e, cmd) {
   e.stopPropagation();
   navigator.clipboard.writeText(cmd).then(() => {
-    const el = e.target;
-    const orig = el.textContent;
-    el.textContent = '✓ скопировано';
-    setTimeout(() => { el.textContent = orig; }, 1200);
+    /* мини-тост рядом с курсором */
+    const tip = document.createElement('div');
+    tip.textContent = '✓ Скопировано';
+    tip.style.cssText = `
+      position:fixed; z-index:99;
+      left:${e.clientX + 10}px; top:${e.clientY - 36}px;
+      background:var(--text); color:var(--surface);
+      font-size:12px; font-weight:600; font-family:inherit;
+      padding:5px 12px; border-radius:8px;
+      box-shadow:0 4px 16px rgba(0,0,0,.18);
+      pointer-events:none;
+      animation:tipIn .18s ease;
+      white-space:nowrap;
+    `;
+    document.body.appendChild(tip);
+    setTimeout(() => {
+      tip.style.opacity = '0';
+      tip.style.transition = 'opacity .2s';
+      setTimeout(() => tip.remove(), 200);
+    }, 900);
   });
 }
 
