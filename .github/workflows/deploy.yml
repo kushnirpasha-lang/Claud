@@ -135,29 +135,42 @@ jobs:
             sleep 4
             systemctl status assistant --no-pager
 
-      # ── Тестовый прогон: demo-события в дашборд ────────────────────────────
-      - name: Send demo events to dashboard
+      # ── Тестовый прогон: HairLove события в дашборд ────────────────────────
+      - name: Send HairLove demo events to dashboard
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Удаляем устаревшие demo-события (старый проект "demo")
+            if [ -f /opt/assistant/data/events.jsonl ]; then
+              grep -v '"project":"demo"' /opt/assistant/data/events.jsonl > /opt/assistant/data/events.tmp || true
+              mv /opt/assistant/data/events.tmp /opt/assistant/data/events.jsonl
+              # Также удаляем уже существующие hairlove-события чтобы не дублировались при повторных деплоях
+              grep -v '"project":"hairlove"' /opt/assistant/data/events.jsonl > /opt/assistant/data/events.tmp || true
+              mv /opt/assistant/data/events.tmp /opt/assistant/data/events.jsonl
+            fi
+
             BASE="http://127.0.0.1:8080/events"
             H="Content-Type: application/json"
             send() { curl -s -X POST "$BASE" -H "$H" -d "$1" >/dev/null; sleep 1; }
 
-            send '{"project":"demo","agent":"coordinator","type":"start","message":"маршрут: исследование рынка — доставка еды"}'
-            send '{"project":"demo","agent":"planning","type":"start","message":"формулирую задачу исследования"}'
-            send '{"project":"demo","agent":"planning","type":"step","message":"определил 4 ключевых конкурента для анализа"}'
-            send '{"project":"demo","agent":"planning","type":"complete","message":"бриф готов → competitors","artifact":"artifacts/planning/2026-05-06-бриф.md","hand_off_to":"competitors"}'
-            send '{"project":"demo","agent":"coordinator","type":"handoff","message":"передача: planning → competitors"}'
-            send '{"project":"demo","agent":"competitors","type":"start","message":"начинаю анализ конкурентов в нише доставки еды"}'
-            send '{"project":"demo","agent":"competitors","type":"step","message":"изучаю Glovo, Bolt Food, Raketa, Меню"}'
-            send '{"project":"demo","agent":"competitors","type":"step","message":"анализирую Instagram и рекламные креативы"}'
-            send '{"project":"demo","agent":"competitors","type":"complete","message":"анализ готов → strategy","artifact":"artifacts/competitors/2026-05-06-доставка.md","hand_off_to":"strategy"}'
-            send '{"project":"demo","agent":"coordinator","type":"handoff","message":"передача: competitors → strategy"}'
-            send '{"project":"demo","agent":"strategy","type":"start","message":"читаю анализ конкурентов, определяю направление"}'
-            send '{"project":"demo","agent":"strategy","type":"complete","message":"стратегия готова: фокус на скорость + локальных поваров","artifact":"artifacts/strategy/2026-05-06-направление.md"}'
-            send '{"project":"demo","agent":"coordinator","type":"complete","message":"маршрут завершён. Итог: 3 артефакта, дашборд в действии ✅"}'
-            echo "✅ Demo-события отправлены"
+            send '{"project":"hairlove","agent":"coordinator","type":"start","message":"маршрут: исследование рынка — салоны красоты Киев"}'
+            send '{"project":"hairlove","agent":"planning","type":"start","message":"формулирую задачу: позиционирование HairLove как B2B-витрины"}'
+            send '{"project":"hairlove","agent":"planning","type":"step","message":"определил 4 ключевых конкурента для анализа"}'
+            send '{"project":"hairlove","agent":"planning","type":"complete","message":"бриф готов → competitors","artifact":"artifacts/planning/2026-05-06-бриф.md","hand_off_to":"competitors"}'
+            send '{"project":"hairlove","agent":"coordinator","type":"handoff","message":"передача: planning → competitors"}'
+            send '{"project":"hairlove","agent":"competitors","type":"start","message":"начинаю анализ конкурентов в нише салонов красоты"}'
+            send '{"project":"hairlove","agent":"competitors","type":"step","message":"изучаю G.Bar, Beauty Hub, OneSalon"}'
+            send '{"project":"hairlove","agent":"competitors","type":"step","message":"анализирую Instagram и рекламные креативы"}'
+            send '{"project":"hairlove","agent":"competitors","type":"complete","message":"анализ готов → strategy","artifact":"artifacts/competitors/2026-05-06-салоны.md","hand_off_to":"strategy"}'
+            send '{"project":"hairlove","agent":"coordinator","type":"handoff","message":"передача: competitors → strategy"}'
+            send '{"project":"hairlove","agent":"strategy","type":"start","message":"читаю анализ, определяю направление: B2B витрина"}'
+            send '{"project":"hairlove","agent":"strategy","type":"complete","message":"стратегия готова: фокус на B2B + сеть локальных мастеров","artifact":"artifacts/strategy/2026-05-06-направление.md"}'
+            send '{"project":"hairlove","agent":"site","type":"start","message":"проектирую B2B-лендинг"}'
+            send '{"project":"hairlove","agent":"copy","type":"start","message":"пишу тексты бренда для лендинга"}'
+            send '{"project":"hairlove","agent":"instagram","type":"start","message":"планирую контент-план на месяц"}'
+            send '{"project":"hairlove","agent":"ads","type":"start","message":"настраиваю Meta Ads на B2B аудиторию"}'
+            send '{"project":"hairlove","agent":"coordinator","type":"complete","message":"маршрут завершён. Итог: HairLove запущен ✅"}'
+            echo "✅ HairLove события отправлены"
