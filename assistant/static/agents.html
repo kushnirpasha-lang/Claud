@@ -9,12 +9,10 @@
 
     :root {
       --bg: #f5f4ff;
-      --bg-grad-1: #f8f6ff;
-      --bg-grad-2: #eee9ff;
       --surface: #ffffff;
-      --surface-2: #faf9ff;
-      --border: #e5e1f5;
-      --border-strong: #d4cfeb;
+      --surface-2: #f8f7ff;
+      --border: #e8e5f5;
+      --border-strong: #d0cce8;
       --text: #1a1a2e;
       --text-muted: #6b6a85;
       --text-dim: #9594ad;
@@ -27,900 +25,568 @@
       --purple: #a855f7;
       --purple-soft: #f3e8ff;
       --red: #ef4444;
-      --red-soft: #fee2e2;
       --blue: #3b82f6;
-      --blue-soft: #dbeafe;
-      --shadow-sm: 0 1px 2px rgba(26, 26, 46, 0.04);
-      --shadow: 0 2px 8px rgba(99, 102, 241, 0.08), 0 1px 2px rgba(26, 26, 46, 0.04);
-      --shadow-lg: 0 8px 24px rgba(99, 102, 241, 0.12), 0 2px 8px rgba(26, 26, 46, 0.06);
+      --shadow-sm: 0 1px 3px rgba(26,26,46,0.07);
+      --shadow: 0 2px 10px rgba(99,102,241,0.09), 0 1px 3px rgba(26,26,46,0.06);
+      --shadow-lg: 0 8px 28px rgba(99,102,241,0.13), 0 2px 8px rgba(26,26,46,0.07);
       --radius: 16px;
-      --radius-sm: 10px;
     }
-
     [data-theme="dark"] {
       --bg: #0e0e1a;
-      --bg-grad-1: #14142a;
-      --bg-grad-2: #0a0a14;
       --surface: #1a1a2e;
       --surface-2: #14142a;
-      --border: rgba(120, 120, 180, 0.2);
-      --border-strong: rgba(120, 120, 180, 0.35);
+      --border: rgba(120,120,180,0.2);
+      --border-strong: rgba(120,120,180,0.35);
       --text: #e8e8f0;
       --text-muted: #9594ad;
       --text-dim: #6b6a85;
       --accent: #818cf8;
-      --accent-soft: rgba(99, 102, 241, 0.15);
-      --green-soft: rgba(34, 197, 94, 0.15);
-      --orange-soft: rgba(245, 158, 11, 0.15);
-      --purple-soft: rgba(168, 85, 247, 0.15);
-      --red-soft: rgba(239, 68, 68, 0.15);
-      --blue-soft: rgba(59, 130, 246, 0.15);
-      --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      --accent-soft: rgba(99,102,241,0.15);
+      --green-soft: rgba(34,197,94,0.15);
+      --orange-soft: rgba(245,158,11,0.15);
+      --purple-soft: rgba(168,85,247,0.15);
+      --shadow: 0 2px 8px rgba(0,0,0,0.4);
+      --shadow-lg: 0 8px 28px rgba(0,0,0,0.55);
     }
 
-    html, body {
-      height: 100%;
+    html, body { height: 100%; overflow: hidden; }
+    body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
+      background: var(--bg);
       color: var(--text);
       font-size: 14px;
       line-height: 1.5;
-      overflow: hidden;
-      transition: background 0.3s, color 0.3s;
     }
 
-    body {
-      position: relative;
-      min-height: 100vh;
-    }
-
-    /* Декоративный фон с точками */
-    .bg-decor {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      background-image: radial-gradient(circle, var(--border-strong) 1px, transparent 1px);
-      background-size: 40px 40px;
-      opacity: 0.4;
-    }
-    [data-theme="dark"] .bg-decor { opacity: 0.15; }
-
-    /* Орбиты */
-    .orbits-bg {
-      position: fixed;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 0;
-      width: 90vh; height: 90vh;
-      max-width: 90vw; max-height: 90vw;
-      border-radius: 50%;
-      border: 1px dashed var(--border-strong);
-      opacity: 0.6;
-    }
-    .orbits-bg::before, .orbits-bg::after {
-      content: '';
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      border: 1px dashed var(--border-strong);
-    }
-    .orbits-bg::before { width: 65%; height: 65%; }
-    .orbits-bg::after { width: 35%; height: 35%; }
-
-    /* ── Шапка ── */
+    /* ── Header ── */
     header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 10;
-      gap: 16px;
-    }
-    .brand {
-      display: flex; align-items: center; gap: 8px;
-      font-weight: 600; font-size: 15px;
-      color: var(--text);
-    }
-    .brand .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 4px var(--accent-soft);
-    }
-
-    .header-center {
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-    .header-center .sep { color: var(--text-dim); margin: 0 6px; }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .theme-switch {
-      display: flex;
+      position: fixed; top: 0; left: 0; right: 0; height: 56px;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 3px;
-      box-shadow: var(--shadow-sm);
-    }
-    .theme-btn {
-      border: none;
-      background: transparent;
-      padding: 5px 12px;
-      font-size: 12px;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-radius: 999px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.15s;
-      font-family: inherit;
-    }
-    .theme-btn:hover { color: var(--text); }
-    .theme-btn.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-weight: 500;
-    }
-
-    .clock {
-      font-variant-numeric: tabular-nums;
-      font-size: 14px;
-      color: var(--text);
-      font-weight: 500;
-      padding: 6px 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    /* ── Галактика ── */
-    .galaxy {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      z-index: 1;
-    }
-    .links {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-    }
-
-    /* ── Карточка-планета ── */
-    .node {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      cursor: pointer;
-      z-index: 3;
-      transition: transform 0.2s ease;
-    }
-    .node:hover { transform: translate(-50%, -50%) translateY(-3px); z-index: 6; }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      box-shadow: var(--shadow);
-      width: 200px;
-      transition: all 0.2s ease;
-    }
-    .node:hover .card {
-      box-shadow: var(--shadow-lg);
-      border-color: var(--accent);
-    }
-    .card-icon {
-      font-size: 28px;
-      margin-bottom: 6px;
-    }
-    .card-title {
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-    .card-handle {
-      font-family: 'SF Mono', Menlo, monospace;
-      font-size: 12px;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-    .card-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.4;
-      margin-bottom: 10px;
-      min-height: 2.8em;
-    }
-    .card-meta {
-      font-size: 11px;
-      color: var(--text-dim);
-      margin-bottom: 10px;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-weight: 500;
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
-    .badge.green { background: var(--green-soft); color: var(--green); }
-    .badge.orange { background: var(--orange-soft); color: var(--orange); }
-    .badge.purple { background: var(--purple-soft); color: var(--purple); }
-    .badge.gray { background: var(--surface-2); color: var(--text-muted); }
-    .badge .dot-mini {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: currentColor;
-    }
-    .badge.green.pulse .dot-mini { animation: pulseDot 1.5s infinite; }
-    @keyframes pulseDot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    /* Центральная карточка (Pavel — солнце) */
-    .node.sun .card {
-      background: linear-gradient(135deg, #ffe89b 0%, #f59e0b 100%);
-      border: none;
-      box-shadow: 0 0 60px rgba(245, 158, 11, 0.3), 0 0 120px rgba(245, 158, 11, 0.15);
-      width: 220px;
-      text-align: center;
-    }
-    .node.sun .card-title, .node.sun .card-handle, .node.sun .card-sub {
-      color: #1a1a2e;
-    }
-    .node.sun .card-handle { color: rgba(26, 26, 46, 0.7); }
-    [data-theme="dark"] .node.sun .card { box-shadow: 0 0 80px rgba(245, 158, 11, 0.4); }
-
-    /* Карточка "новый проект" */
-    .node.add .card {
-      background: transparent;
-      border: 2px dashed var(--border-strong);
-      box-shadow: none;
-      opacity: 0.6;
-      text-align: center;
-    }
-    .node.add:hover .card { opacity: 1; border-color: var(--accent); }
-
-    /* ── Side панель ── */
-    .panel {
-      position: fixed;
-      top: 0; right: 0; bottom: 0;
-      width: 480px;
-      max-width: 90vw;
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow-lg);
-    }
-    .panel.open { transform: translateX(0); }
-    .panel-header {
-      padding: 18px 22px;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; gap: 16px; z-index: 10;
     }
-    .panel-title {
-      font-size: 17px; font-weight: 700;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .panel-close {
-      background: transparent; border: none;
-      color: var(--text-muted); cursor: pointer;
-      font-size: 22px; width: 32px; height: 32px;
-      border-radius: 8px;
-    }
-    .panel-close:hover { background: var(--surface-2); color: var(--text); }
-    .panel-body { flex: 1; overflow-y: auto; padding: 16px 22px; }
-    .panel-section { margin-bottom: 22px; }
-    .panel-section h4 {
-      font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
-      color: var(--text-muted); margin-bottom: 10px; font-weight: 600;
-    }
-    .agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
-    .agent-chip {
-      background: var(--surface-2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 10px 6px; text-align: center;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .agent-chip:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
-    .agent-chip.active { border-color: var(--green); background: var(--green-soft); }
-    .agent-chip .emoji { font-size: 22px; }
-    .agent-chip .name { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; white-space: nowrap; }
+    .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); flex-shrink: 0; }
+    .header-center { color: var(--text-muted); font-size: 13px; white-space: nowrap; }
+    .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .theme-switch { display: flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
+    .theme-btn { border: none; background: transparent; padding: 4px 11px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-radius: 999px; font-family: inherit; transition: all 0.15s; }
+    .theme-btn:hover { color: var(--text); }
+    .theme-btn.active { background: var(--surface); color: var(--accent); font-weight: 600; box-shadow: var(--shadow-sm); }
+    .clock { font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 500; padding: 5px 13px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; }
 
-    .events { display: flex; flex-direction: column; gap: 8px; }
-    .event {
-      background: var(--surface-2); border: 1px solid var(--border);
-      border-left: 3px solid var(--accent); border-radius: 10px;
-      padding: 10px 12px; font-size: 12px;
+    /* ── Canvas ── */
+    .canvas {
+      position: fixed; top: 56px; left: 0; right: 0; bottom: 52px;
+      overflow: visible;
     }
-    .event .meta {
-      display: flex; gap: 8px; align-items: center;
-      color: var(--text-muted); font-size: 11px; margin-bottom: 4px;
-    }
-    .event .agent-name { color: var(--text); font-weight: 600; }
-    .event .msg { color: var(--text); }
-    .event.start { border-left-color: var(--blue); }
-    .event.step { border-left-color: var(--green); }
-    .event.complete { border-left-color: var(--green); background: var(--green-soft); }
-    .event.handoff { border-left-color: var(--purple); }
-    .event.error { border-left-color: var(--red); background: var(--red-soft); }
-    .event.wait { border-left-color: var(--orange); }
+    .lines-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 
-    .empty {
-      padding: 28px;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
+    /* ── Node ── */
+    .node { position: absolute; transform: translate(-50%,-50%); cursor: pointer; z-index: 3; transition: transform 0.2s; }
+    .node:hover { transform: translate(-50%,-50%) translateY(-3px); z-index: 7; }
 
-    /* ── Toast ── */
-    .toasts {
-      position: fixed;
-      bottom: 24px; left: 24px;
-      z-index: 30;
-      display: flex; flex-direction: column;
-      gap: 8px;
+    /* ── Card ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 15px; width: 188px;
+      box-shadow: var(--shadow); transition: box-shadow 0.2s, border-color 0.2s;
     }
-    .toast {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 12px;
-      max-width: 320px;
-      box-shadow: var(--shadow-lg);
-      animation: toastIn 0.3s ease;
-      color: var(--text);
-    }
-    @keyframes toastIn {
-      from { transform: translateX(-20px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
+    .node:hover .card { box-shadow: var(--shadow-lg); border-color: var(--accent); }
+    .card-emoji { font-size: 34px; display: block; margin-bottom: 7px; }
+    .card-title { font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 3px; }
+    .card-handle { font-family: 'SF Mono', Menlo, monospace; font-size: 11px; color: var(--accent); display: block; margin-bottom: 7px; }
+    .card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 7px; min-height: 2.8em; }
+    .card-ts { font-size: 10px; color: var(--text-dim); margin-bottom: 7px; }
 
-    /* ── Легенда ── */
-    .legend {
-      position: fixed;
-      bottom: 16px; left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 8px 18px;
-      font-size: 11px;
-      color: var(--text-muted);
-      box-shadow: var(--shadow-sm);
-      z-index: 5;
-    }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-line {
-      width: 16px; height: 2px;
-      border-radius: 2px;
-    }
+    /* ── Hub card ── */
+    .node.hub .card { background: var(--purple-soft); border: 2.5px solid var(--purple); width: 200px; }
+    .node.hub:hover .card { border-color: var(--purple); box-shadow: 0 0 0 5px rgba(168,85,247,0.12), var(--shadow-lg); }
+    .node.hub .card-title { color: var(--purple); }
+    .node.hub .card-sub { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--purple); margin-bottom: 8px; opacity: 0.75; }
 
-    /* ── Луна-агент ── */
-    .moon {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: var(--surface);
-      border: 1.5px solid var(--border-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 4;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    /* ── Owner card ── */
+    .node.owner .card { text-align: center; padding: 22px 15px; width: 190px; }
+    .owner-avatar {
+      width: 62px; height: 62px; border-radius: 50%;
+      background: linear-gradient(135deg, #818cf8 0%, #a855f7 100%);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 10px; font-size: 30px;
+      box-shadow: 0 0 0 5px var(--accent-soft);
     }
-    .moon:hover {
-      transform: translate(-50%, -50%) scale(1.25);
-      border-color: var(--accent);
-      box-shadow: var(--shadow);
-      z-index: 7;
-    }
-    .moon.active {
-      border-color: var(--green);
-      background: var(--green-soft);
-      animation: moonPulse 2s infinite;
-    }
-    .moon-emoji { font-size: 16px; line-height: 1; pointer-events: none; }
-    .moon-label {
-      position: absolute;
-      bottom: -16px;
-      font-size: 9px;
-      color: var(--text-muted);
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1px 4px;
-      transition: opacity 0.15s;
-    }
-    .moon:hover .moon-label { opacity: 1; }
-    @keyframes moonPulse {
-      0%, 100% { box-shadow: 0 0 10px rgba(34, 197, 94, 0.35); }
-      50%       { box-shadow: 0 0 22px rgba(34, 197, 94, 0.65); }
-    }
+    .node.owner .card-title { font-size: 18px; text-align: center; }
+    .node.owner .card-sub { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); text-align: center; }
+    .node.owner:hover .card { border-color: var(--purple); }
 
-    /* ── Адаптив ── */
-    @media (max-width: 720px) {
-      header { flex-direction: column; padding: 10px; gap: 8px; }
+    /* ── Placeholder card ── */
+    .node.placeholder .card { background: transparent; border: 1.5px dashed var(--border-strong); box-shadow: none; opacity: 0.55; text-align: center; width: 175px; }
+    .node.placeholder:hover .card { opacity: 0.9; border-color: var(--accent); }
+    .node.placeholder .card-title { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+    /* ── Badges ── */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+    .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .b-active  { background: var(--green-soft); color: var(--green); }
+    .b-active .dot { animation: blink 1.6s infinite; }
+    .b-working { background: var(--orange-soft); color: var(--orange); }
+    .b-next    { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border-strong); }
+    .b-wait    { background: transparent; color: var(--text-dim); border: 1px solid var(--border-strong); }
+    .b-stage   { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+    .b-hub     { background: var(--purple-soft); color: var(--purple); border: 1px solid rgba(168,85,247,0.4); cursor: pointer; }
+    .b-hub:hover { background: var(--purple); color: #fff; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    /* ── Panel ── */
+    .panel { position: fixed; top: 56px; right: 0; bottom: 52px; width: 460px; max-width: 92vw; background: var(--surface); border-left: 1px solid var(--border); transform: translateX(100%); transition: transform 0.3s ease; z-index: 20; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); }
+    .panel.open { transform: translateX(0); }
+    .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .panel-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 20px; width: 30px; height: 30px; border-radius: 8px; }
+    .panel-close:hover { background: var(--surface-2); }
+    .panel-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+    .p-section { margin-bottom: 20px; }
+    .p-section h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 9px; font-weight: 600; }
+    .p-text { font-size: 13px; color: var(--text-muted); }
+    .agent-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .agent-chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 12px; transition: all 0.15s; }
+    .agent-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .events { display: flex; flex-direction: column; gap: 7px; }
+    .ev { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 9px 12px; font-size: 12px; }
+    .ev .meta { display: flex; gap: 7px; align-items: center; color: var(--text-muted); font-size: 11px; margin-bottom: 3px; }
+    .ev .ev-agent { color: var(--text); font-weight: 600; }
+    .ev .ev-msg { color: var(--text); }
+    .ev.start   { border-left-color: var(--blue); }
+    .ev.step    { border-left-color: var(--green); }
+    .ev.complete{ border-left-color: var(--green); background: var(--green-soft); }
+    .ev.handoff { border-left-color: var(--purple); }
+    .ev.error   { border-left-color: var(--red); }
+    .ev.wait    { border-left-color: var(--orange); }
+    .empty-ev { padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
+    .back-btn { padding: 5px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 12px; font-family: inherit; color: var(--text); }
+    .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Bottom bar ── */
+    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 52px; background: var(--surface); border-top: 1px solid var(--border); z-index: 10; display: flex; align-items: center; padding: 0 16px; gap: 6px; overflow-x: auto; }
+    .bar-hint { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .bar-sep { color: var(--border-strong); padding: 0 4px; }
+    .bar-btn { display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; white-space: nowrap; font-size: 12px; font-family: inherit; color: var(--text-muted); transition: all 0.15s; }
+    .bar-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+    .bar-btn .bh { color: var(--accent); font-family: 'SF Mono', Menlo, monospace; font-size: 11px; }
+
+    /* ── Legend ── */
+    .legend { position: fixed; bottom: 60px; left: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 9px 14px; z-index: 5; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 5px; }
+    .leg-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+    .leg-line { width: 22px; border-top: 2px dashed; flex-shrink: 0; }
+    .leg-line.blue   { border-color: var(--blue); }
+    .leg-line.orange { border-color: var(--orange); }
+    .leg-line.red    { border-color: var(--red); }
+
+    /* ── Toasts ── */
+    .toasts { position: fixed; bottom: 60px; right: 14px; z-index: 30; display: flex; flex-direction: column; gap: 8px; }
+    .toast { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 9px 13px; border-radius: 10px; font-size: 12px; max-width: 300px; box-shadow: var(--shadow-lg); color: var(--text); animation: tIn 0.25s ease; }
+    @keyframes tIn { from { transform: translateX(16px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    @media (max-width: 768px) {
       .header-center { display: none; }
-      .card { width: 160px; padding: 12px; }
-      .legend { font-size: 10px; padding: 6px 12px; gap: 10px; }
-      .moon { width: 30px; height: 30px; }
-      .moon-emoji { font-size: 13px; }
+      .legend { display: none; }
+      .card { width: 155px !important; }
     }
   </style>
 </head>
 <body>
-  <div class="bg-decor"></div>
-  <div class="orbits-bg"></div>
 
-  <header>
-    <div class="brand">
-      <span class="dot"></span>
-      <span>Система агентов — Pavel</span>
+<header>
+  <div class="brand"><span class="brand-dot"></span>Система агентов — Pavel</div>
+  <div class="header-center">Галактика HairLove — Агенты — Связи</div>
+  <div class="header-right">
+    <div class="theme-switch" id="themeSwitch">
+      <button class="theme-btn" data-mode="light">☀️ Светлая</button>
+      <button class="theme-btn" data-mode="dark">🌙 Тёмная</button>
+      <button class="theme-btn" data-mode="auto">⚙️ Авто</button>
     </div>
-    <div class="header-center">
-      <span id="hc-stat-projects">0 проектов</span>
-      <span class="sep">—</span>
-      <span id="hc-stat-events">0 событий</span>
-      <span class="sep">—</span>
-      <span>живая лента</span>
-    </div>
-    <div class="header-right">
-      <div class="theme-switch" id="theme-switch">
-        <button class="theme-btn" data-theme="light">☀️ Светлая</button>
-        <button class="theme-btn" data-theme="dark">🌙 Тёмная</button>
-        <button class="theme-btn" data-theme="auto">⚙️ Авто</button>
-      </div>
-      <div class="clock" id="clock">--:--:--</div>
-    </div>
-  </header>
-
-  <div class="galaxy" id="galaxy">
-    <svg class="links" id="links"></svg>
+    <div class="clock" id="clock">--:--:--</div>
   </div>
+</header>
 
-  <aside class="panel" id="panel">
-    <div class="panel-header">
-      <div class="panel-title" id="panel-title">—</div>
-      <button class="panel-close" onclick="closePanel()">×</button>
-    </div>
-    <div class="panel-body" id="panel-body"></div>
-  </aside>
+<div class="canvas" id="canvas">
+  <svg class="lines-svg" id="linesSvg"></svg>
+</div>
 
-  <div class="toasts" id="toasts"></div>
-
-  <div class="legend">
-    <div class="legend-item">🧑 <span>Pavel — солнце</span></div>
-    <div class="legend-item">🌍 <span>проект — планета</span></div>
-    <div class="legend-item">🔍 <span>агент — луна (клик = события)</span></div>
-    <div class="legend-item"><span class="legend-line" style="background:var(--green)"></span>активен</div>
+<aside class="panel" id="panel">
+  <div class="panel-header">
+    <div class="panel-title" id="panelTitle">—</div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
   </div>
+  <div class="panel-body" id="panelBody"></div>
+</aside>
 
-  <script>
-    const AGENTS = [
-      { key: 'coordinator', emoji: '🎯', name: 'координатор' },
-      { key: 'planning', emoji: '📋', name: 'планинг' },
-      { key: 'competitors', emoji: '🔍', name: 'конкуренты' },
-      { key: 'strategy', emoji: '🧭', name: 'стратегия' },
-      { key: 'site', emoji: '🌐', name: 'сайт' },
-      { key: 'ads', emoji: '📢', name: 'реклама' },
-      { key: 'growth', emoji: '📈', name: 'рост' },
-      { key: 'instagram', emoji: '📱', name: 'instagram' },
-      { key: 'copy', emoji: '✍️', name: 'тексты бренда' },
-      { key: 'text-editor', emoji: '🖋️', name: 'редактор' },
-    ];
-    const AGENT_MAP = Object.fromEntries(AGENTS.map(a => [a.key, a]));
+<div class="bottom-bar" id="bottomBar"></div>
 
-    const TYPE_LABEL = {
-      start: 'старт', step: 'шаг', complete: 'готово',
-      handoff: 'передача', error: 'ошибка', wait: 'ожидание'
+<div class="legend">
+  <div class="leg-item"><span class="leg-line blue"></span>Тексты → канал</div>
+  <div class="leg-item"><span class="leg-line orange"></span>Конкуренты → анализ</div>
+  <div class="leg-item"><span class="leg-line red"></span>Реклама → запуск</div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+  // ── Config ────────────────────────────────────────────────
+  const PROJECT = 'hairlove';
+
+  // Positions as % of canvas (left%, top%)
+  const AGENTS = [
+    { key:'strategy',    name:'Стратегия',     handle:'/hairlove-strategy',   emoji:'🧭', desc:'Центр сети, дорожная карта',           px:22, py:17, def:'working' },
+    { key:'copy',        name:'Тексты бренда', handle:'/hairlove-texts',       emoji:'✍️', desc:'Контент для всех каналов',              px: 7, py:36, def:'active'  },
+    { key:'site',        name:'Сайт',          handle:'/hairlove-site',        emoji:'🌐', desc:'B2B витрина, следующий приоритет',      px:38, py:31, def:'next'    },
+    { key:'competitors', name:'Конкуренты',    handle:'/hairlove-competitors', emoji:'🔍', desc:'Данные для стратегии и рекламы',        px: 7, py:64, def:'wait'    },
+    { key:'ads',         name:'Реклама',       handle:'/hairlove-ads',         emoji:'📢', desc:'Meta Ads, стреляет в сайт и Insta',    px:38, py:69, def:'stage'   },
+    { key:'instagram',   name:'Instagram',     handle:'/hairlove-insta',       emoji:'📸', desc:'Публикация постов',                    px:22, py:83, def:'active'  },
+  ];
+
+  const HUB   = { px:22, py:50 };
+  const OWNER = { px:64, py:50 };
+  const EXTRA = [{ px:81, py:33 }, { px:81, py:68 }];
+
+  // Workflow connections between agents
+  const CONNS = [
+    { from:'copy',        to:'instagram', color:'blue'   },
+    { from:'copy',        to:'site',      color:'blue'   },
+    { from:'competitors', to:'strategy',  color:'orange' },
+    { from:'ads',         to:'instagram', color:'red'    },
+    { from:'ads',         to:'site',      color:'red'    },
+  ];
+
+  const COLOR = { blue:'var(--blue)', orange:'var(--orange)', red:'var(--red)' };
+
+  let projData   = null;
+  let agentTs    = {};     // key → formatted timestamp string
+  let lastEvTs   = '';
+  let activePanel = null;
+
+  // ── Theme ─────────────────────────────────────────────────
+  function applyTheme(mode) {
+    const actual = mode === 'auto'
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : mode;
+    document.documentElement.setAttribute('data-theme', actual);
+    localStorage.setItem('theme', mode);
+    document.querySelectorAll('.theme-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.mode === mode));
+  }
+  document.querySelectorAll('.theme-btn').forEach(b =>
+    b.addEventListener('click', () => applyTheme(b.dataset.mode)));
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if ((localStorage.getItem('theme') || 'light') === 'auto') applyTheme('auto');
+  });
+  applyTheme(localStorage.getItem('theme') || 'light');
+
+  // ── Clock ─────────────────────────────────────────────────
+  function tick() {
+    const d = new Date();
+    document.getElementById('clock').textContent =
+      `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+  function pad(n) { return String(n).padStart(2,'0'); }
+  setInterval(tick, 1000); tick();
+
+  // ── API ───────────────────────────────────────────────────
+  async function get(path) {
+    try { return await (await fetch(path)).json(); } catch { return null; }
+  }
+
+  // ── Badge HTML ────────────────────────────────────────────
+  function badge(status, custom) {
+    const cfg = {
+      active:  ['b-active',  custom || 'Активен'],
+      working: ['b-working', custom || 'В работе'],
+      next:    ['b-next',    custom || 'Следующий'],
+      wait:    ['b-wait',    custom || 'Жёт задачи'],
+      stage:   ['b-stage',   custom || 'Этап 2'],
+      done:    ['b-active',  custom || 'Готово'],
     };
+    const [cls, label] = cfg[status] || ['b-wait', custom || 'Ожидает'];
+    return `<span class="badge ${cls}"><span class="dot"></span>${label}</span>`;
+  }
 
-    let projects = [];
-    let lastEventTs = '';
-    let activePanel = null;
+  function agentStatus(a) {
+    if (projData && projData.active_agent === a.key) return 'active';
+    return a.def;
+  }
 
-    // ── Тема ─────────────────────────────────────────────────────
-    function applyTheme(mode) {
-      const actual = mode === 'auto'
-        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-        : mode;
-      document.documentElement.setAttribute('data-theme', actual);
-      localStorage.setItem('theme-mode', mode);
-      document.querySelectorAll('.theme-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.theme === mode);
-      });
-    }
-    document.querySelectorAll('.theme-btn').forEach(b => {
-      b.addEventListener('click', () => applyTheme(b.dataset.theme));
+  function fmtTs(ts) {
+    if (!ts) return '';
+    try {
+      const d = new Date(ts);
+      return `обновлён ${d.toLocaleDateString('ru',{day:'2-digit',month:'2-digit',year:'2-digit'})} ${d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}`;
+    } catch { return ''; }
+  }
+
+  // ── SVG line ──────────────────────────────────────────────
+  function line(svg, x1, y1, x2, y2, stroke, dash, width, opacity) {
+    const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',x1); l.setAttribute('y1',y1);
+    l.setAttribute('x2',x2); l.setAttribute('y2',y2);
+    l.setAttribute('stroke', stroke);
+    l.setAttribute('stroke-width', width);
+    l.setAttribute('stroke-dasharray', dash);
+    l.setAttribute('opacity', opacity);
+    l.setAttribute('stroke-linecap','round');
+    svg.appendChild(l);
+  }
+
+  // ── Render ────────────────────────────────────────────────
+  function render() {
+    const canvas = document.getElementById('canvas');
+    const svg    = document.getElementById('linesSvg');
+    canvas.querySelectorAll('.node').forEach(n => n.remove());
+    svg.innerHTML = '';
+
+    const W = canvas.clientWidth;
+    const H = canvas.clientHeight;
+    const xy = pos => ({ x: pos.px/100*W, y: pos.py/100*H });
+
+    // Hub ↔ each agent (gray)
+    AGENTS.forEach(a => {
+      const h = xy(HUB), p = xy(a);
+      line(svg, h.x, h.y, p.x, p.y, 'var(--border-strong)', '3 5', 1, 0.5);
     });
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      const mode = localStorage.getItem('theme-mode') || 'light';
-      if (mode === 'auto') applyTheme('auto');
+
+    // Hub ↔ Owner (purple)
+    { const h = xy(HUB), o = xy(OWNER);
+      line(svg, h.x, h.y, o.x, o.y, 'var(--purple)', '4 6', 1.5, 0.45); }
+
+    // Workflow connections (colored)
+    CONNS.forEach(c => {
+      const fa = AGENTS.find(a=>a.key===c.from);
+      const ta = AGENTS.find(a=>a.key===c.to);
+      if (!fa||!ta) return;
+      const p1 = xy(fa), p2 = xy(ta);
+      line(svg, p1.x, p1.y, p2.x, p2.y, COLOR[c.color], '5 4', 1.8, 0.7);
     });
-    applyTheme(localStorage.getItem('theme-mode') || 'light');
 
-    // ── Часы ─────────────────────────────────────────────────────
-    function tickClock() {
-      const d = new Date();
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mm = String(d.getMinutes()).padStart(2, '0');
-      const ss = String(d.getSeconds()).padStart(2, '0');
-      document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
-    }
-    setInterval(tickClock, 1000); tickClock();
+    // Agent nodes
+    AGENTS.forEach(a => {
+      const p = xy(a);
+      const el = mkNode('node', p.x, p.y);
+      const ts = agentTs[a.key] || '';
+      el.innerHTML = `<div class="card">
+        <span class="card-emoji">${a.emoji}</span>
+        <div class="card-title">${a.name}</div>
+        <span class="card-handle">${a.handle}</span>
+        <div class="card-desc">${a.desc}</div>
+        ${ts ? `<div class="card-ts">${ts}</div>` : ''}
+        ${badge(agentStatus(a))}
+      </div>`;
+      el.addEventListener('click', () => openPanel({ type:'agent', key:a.key }));
+      canvas.appendChild(el);
+    });
 
-    // ── API ──────────────────────────────────────────────────────
-    async function api(path) {
-      try { const r = await fetch(path); return await r.json(); } catch { return null; }
-    }
+    // Hub (HairLove)
+    { const p = xy(HUB);
+      const el = mkNode('node hub', p.x, p.y);
+      el.innerHTML = `<div class="card">
+        <span class="card-emoji">🐱</span>
+        <div class="card-title">HairLove</div>
+        <div class="card-sub">ГАЛАКТИКА</div>
+        <div class="card-desc">Бренд косметики для волос</div>
+        <span class="badge b-hub">⚡ /full-cycle</span>
+      </div>`;
+      el.addEventListener('click', () => openPanel({ type:'project' }));
+      canvas.appendChild(el); }
 
-    // ── Рендер галактики ─────────────────────────────────────────
-    function renderGalaxy() {
-      const galaxy = document.getElementById('galaxy');
-      const links = document.getElementById('links');
-      const w = galaxy.clientWidth, h = galaxy.clientHeight;
-      const cx = w / 2, cy = h / 2;
+    // Owner (Pavel)
+    { const p = xy(OWNER);
+      const el = mkNode('node owner', p.x, p.y);
+      el.innerHTML = `<div class="card">
+        <div class="owner-avatar">👤</div>
+        <div class="card-title">Павел</div>
+        <div class="card-sub">ВЛАДЕЛЕЦ</div>
+      </div>`;
+      el.addEventListener('click', () => openPanel({ type:'owner' }));
+      canvas.appendChild(el); }
 
-      [...galaxy.querySelectorAll('.node, .moon')].forEach(el => el.remove());
-      links.innerHTML = '';
+    // Placeholders
+    EXTRA.forEach(pos => {
+      const p = xy(pos);
+      const el = mkNode('node placeholder', p.x, p.y);
+      el.innerHTML = `<div class="card">
+        <span class="card-emoji">📦</span>
+        <div class="card-title">Новое направление</div>
+        <span class="badge b-stage"><span class="dot"></span>Скоро</span>
+      </div>`;
+      canvas.appendChild(el);
+    });
+  }
 
-      // Sun (Pavel) в центре
-      const sun = document.createElement('div');
-      sun.className = 'node sun';
-      sun.style.left = cx + 'px';
-      sun.style.top = cy + 'px';
-      sun.innerHTML = `
-        <div class="card">
-          <div class="card-icon">🧑</div>
-          <div class="card-title">Pavel</div>
-          <div class="card-handle">/orchestrator</div>
-          <div class="card-sub">главный оркестратор всей системы</div>
-          <span class="badge orange"><span class="dot-mini"></span>владелец</span>
+  function mkNode(cls, x, y) {
+    const el = document.createElement('div');
+    el.className = cls;
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+    return el;
+  }
+
+  // ── Bottom bar ────────────────────────────────────────────
+  function renderBar() {
+    const bar = document.getElementById('bottomBar');
+    const links = AGENTS.map(a =>
+      `<button class="bar-btn" data-key="${a.key}">
+         <span class="bh">${a.handle}</span> ${a.name}
+       </button>`
+    ).join('');
+    bar.innerHTML = `<span class="bar-hint">Нажми на планету → детали</span><span class="bar-sep">|</span>${links}`;
+    bar.querySelectorAll('.bar-btn').forEach(b =>
+      b.addEventListener('click', () => openPanel({ type:'agent', key: b.dataset.key })));
+  }
+
+  // ── Panel ─────────────────────────────────────────────────
+  function openPanel(ctx) {
+    activePanel = ctx;
+    document.getElementById('panel').classList.add('open');
+    renderPanel();
+  }
+  function closePanel() {
+    activePanel = null;
+    document.getElementById('panel').classList.remove('open');
+  }
+
+  async function renderPanel() {
+    if (!activePanel) return;
+    const titleEl = document.getElementById('panelTitle');
+    const bodyEl  = document.getElementById('panelBody');
+
+    if (activePanel.type === 'owner') {
+      titleEl.textContent = '👤 Павел';
+      bodyEl.innerHTML = `
+        <div class="p-section">
+          <h4>Роль</h4>
+          <p class="p-text">Владелец системы агентов. Управляет направлениями через оркестратора каждого проекта.</p>
         </div>
-      `;
-      sun.addEventListener('click', () => openPanel({ type: 'sun' }));
-      galaxy.appendChild(sun);
-
-      // Радиус главной орбиты (планеты вокруг солнца)
-      const R = Math.min(w, h) * 0.36;
-      // Радиус лунной орбиты (агенты вокруг планеты)
-      const moonR = Math.min(96, Math.min(w, h) * 0.1);
-
-      // Проекты-планеты
-      const items = [...projects, { name: '__add__' }];
-      items.forEach((p, i) => {
-        const angle = (i / items.length) * Math.PI * 2 - Math.PI / 2;
-        const x = cx + Math.cos(angle) * R;
-        const y = cy + Math.sin(angle) * R;
-
-        // линия к солнцу
-        if (p.name !== '__add__') {
-          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          line.setAttribute('x1', cx);
-          line.setAttribute('y1', cy);
-          line.setAttribute('x2', x);
-          line.setAttribute('y2', y);
-          line.setAttribute('stroke', p.active_agent ? 'var(--green)' : 'var(--border-strong)');
-          line.setAttribute('stroke-width', p.active_agent ? '2' : '1');
-          line.setAttribute('stroke-dasharray', '4 6');
-          line.setAttribute('opacity', p.active_agent ? '0.8' : '0.5');
-          links.appendChild(line);
-
-          // кольцо орбиты лун вокруг планеты
-          const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          ring.setAttribute('cx', x);
-          ring.setAttribute('cy', y);
-          ring.setAttribute('r', moonR);
-          ring.setAttribute('fill', 'none');
-          ring.setAttribute('stroke', 'var(--border-strong)');
-          ring.setAttribute('stroke-width', '1');
-          ring.setAttribute('stroke-dasharray', '3 5');
-          ring.setAttribute('opacity', '0.35');
-          links.appendChild(ring);
-        }
-
-        const el = createNode(p, x, y);
-        galaxy.appendChild(el);
-
-        // луны-агенты вокруг планеты
-        if (p.name !== '__add__') {
-          AGENTS.forEach((a, ai) => {
-            const mAngle = (ai / AGENTS.length) * Math.PI * 2 - Math.PI / 2;
-            const mx = x + Math.cos(mAngle) * moonR;
-            const my = y + Math.sin(mAngle) * moonR;
-            const moon = document.createElement('div');
-            moon.className = 'moon' + (p.active_agent === a.key ? ' active' : '');
-            moon.style.left = mx + 'px';
-            moon.style.top = my + 'px';
-            moon.innerHTML = `<span class="moon-emoji">${a.emoji}</span><span class="moon-label">${a.name}</span>`;
-            moon.addEventListener('click', ev => {
-              ev.stopPropagation();
-              openPanel({ type: 'agent', project: p.name, agent: a.key });
-            });
-            galaxy.appendChild(moon);
-          });
-        }
-      });
-    }
-
-    function createNode(p, x, y) {
-      const el = document.createElement('div');
-      el.className = 'node';
-      el.style.left = x + 'px';
-      el.style.top = y + 'px';
-
-      if (p.name === '__add__') {
-        el.classList.add('add');
-        el.innerHTML = `
-          <div class="card">
-            <div class="card-icon">➕</div>
-            <div class="card-title" style="color:var(--text-muted)">Новое направление</div>
-            <div class="card-handle">/новый-проект</div>
-            <span class="badge gray">скоро</span>
+        <div class="p-section">
+          <h4>Направления</h4>
+          <div class="agent-chips">
+            <div class="agent-chip" onclick="openPanel({type:'project'})">🐱 HairLove</div>
           </div>
-        `;
-        el.addEventListener('click', () => openPanel({ type: 'add' }));
-        return el;
-      }
-
-      const lastEv = p.last_event;
-      const lastTime = lastEv ? formatTime(lastEv.ts) : '';
-      const isActive = !!p.active_agent;
-      const agentInfo = isActive ? AGENT_MAP[p.active_agent] : null;
-      const subText = lastEv ? (lastEv.message || '').slice(0, 60) : 'нет событий';
-
-      const badgeHtml = isActive
-        ? `<span class="badge green pulse"><span class="dot-mini"></span>${agentInfo ? agentInfo.emoji + ' ' + agentInfo.name : p.active_agent}</span>`
-        : `<span class="badge gray"><span class="dot-mini"></span>покой</span>`;
-
-      el.innerHTML = `
-        <div class="card">
-          <div class="card-icon">🌍</div>
-          <div class="card-title">${escapeHtml(p.name)}</div>
-          <div class="card-handle">/${escapeHtml(p.name)}</div>
-          <div class="card-sub">${escapeHtml(subText)}</div>
-          ${lastTime ? `<div class="card-meta">обновлён ${lastTime}</div>` : ''}
-          ${badgeHtml}
-        </div>
-      `;
-
-      el.addEventListener('click', () => openPanel({ type: 'project', project: p.name }));
-      return el;
-    }
-
-    function formatTime(ts) {
-      if (!ts) return '';
-      try {
-        const d = new Date(ts);
-        const date = d.toLocaleDateString('ru', { day: '2-digit', month: '2-digit', year: '2-digit' });
-        const time = d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-        return `${date} ${time}`;
-      } catch { return ts.slice(0, 16).replace('T', ' '); }
-    }
-
-    // ── Панель ───────────────────────────────────────────────────
-    function openPanel(ctx) {
-      activePanel = ctx;
-      document.getElementById('panel').classList.add('open');
-      renderPanel();
-    }
-    function closePanel() {
-      activePanel = null;
-      document.getElementById('panel').classList.remove('open');
-    }
-
-    async function renderPanel() {
-      if (!activePanel) return;
-      const titleEl = document.getElementById('panel-title');
-      const bodyEl = document.getElementById('panel-body');
-
-      if (activePanel.type === 'add') {
-        titleEl.innerHTML = `<span>➕ Новый проект</span>`;
-        bodyEl.innerHTML = `
-          <div class="empty">
-            Создание через CLI на сервере:
-            <pre style="margin-top:14px;background:var(--surface-2);border:1px solid var(--border);padding:12px;border-radius:10px;text-align:left;font-size:12px;color:var(--text);font-family:'SF Mono',monospace;">~/projects/новый-проект.sh имя-проекта</pre>
-          </div>`;
-        return;
-      }
-
-      if (activePanel.type === 'sun') {
-        titleEl.innerHTML = `🧑 Pavel — оркестратор`;
-        bodyEl.innerHTML = `
-          <div class="panel-section">
-            <h4>Роль</h4>
-            <p style="color:var(--text-muted);font-size:13px">
-              Главный оркестратор всей системы. Каждый проект — мини-вселенная
-              со своим координатором и 9 агентами.
-            </p>
-          </div>
-          <div class="panel-section">
-            <h4>Все агенты системы</h4>
-            <div class="agent-grid">
-              ${AGENTS.map(a => `
-                <div class="agent-chip">
-                  <div class="emoji">${a.emoji}</div>
-                  <div class="name">${a.name}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>`;
-        return;
-      }
-
-      if (activePanel.type === 'project') {
-        const p = projects.find(x => x.name === activePanel.project);
-        if (!p) return;
-        titleEl.innerHTML = `🌍 ${escapeHtml(p.name)}`;
-        const events = await api(`/api/agents/events?project=${encodeURIComponent(p.name)}&limit=50`) || [];
-        bodyEl.innerHTML = `
-          <div class="panel-section">
-            <h4>Состояние</h4>
-            <div style="font-size:13px">
-              ${p.active_agent
-                ? `🟢 активен: <b>${escapeHtml(p.active_agent)}</b>`
-                : '⚪ покой'}
-            </div>
-          </div>
-          <div class="panel-section">
-            <h4>Агенты проекта</h4>
-            <div class="agent-grid">
-              ${AGENTS.map(a => `
-                <div class="agent-chip ${p.active_agent === a.key ? 'active' : ''}"
-                     onclick='openPanel({type:"agent",project:${JSON.stringify(p.name)},agent:${JSON.stringify(a.key)}})'>
-                  <div class="emoji">${a.emoji}</div>
-                  <div class="name">${a.name}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          <div class="panel-section">
-            <h4>Лента событий (${events.length})</h4>
-            <div class="events">
-              ${events.length ? events.reverse().map(renderEvent).join('') : '<div class="empty">пока пусто</div>'}
-            </div>
-          </div>`;
-        return;
-      }
-
-      if (activePanel.type === 'agent') {
-        const a = AGENT_MAP[activePanel.agent];
-        const proj = activePanel.project;
-        titleEl.innerHTML = `${a.emoji} ${escapeHtml(a.name)} <span style="color:var(--text-muted);font-weight:400;font-size:13px">· ${escapeHtml(proj)}</span>`;
-        const events = await api(`/api/agents/events?project=${encodeURIComponent(proj)}&agent=${encodeURIComponent(activePanel.agent)}&limit=50`) || [];
-        bodyEl.innerHTML = `
-          <div class="panel-section">
-            <h4>← Назад</h4>
-            <div class="agent-chip" style="display:inline-block;cursor:pointer" onclick='openPanel({type:"project",project:${JSON.stringify(proj)}})'>
-              <div class="emoji">🌍</div>
-              <div class="name">${escapeHtml(proj)}</div>
-            </div>
-          </div>
-          <div class="panel-section">
-            <h4>События агента (${events.length})</h4>
-            <div class="events">
-              ${events.length ? events.reverse().map(renderEvent).join('') : '<div class="empty">этот агент ещё не работал в проекте</div>'}
-            </div>
-          </div>`;
-        return;
-      }
-    }
-
-    function renderEvent(e) {
-      const time = (e.ts || '').slice(11, 16);
-      const type = e.type || 'step';
-      const a = AGENT_MAP[e.agent] || { emoji: '•', name: e.agent || '—' };
-      return `
-        <div class="event ${type}">
-          <div class="meta">
-            <span>${time}</span>
-            <span>${a.emoji}</span>
-            <span class="agent-name">${escapeHtml(a.name)}</span>
-            <span style="margin-left:auto">${TYPE_LABEL[type] || type}</span>
-          </div>
-          <div class="msg">${escapeHtml(e.message || '')}</div>
         </div>`;
+      return;
     }
 
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, c => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[c]));
+    if (activePanel.type === 'project') {
+      titleEl.textContent = '🐱 HairLove';
+      const evs = await get(`/api/agents/events?project=${PROJECT}&limit=40`) || [];
+      bodyEl.innerHTML = `
+        <div class="p-section">
+          <h4>Агенты</h4>
+          <div class="agent-chips">
+            ${AGENTS.map(a=>`<div class="agent-chip" onclick="openPanel({type:'agent',key:'${a.key}'})">${a.emoji} ${a.name}</div>`).join('')}
+          </div>
+        </div>
+        <div class="p-section">
+          <h4>Лента событий (${evs.length})</h4>
+          <div class="events">${evs.length ? [...evs].reverse().map(fmtEv).join('') : '<div class="empty-ev">событий пока нет</div>'}</div>
+        </div>`;
+      return;
     }
 
-    // ── Polling ──────────────────────────────────────────────────
-    async function loadProjects() {
-      const data = await api('/api/agents/projects');
-      if (data) {
-        projects = data;
-        renderGalaxy();
-        if (activePanel && (activePanel.type === 'project' || activePanel.type === 'agent')) {
-          renderPanel();
+    if (activePanel.type === 'agent') {
+      const a = AGENTS.find(x => x.key === activePanel.key);
+      if (!a) return;
+      titleEl.innerHTML = `${a.emoji} ${a.name}`;
+      const evs = await get(`/api/agents/events?project=${PROJECT}&agent=${a.key}&limit=50`) || [];
+      bodyEl.innerHTML = `
+        <div class="p-section">
+          <h4>Агент</h4>
+          <div style="margin-bottom:6px"><code style="background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:6px;font-size:12px">${a.handle}</code></div>
+          <p class="p-text">${a.desc}</p>
+        </div>
+        <div class="p-section">
+          <button class="back-btn" onclick="openPanel({type:'project'})">← HairLove</button>
+        </div>
+        <div class="p-section">
+          <h4>События (${evs.length})</h4>
+          <div class="events">${evs.length ? [...evs].reverse().map(fmtEv).join('') : '<div class="empty-ev">агент ещё не работал</div>'}</div>
+        </div>`;
+      return;
+    }
+  }
+
+  function fmtEv(e) {
+    const time = (e.ts||'').slice(11,16);
+    const type = e.type||'step';
+    const a = AGENTS.find(x=>x.key===e.agent);
+    return `<div class="ev ${type}">
+      <div class="meta">
+        <span>${time}</span>
+        <span>${a?a.emoji:'•'}</span>
+        <span class="ev-agent">${esc(a?a.name:(e.agent||'—'))}</span>
+        <span style="margin-left:auto;font-size:10px;opacity:.7">${type}</span>
+      </div>
+      <div class="ev-msg">${esc(e.message||'')}</div>
+    </div>`;
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ── Toast ─────────────────────────────────────────────────
+  function toast(e) {
+    const a = AGENTS.find(x=>x.key===e.agent);
+    const div = document.createElement('div');
+    div.className = 'toast';
+    div.innerHTML = `${a?a.emoji:'•'} <b>${esc(a?a.name:(e.agent||'—'))}</b>: ${esc((e.message||'').slice(0,90))}`;
+    document.getElementById('toasts').appendChild(div);
+    setTimeout(()=>div.remove(), 4500);
+  }
+
+  // ── Polling ───────────────────────────────────────────────
+  async function loadProject() {
+    const list = await get('/api/agents/projects');
+    if (list) {
+      projData = list.find(p=>p.name===PROJECT)||null;
+      render();
+      if (activePanel) renderPanel();
+    }
+  }
+
+  async function pollEvents() {
+    const url = lastEvTs
+      ? `/api/agents/events?project=${PROJECT}&since=${encodeURIComponent(lastEvTs)}&limit=20`
+      : `/api/agents/events?project=${PROJECT}&limit=1`;
+    const evs = await get(url);
+    if (evs && evs.length) {
+      evs.forEach(e => {
+        if (e.ts > lastEvTs) {
+          lastEvTs = e.ts;
+          agentTs[e.agent] = fmtTs(e.ts);
+          toast(e);
         }
-      }
+      });
     }
-    async function loadStats() {
-      const s = await api('/api/agents/stats');
-      if (s) {
-        document.getElementById('hc-stat-projects').textContent = (s.total_projects || 0) + ' проектов';
-        document.getElementById('hc-stat-events').textContent = (s.total_events || 0) + ' событий';
-      }
-    }
-    async function pollNewEvents() {
-      const url = lastEventTs
-        ? `/api/agents/events?since=${encodeURIComponent(lastEventTs)}&limit=20`
-        : `/api/agents/events?limit=1`;
-      const events = await api(url);
-      if (events && events.length) {
-        events.forEach(e => {
-          if (e.ts > lastEventTs) {
-            lastEventTs = e.ts;
-            showToast(e);
-          }
-        });
-      }
-    }
-    function showToast(e) {
-      const t = document.getElementById('toasts');
-      const a = AGENT_MAP[e.agent] || { emoji: '•', name: e.agent };
-      const div = document.createElement('div');
-      div.className = 'toast';
-      div.innerHTML = `${a.emoji} <b>${escapeHtml(e.project || '—')}</b> · ${escapeHtml(a.name)}: ${escapeHtml((e.message || '').slice(0, 80))}`;
-      t.appendChild(div);
-      setTimeout(() => div.remove(), 4000);
-    }
+  }
 
-    window.addEventListener('resize', () => renderGalaxy());
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+  // ── Init ──────────────────────────────────────────────────
+  window.addEventListener('resize', render);
+  document.addEventListener('keydown', e => { if (e.key==='Escape') closePanel(); });
 
-    (async () => {
-      await loadStats();
-      await loadProjects();
-      const last = await api('/api/agents/events?limit=1');
-      if (last && last.length) lastEventTs = last[last.length - 1].ts;
-      setInterval(loadProjects, 5000);
-      setInterval(loadStats, 10000);
-      setInterval(pollNewEvents, 3000);
-    })();
+  renderBar();
 
-    window.openPanel = openPanel;
-    window.closePanel = closePanel;
-  </script>
+  (async () => {
+    await loadProject();
+    const last = await get(`/api/agents/events?project=${PROJECT}&limit=20`);
+    if (last && last.length) {
+      lastEvTs = last[last.length-1].ts;
+      last.forEach(e => { if (!agentTs[e.agent]) agentTs[e.agent] = fmtTs(e.ts); });
+      render();
+    }
+    setInterval(loadProject, 8000);
+    setInterval(pollEvents, 3000);
+  })();
+
+  window.openPanel = openPanel;
+  window.closePanel = closePanel;
+</script>
 </body>
 </html>
