@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~)",
+      "Bash(git push --force *)",
+      "Bash(sudo *)"
+    ],
+    "ask": [
+      "Bash(rm -rf *)",
+      "Bash(git push *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/событие.sh \"${CLAUDE_PROJECT_NAME:-unknown}\" tool step \"правка файла: $(basename ${CLAUDE_TOOL_INPUT_FILE_PATH:-неизвестно})\""
+          }
+        ]
+      }
+    ]
+  }
+}

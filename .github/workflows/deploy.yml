@@ -86,12 +86,10 @@ jobs:
             chmod +x /root/projects/запуск.sh 2>/dev/null || true
             chmod +x /root/.claude/событие.sh 2>/dev/null || true
 
-            # Создаём проект hairlove из шаблона, если его нет
-            if [ ! -d /root/projects/hairlove ]; then
-              cp -R /root/projects/_шаблон /root/projects/hairlove
-              find /root/projects/hairlove -type f \( -name "*.md" -o -name "*.json" \) -exec sed -i "s|<ИМЯ_ПРОЕКТА>|hairlove|g" {} \;
+            # Инициализируем git для hairlove если нет
+            if [ ! -d /root/projects/hairlove/.git ]; then
               cd /root/projects/hairlove && git init -q && git add . && git commit -q -m "🌱 инициализация hairlove" || true
-              echo "✅ Проект hairlove создан"
+              echo "✅ Проект hairlove инициализирован"
             fi
 
             # Update credentials from secrets
