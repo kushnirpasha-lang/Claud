@@ -167,7 +167,11 @@ header {
 .c-cmd  {
   display:block; font-family:'SF Mono',ui-monospace,Menlo,monospace;
   font-size:10px; color:var(--accent); margin-bottom:5px;
+  cursor:pointer; user-select:none;
+  transition: opacity .15s;
 }
+.c-cmd:hover { opacity:.7; }
+.c-cmd:active { opacity:.4; }
 .c-desc { font-size:10.5px; color:var(--muted); line-height:1.4; margin-bottom:6px; min-height:28px; }
 .c-ts   { font-size:9px; color:var(--dim); margin-bottom:6px; }
 
@@ -497,7 +501,7 @@ function render(){
     el.innerHTML=`<div class="card">
       <span class="c-ico">${a.ico}</span>
       <div class="c-name">${a.n}</div>
-      <span class="c-cmd">${a.cmd}</span>
+      <span class="c-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(event,'${a.cmd}')">${a.cmd}</span>
       <div class="c-desc">${a.d}</div>${ts}
       ${bdg(agSt(a))}
     </div>`;
@@ -513,6 +517,7 @@ function render(){
      <span class="c-ico">🐱</span>
      <div class="c-name">HairLove</div>
      <div class="c-sub">ГАЛАКТИКА</div>
+     <span class="c-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(event,'/hairlove')">/hairlove</span>
      <div class="c-desc">Косметика для волос</div>
      <span class="badge b-hub">⚡ /full-cycle</span>
    </div>`;
@@ -597,6 +602,16 @@ function fe(e){
     <div class="msg">${esc(e.message||'')}</div></div>`;
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function copyCmd(e, cmd) {
+  e.stopPropagation();
+  navigator.clipboard.writeText(cmd).then(() => {
+    const el = e.target;
+    const orig = el.textContent;
+    el.textContent = '✓ скопировано';
+    setTimeout(() => { el.textContent = orig; }, 1200);
+  });
+}
 
 function toast(e){
   const a=AG.find(x=>x.k===e.agent);
