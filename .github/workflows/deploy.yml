@@ -86,6 +86,14 @@ jobs:
             chmod +x /root/projects/запуск.sh 2>/dev/null || true
             chmod +x /root/.claude/событие.sh 2>/dev/null || true
 
+            # Создаём проект hairlove из шаблона, если его нет
+            if [ ! -d /root/projects/hairlove ]; then
+              cp -R /root/projects/_шаблон /root/projects/hairlove
+              find /root/projects/hairlove -type f \( -name "*.md" -o -name "*.json" \) -exec sed -i "s|<ИМЯ_ПРОЕКТА>|hairlove|g" {} \;
+              cd /root/projects/hairlove && git init -q && git add . && git commit -q -m "🌱 инициализация hairlove" || true
+              echo "✅ Проект hairlove создан"
+            fi
+
             # Update credentials from secrets
             grep -q "TELEGRAM_API_ID" /opt/assistant/.env || echo "TELEGRAM_API_ID=38039077" >> /opt/assistant/.env
             grep -q "TELEGRAM_API_HASH" /opt/assistant/.env || echo "TELEGRAM_API_HASH=5dda659889e12536b8d78a4444e960ae" >> /opt/assistant/.env
