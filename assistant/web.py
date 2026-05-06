@@ -1,8 +1,12 @@
 import asyncio
+import json
 import os
 import threading
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, Response, jsonify, request, send_from_directory
 
 import claude_client
 
@@ -11,6 +15,40 @@ app = Flask(__name__, static_folder="static")
 _tg_auth_state: dict = {}
 _tg_auth_lock = threading.Lock()
 
+# ── Агентный дашборд: хранилище ─────────────────────────────────────────────
+
+DATA_DIR = Path("/opt/assistant/data")
+EVENTS_FILE = DATA_DIR / "events.jsonl"
+DASHBOARD_TOKEN = os.environ.get("DASHBOARD_TOKEN", "")
+
+
+def _ensure_data_dir() -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _append_event(event: dict) -> None:
+    _ensure_data_dir()
+    with open(EVENTS_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(event, ensure_ascii=False) + "\n")
+
+
+def _read_all_events() -> list[dict]:
+    if not EVENTS_FILE.exists():
+        return []
+    events = []
+    with open(EVENTS_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                events.append(json.loads(line))
+            except Exception:
+                pass
+    return events
+
+
+# ── Основной чат ─────────────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
@@ -41,6 +79,101 @@ def new_chat():
     claude_client.clear(f"web_{session_id}")
     return jsonify({"ok": True})
 
+
+# ── Агентный дашборд: эндпоинты ──────────────────────────────────────────────
+
+@app.route("/agents")
+def agents_dashboard():
+    return send_from_directory("static", "agents.html")
+
+
+@app.route("/events", methods=["POST"])
+def receive_event():
+    if DASHBOARD_TOKEN:
+        token = request.headers.get("X-Token", "")
+        if token != DASHBOARD_TOKEN:
+            return jsonify({"error": "unauthorized"}), 401
+
+    data = request.get_json(silent=True) or {}
+    if not data.get("ts"):
+        data["ts"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
+    if not data.get("task_id"):
+        data["task_id"] = str(uuid.uuid4())[:8]
+
+    _append_event(data)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/agents/projects")
+def api_projects():
+    all_events = _read_all_events()
+
+    projects: dict[str, dict] = {}
+    for e in all_events:
+        proj = e.get("project") or "unknown"
+        if proj not in projects:
+            projects[proj] = {
+                "name": proj,
+                "active_agent": None,
+                "last_event": None,
+                "recent_events": [],
+            }
+        p = projects[proj]
+        p["last_event"] = e
+        p["recent_events"].append(e)
+        etype = e.get("type", "")
+        if etype in ("start", "step"):
+            p["active_agent"] = e.get("agent")
+        elif etype in ("complete", "error"):
+            p["active_agent"] = None
+
+    result = []
+    for name, p in projects.items():
+        result.append({
+            "name": name,
+            "active_agent": p["active_agent"],
+            "last_event": p["last_event"],
+            "recent_events": p["recent_events"][-5:],
+        })
+
+    result.sort(key=lambda x: x["last_event"]["ts"] if x["last_event"] else "", reverse=True)
+    return jsonify(result)
+
+
+@app.route("/api/agents/events")
+def api_events():
+    project = request.args.get("project")
+    agent = request.args.get("agent")
+    since = request.args.get("since", "")
+    limit = min(int(request.args.get("limit", 100)), 500)
+
+    all_events = _read_all_events()
+
+    filtered = []
+    for e in all_events:
+        if project and e.get("project") != project:
+            continue
+        if agent and e.get("agent") != agent:
+            continue
+        if since and e.get("ts", "") <= since:
+            continue
+        filtered.append(e)
+
+    return jsonify(filtered[-limit:])
+
+
+@app.route("/api/agents/stats")
+def api_stats():
+    all_events = _read_all_events()
+    projects = set(e.get("project") for e in all_events if e.get("project"))
+    return jsonify({
+        "total_events": len(all_events),
+        "total_projects": len(projects),
+        "last_event_ts": all_events[-1]["ts"] if all_events else None,
+    })
+
+
+# ── Telegram авторизация ──────────────────────────────────────────────────────
 
 @app.route("/api/tg-auth/request", methods=["POST"])
 def tg_auth_request():
