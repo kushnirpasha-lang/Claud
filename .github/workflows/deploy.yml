@@ -11,7 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Copy files to server
+      # ── Python-файлы ────────────────────────────────────────────────────────
+      - name: Copy Python files to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -21,6 +22,50 @@ jobs:
           target: /opt/assistant
           strip_components: 1
 
+      # ── Статика дашборда ────────────────────────────────────────────────────
+      - name: Copy static files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "assistant/static/"
+          target: /opt/assistant/static
+          strip_components: 2
+
+      # ── Шаблон проектов ─────────────────────────────────────────────────────
+      - name: Copy project template to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "projects/"
+          target: /root/projects
+          strip_components: 1
+
+      # ── Глобальные файлы Claude ─────────────────────────────────────────────
+      - name: Copy global Claude files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "global_claude/CLAUDE.md"
+          target: /root/.claude
+          strip_components: 1
+
+      - name: Copy событие.sh to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "global_claude/событие.sh"
+          target: /root/.claude
+          strip_components: 1
+
+      # ── Настройка на сервере ────────────────────────────────────────────────
       - name: Run setup on server
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -33,12 +78,21 @@ jobs:
             # Install dependencies
             /opt/assistant/venv/bin/pip install -r /opt/assistant/requirements.txt -q
 
+            # Create data directory for dashboard events
+            mkdir -p /opt/assistant/data
+
+            # Make scripts executable
+            chmod +x /root/projects/новый-проект.sh 2>/dev/null || true
+            chmod +x /root/projects/запуск.sh 2>/dev/null || true
+            chmod +x /root/.claude/событие.sh 2>/dev/null || true
+
             # Update credentials from secrets
             grep -q "TELEGRAM_API_ID" /opt/assistant/.env || echo "TELEGRAM_API_ID=38039077" >> /opt/assistant/.env
             grep -q "TELEGRAM_API_HASH" /opt/assistant/.env || echo "TELEGRAM_API_HASH=5dda659889e12536b8d78a4444e960ae" >> /opt/assistant/.env
             grep -q "OPENAI_API_KEY" /opt/assistant/.env || echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> /opt/assistant/.env
             grep -q "TRELLO_API_KEY" /opt/assistant/.env || echo "TRELLO_API_KEY=${{ secrets.TRELLO_API_KEY }}" >> /opt/assistant/.env
             grep -q "TRELLO_TOKEN" /opt/assistant/.env || echo "TRELLO_TOKEN=${{ secrets.TRELLO_TOKEN }}" >> /opt/assistant/.env
+            grep -q "TRELLO_BOARD_ID" /opt/assistant/.env || echo "TRELLO_BOARD_ID=69f5ee59565cd64f2e9da2ff" >> /opt/assistant/.env
             grep -q "INSTAGRAM_USER_ID" /opt/assistant/.env || echo "INSTAGRAM_USER_ID=${{ secrets.INSTAGRAM_USER_ID }}" >> /opt/assistant/.env
             # Always update Instagram token in case it changed
             sed -i '/^INSTAGRAM_ACCESS_TOKEN=/d' /opt/assistant/.env
@@ -78,5 +132,32 @@ jobs:
 
             # Restart service
             systemctl restart assistant
-            sleep 3
+            sleep 4
             systemctl status assistant --no-pager
+
+      # ── Тестовый прогон: demo-события в дашборд ────────────────────────────
+      - name: Send demo events to dashboard
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            BASE="http://127.0.0.1:8080/events"
+            H="Content-Type: application/json"
+            send() { curl -s -X POST "$BASE" -H "$H" -d "$1" >/dev/null; sleep 1; }
+
+            send '{"project":"demo","agent":"coordinator","type":"start","message":"маршрут: исследование рынка — доставка еды"}'
+            send '{"project":"demo","agent":"planning","type":"start","message":"формулирую задачу исследования"}'
+            send '{"project":"demo","agent":"planning","type":"step","message":"определил 4 ключевых конкурента для анализа"}'
+            send '{"project":"demo","agent":"planning","type":"complete","message":"бриф готов → competitors","artifact":"artifacts/planning/2026-05-06-бриф.md","hand_off_to":"competitors"}'
+            send '{"project":"demo","agent":"coordinator","type":"handoff","message":"передача: planning → competitors"}'
+            send '{"project":"demo","agent":"competitors","type":"start","message":"начинаю анализ конкурентов в нише доставки еды"}'
+            send '{"project":"demo","agent":"competitors","type":"step","message":"изучаю Glovo, Bolt Food, Raketa, Меню"}'
+            send '{"project":"demo","agent":"competitors","type":"step","message":"анализирую Instagram и рекламные креативы"}'
+            send '{"project":"demo","agent":"competitors","type":"complete","message":"анализ готов → strategy","artifact":"artifacts/competitors/2026-05-06-доставка.md","hand_off_to":"strategy"}'
+            send '{"project":"demo","agent":"coordinator","type":"handoff","message":"передача: competitors → strategy"}'
+            send '{"project":"demo","agent":"strategy","type":"start","message":"читаю анализ конкурентов, определяю направление"}'
+            send '{"project":"demo","agent":"strategy","type":"complete","message":"стратегия готова: фокус на скорость + локальных поваров","artifact":"artifacts/strategy/2026-05-06-направление.md"}'
+            send '{"project":"demo","agent":"coordinator","type":"complete","message":"маршрут завершён. Итог: 3 артефакта, дашборд в действии ✅"}'
+            echo "✅ Demo-события отправлены"

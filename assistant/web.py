@@ -1,9 +1,12 @@
 import asyncio
+import json
 import os
 import threading
 import uuid
+from datetime import datetime, timezone
+from pathlib import Path
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, Response, jsonify, request, send_from_directory
 
 import claude_client
 
@@ -12,6 +15,40 @@ app = Flask(__name__, static_folder="static")
 _tg_auth_state: dict = {}
 _tg_auth_lock = threading.Lock()
 
+# ── Агентный дашборд: хранилище ─────────────────────────────────────────────
+
+DATA_DIR = Path("/opt/assistant/data")
+EVENTS_FILE = DATA_DIR / "events.jsonl"
+DASHBOARD_TOKEN = os.environ.get("DASHBOARD_TOKEN", "")
+
+
+def _ensure_data_dir() -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _append_event(event: dict) -> None:
+    _ensure_data_dir()
+    with open(EVENTS_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(event, ensure_ascii=False) + "\n")
+
+
+def _read_all_events() -> list[dict]:
+    if not EVENTS_FILE.exists():
+        return []
+    events = []
+    with open(EVENTS_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                events.append(json.loads(line))
+            except Exception:
+                pass
+    return events
+
+
+# ── Основной чат ─────────────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
@@ -42,6 +79,101 @@ def new_chat():
     claude_client.clear(f"web_{session_id}")
     return jsonify({"ok": True})
 
+
+# ── Агентный дашборд: эндпоинты ──────────────────────────────────────────────
+
+@app.route("/agents")
+def agents_dashboard():
+    return send_from_directory("static", "agents.html")
+
+
+@app.route("/events", methods=["POST"])
+def receive_event():
+    if DASHBOARD_TOKEN:
+        token = request.headers.get("X-Token", "")
+        if token != DASHBOARD_TOKEN:
+            return jsonify({"error": "unauthorized"}), 401
+
+    data = request.get_json(silent=True) or {}
+    if not data.get("ts"):
+        data["ts"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
+    if not data.get("task_id"):
+        data["task_id"] = str(uuid.uuid4())[:8]
+
+    _append_event(data)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/agents/projects")
+def api_projects():
+    all_events = _read_all_events()
+
+    projects: dict[str, dict] = {}
+    for e in all_events:
+        proj = e.get("project") or "unknown"
+        if proj not in projects:
+            projects[proj] = {
+                "name": proj,
+                "active_agent": None,
+                "last_event": None,
+                "recent_events": [],
+            }
+        p = projects[proj]
+        p["last_event"] = e
+        p["recent_events"].append(e)
+        etype = e.get("type", "")
+        if etype in ("start", "step"):
+            p["active_agent"] = e.get("agent")
+        elif etype in ("complete", "error"):
+            p["active_agent"] = None
+
+    result = []
+    for name, p in projects.items():
+        result.append({
+            "name": name,
+            "active_agent": p["active_agent"],
+            "last_event": p["last_event"],
+            "recent_events": p["recent_events"][-5:],
+        })
+
+    result.sort(key=lambda x: x["last_event"]["ts"] if x["last_event"] else "", reverse=True)
+    return jsonify(result)
+
+
+@app.route("/api/agents/events")
+def api_events():
+    project = request.args.get("project")
+    agent = request.args.get("agent")
+    since = request.args.get("since", "")
+    limit = min(int(request.args.get("limit", 100)), 500)
+
+    all_events = _read_all_events()
+
+    filtered = []
+    for e in all_events:
+        if project and e.get("project") != project:
+            continue
+        if agent and e.get("agent") != agent:
+            continue
+        if since and e.get("ts", "") <= since:
+            continue
+        filtered.append(e)
+
+    return jsonify(filtered[-limit:])
+
+
+@app.route("/api/agents/stats")
+def api_stats():
+    all_events = _read_all_events()
+    projects = set(e.get("project") for e in all_events if e.get("project"))
+    return jsonify({
+        "total_events": len(all_events),
+        "total_projects": len(projects),
+        "last_event_ts": all_events[-1]["ts"] if all_events else None,
+    })
+
+
+# ── Telegram авторизация ──────────────────────────────────────────────────────
 
 @app.route("/api/tg-auth/request", methods=["POST"])
 def tg_auth_request():
@@ -118,176 +250,6 @@ def tg_auth_signin():
         os.system("systemctl restart assistant &")
 
     return jsonify(result)
-
-
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-VPS_URL = os.environ.get("VPS_URL", "http://188.166.67.237")
-
-
-@app.route("/api/upload", methods=["POST"])
-def upload_file():
-    if "file" not in request.files:
-        return jsonify({"error": "no file"}), 400
-    f = request.files["file"]
-    if not f.filename:
-        return jsonify({"error": "empty filename"}), 400
-    ext = os.path.splitext(f.filename)[1].lower() or ".jpg"
-    filename = uuid.uuid4().hex + ext
-    f.save(os.path.join(UPLOAD_DIR, filename))
-    url = f"{VPS_URL}/static/uploads/{filename}"
-    return jsonify({"url": url, "filename": filename})
-
-
-@app.route("/instagram")
-def instagram_page():
-    return send_from_directory("static", "instagram.html")
-
-
-@app.route("/api/instagram/info", methods=["GET"])
-def instagram_info():
-    try:
-        import instagram_client
-        info = instagram_client.get_account_info()
-        return jsonify(info)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/instagram/post", methods=["POST"])
-def instagram_post():
-    data = request.get_json(silent=True) or {}
-    image_url = (data.get("image_url") or "").strip()
-    caption = (data.get("caption") or "").strip()
-
-    if not image_url:
-        return jsonify({"error": "image_url required"}), 400
-
-    try:
-        import instagram_client
-        result = instagram_client.post_photo(image_url, caption)
-        return jsonify({"ok": True, "id": result.get("id")})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/drive/ai-process", methods=["POST"])
-def drive_ai_process():
-    """Full AI pipeline: crop → remove bg → AI background → upload to Обработанные."""
-    product = request.form.get("product", "").strip()
-    size = request.form.get("size", "").strip()
-    ig_format = request.form.get("format", "1:1").strip()
-    if "file" not in request.files:
-        return jsonify({"error": "no file"}), 400
-    f = request.files["file"]
-    image_bytes = f.read()
-    try:
-        import image_ai_processor
-        import google_drive_client
-        processed = image_ai_processor.process_product_photo(image_bytes, f"{product} {size}", ig_format)
-        file_id = google_drive_client.upload_to_product(product, size, "Обработанные", processed, "image/jpeg")
-        preview_url = f"{VPS_URL}/api/drive/file/{file_id}"
-        return jsonify({"ok": True, "file_id": file_id, "preview_url": preview_url})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/drive/setup", methods=["POST"])
-def drive_setup():
-    try:
-        import google_drive_client
-        result = google_drive_client.create_product_structure()
-        return jsonify({"ok": True, "folders": result})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/drive/upload", methods=["POST"])
-def drive_upload():
-    """Upload image to Drive product folder (Исходники or Обработанные)."""
-    product = request.form.get("product", "").strip()
-    size = request.form.get("size", "").strip()
-    folder_type = request.form.get("folder_type", "Исходники").strip()
-    if "file" not in request.files:
-        return jsonify({"error": "no file"}), 400
-    f = request.files["file"]
-    image_bytes = f.read()
-    mime_type = f.content_type or "image/jpeg"
-    name = f.filename or None
-    try:
-        import google_drive_client
-        file_id = google_drive_client.upload_to_product(product, size, folder_type, image_bytes, mime_type, name)
-        return jsonify({"ok": True, "file_id": file_id})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/drive/process", methods=["POST"])
-def drive_process():
-    """Crop image to Instagram format and save to Обработанные."""
-    product = request.form.get("product", "").strip()
-    size = request.form.get("size", "").strip()
-    ig_format = request.form.get("format", "1:1").strip()
-    if "file" not in request.files:
-        return jsonify({"error": "no file"}), 400
-    f = request.files["file"]
-    image_bytes = f.read()
-    try:
-        import image_processor
-        import google_drive_client
-        processed = image_processor.crop_to_instagram(image_bytes, ig_format)
-        file_id = google_drive_client.upload_to_product(product, size, "Обработанные", processed, "image/jpeg")
-        return jsonify({"ok": True, "file_id": file_id})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/drive/list", methods=["GET"])
-def drive_list():
-    """List files in product/size/folder_type."""
-    product = request.args.get("product", "").strip()
-    size = request.args.get("size", "").strip()
-    folder_type = request.args.get("folder_type", "Обработанные").strip()
-    try:
-        import google_drive_client
-        files = google_drive_client.list_product_files(product, size, folder_type)
-        return jsonify({"files": files})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/drive/file/<file_id>", methods=["GET"])
-def drive_file(file_id):
-    """Download a file from Drive."""
-    try:
-        import google_drive_client
-        from flask import Response
-        image_bytes = google_drive_client.download_file(file_id)
-        return Response(image_bytes, mimetype="image/jpeg")
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/drive/post-to-instagram", methods=["POST"])
-def drive_post_to_instagram():
-    """Make Drive file public → post to Instagram → move to Выложенные → remove public access."""
-    data = request.get_json(silent=True) or {}
-    file_id = (data.get("file_id") or "").strip()
-    caption = (data.get("caption") or "").strip()
-    mime_type = (data.get("mime_type") or "image/jpeg").strip()
-    if not file_id:
-        return jsonify({"error": "file_id required"}), 400
-    try:
-        import google_drive_client
-        import instagram_client
-        public_url = google_drive_client.make_file_public(file_id)
-        result = instagram_client.post_photo(public_url, caption)
-        posted_name = google_drive_client.move_file_to_posted(file_id, mime_type)
-        google_drive_client.remove_public_access(file_id)
-        return jsonify({"ok": True, "instagram_id": result.get("id"), "posted_as": posted_name})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 def run() -> None:

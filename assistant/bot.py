@@ -1,7 +1,6 @@
 import asyncio
 import io
 import os
-import uuid
 from functools import partial
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -18,8 +17,6 @@ import claude_client
 
 # {user_id: {"to": contact_name, "text": message_text}}
 _pending_sends: dict = {}
-# {user_id: {"image_bytes": bytes, "caption": str, "temp_path": str, "temp_name": str}}
-_pending_instagram: dict = {}
 
 WELCOME = (
     "Привет! Я твой личный ИИ-ассистент 🤖\n\n"
@@ -37,13 +34,9 @@ HELP = (
     "• Отвечать на вопросы и анализировать\n"
     "• Писать тексты, посты, письма\n"
     "• Принимать голосовые команды 🎤\n"
-    "• Отправлять сообщения твоим Telegram-контактам\n"
-    "• Управлять Trello-доской HairLove\n"
-    "• Публиковать посты в Instagram @hair_love_company\n\n"
+    "• Отправлять сообщения твоим Telegram-контактам\n\n"
     "Голосовые: просто запиши голосовое — расшифрую и выполню.\n\n"
-    "/new — очистить историю разговора\n"
-    "/trello — показать доску\n"
-    "/instagram — статус Instagram"
+    "/new — очистить историю разговора"
 )
 
 
@@ -82,16 +75,13 @@ def _transcribe_voice_sync(file_bytes: bytes) -> str:
 _SEND_KEYWORDS = ("отправь", "напиши", "передай", "скажи", "пошли", "send")
 _TRELLO_KEYWORDS = ("trello", "трелло", "доска", "карточк", "задач", "колонк", "добавь задачу",
                     "перемести", "покажи задачи", "что в работе", "что сделано")
-_INSTAGRAM_KEYWORDS = ("инстаграм", "instagram", "инста", "пост", "опубликуй", "выложи", "reels", "рилс")
 
 
 def _quick_intent(text: str) -> str | None:
-    """Fast keyword check — returns 'trello', 'instagram', 'maybe_send', or None (=needs AI)."""
+    """Fast keyword check — returns 'send_tg', 'trello', or None (=needs AI)."""
     tl = text.lower()
     if any(k in tl for k in _TRELLO_KEYWORDS):
         return "trello"
-    if any(k in tl for k in _INSTAGRAM_KEYWORDS):
-        return "instagram"
     if any(k in tl for k in _SEND_KEYWORDS):
         return "maybe_send"
     return None
@@ -108,8 +98,7 @@ def _detect_intent(text: str) -> dict:
             "Classify user intent into one of these:\n"
             "1. Send Telegram message to someone → respond: SEND_TG:<recipient name>|<message>\n"
             "2. Trello task (show board, add/move/delete card, list tasks) → respond: TRELLO:<user request verbatim>\n"
-            "3. Instagram post (publish photo/reel/post to Instagram) → respond: INSTAGRAM:<user request verbatim>\n"
-            "4. Anything else → respond: CHAT\n"
+            "3. Anything else → respond: CHAT\n"
             "Respond with ONLY one of these formats, nothing else."
         ),
         messages=[{"role": "user", "content": text}],
@@ -121,74 +110,69 @@ def _detect_intent(text: str) -> dict:
             return {"type": "send_tg", "to": parts[0].strip(), "text": parts[1].strip()}
     elif result.startswith("TRELLO:"):
         return {"type": "trello", "action": result[7:].strip()}
-    elif result.startswith("INSTAGRAM:"):
-        return {"type": "instagram", "action": result[10:].strip()}
     return {"type": "chat"}
 
 
 def _handle_trello(uid: str, user_request: str) -> str:
-    """Process Trello-related request using Claude + Trello API."""
+    """Process Trello request: parse action with Haiku, execute via API, return result."""
     try:
         import trello_client
-        boards = trello_client.get_boards()
-        if not boards:
-            return "В твоём Trello нет активных досок."
-
-        board_id = os.environ.get("TRELLO_BOARD_ID", boards[0]["id"])
-        board_name = next((b["name"] for b in boards if b["id"] == board_id), boards[0]["name"])
-        summary = trello_client.get_board_summary(board_id)
+        summary = trello_client.get_board_summary()
 
         import anthropic
         c = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+        # Ask Haiku to parse the action
         resp = c.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=1000,
+            max_tokens=300,
             system=(
-                f"Ты помощник для работы с Trello-доской '{board_name}'.\n"
-                f"Текущее состояние доски:\n{summary}\n\n"
-                "Отвечай кратко и по делу. Если нужно создать карточку или переместить — "
-                "скажи что именно сделал. Отвечай на русском."
+                "Ты менеджер Trello-доски HairLove. Текущее состояние:\n"
+                f"{summary}\n\n"
+                "Определи что нужно сделать и ответь ТОЛЬКО одной из команд:\n"
+                "SHOW — показать доску\n"
+                "CREATE:<колонка>|<название карточки> — создать карточку\n"
+                "MOVE:<название карточки>|<колонка назначения> — переместить\n"
+                "DELETE:<название карточки> — удалить карточку\n"
+                "CHAT:<ответ пользователю> — просто ответить"
             ),
             messages=[{"role": "user", "content": user_request}],
         )
-        return resp.content[0].text
+        cmd = resp.content[0].text.strip()
+
+        if cmd == "SHOW" or cmd.startswith("SHOW"):
+            fresh = trello_client.get_board_summary(force=True)
+            return f"📋 *HairLove*\n{fresh}"
+
+        elif cmd.startswith("CREATE:"):
+            parts = cmd[7:].split("|", 1)
+            if len(parts) == 2:
+                col, name = parts[0].strip(), parts[1].strip()
+                trello_client.create_card(col, name)
+                return f"✅ Карточка «{name}» добавлена в «{col}»"
+            return "Не понял что создать. Уточни колонку и название."
+
+        elif cmd.startswith("MOVE:"):
+            parts = cmd[5:].split("|", 1)
+            if len(parts) == 2:
+                card, col = parts[0].strip(), parts[1].strip()
+                ok = trello_client.move_card(card, col)
+                return f"✅ «{card}» перемещена в «{col}»" if ok else f"❌ Карточка «{card}» не найдена"
+            return "Не понял что переместить."
+
+        elif cmd.startswith("DELETE:"):
+            name = cmd[7:].strip()
+            ok = trello_client.delete_card(name)
+            return f"✅ Карточка «{name}» удалена" if ok else f"❌ Карточка «{name}» не найдена"
+
+        elif cmd.startswith("CHAT:"):
+            return cmd[5:].strip()
+
+        return cmd  # fallback
+
     except Exception as e:
         print(f"Trello error: {e}")
-        return f"Ошибка при работе с Trello: {e}"
-
-
-def _handle_instagram(user_request: str) -> str:
-    """Handle Instagram posting requests."""
-    try:
-        import instagram_client
-        info = instagram_client.get_account_info()
-        username = info.get("username", "hair_love_company")
-        media_count = info.get("media_count", 0)
-        followers = info.get("followers_count", 0)
-        return (
-            f"📸 Instagram @{username}\n"
-            f"Публикаций: {media_count} | Подписчиков: {followers}\n\n"
-            f"Для публикации поста отправь мне:\n"
-            f"• Фото с подписью — напиши «выложи это фото: [URL] с подписью [текст]»\n"
-            f"• Или просто пришли фото и скажи что написать"
-        )
-    except Exception as e:
-        return f"Ошибка Instagram: {e}"
-
-
-async def cmd_instagram(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    try:
-        import instagram_client
-        info = instagram_client.get_account_info()
-        username = info.get("username", "hair_love_company")
-        media_count = info.get("media_count", 0)
-        followers = info.get("followers_count", 0)
-        await update.message.reply_text(
-            f"📸 Instagram @{username}\n"
-            f"Публикаций: {media_count} | Подписчиков: {followers}"
-        )
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка: {e}")
+        return f"Ошибка Trello: {e}"
 
 
 async def cmd_trello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -244,13 +228,6 @@ async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text
             typing_task.cancel()
             for i in range(0, len(trello_reply), 4096):
                 await update.message.reply_text(trello_reply[i:i + 4096])
-            return
-
-        if intent["type"] == "instagram":
-            ig_reply = await loop.run_in_executor(None, partial(_handle_instagram, text))
-            stop_event.set()
-            typing_task.cancel()
-            await update.message.reply_text(ig_reply)
             return
 
         reply = await loop.run_in_executor(None, partial(claude_client.chat, uid, text))
@@ -313,93 +290,6 @@ async def handle_send_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         await query.edit_message_text("❌ Отменено")
 
 
-async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    uid = update.effective_user.id
-    stop_event = asyncio.Event()
-    typing_task = asyncio.create_task(
-        _keep_typing(context, update.effective_chat.id, stop_event)
-    )
-    try:
-        photo = update.message.photo[-1]
-        file = await photo.get_file()
-        image_bytes = bytes(await file.download_as_bytearray())
-
-        loop = asyncio.get_running_loop()
-        caption = await loop.run_in_executor(
-            None, partial(claude_client.generate_instagram_caption, image_bytes)
-        )
-
-        temp_name = uuid.uuid4().hex + ".jpg"
-        temp_path = f"/opt/assistant/static/uploads/{temp_name}"
-        os.makedirs(os.path.dirname(temp_path), exist_ok=True)
-        with open(temp_path, "wb") as fp:
-            fp.write(image_bytes)
-
-        _pending_instagram[uid] = {
-            "image_bytes": image_bytes,
-            "caption": caption,
-            "temp_path": temp_path,
-            "temp_name": temp_name,
-        }
-        stop_event.set()
-        typing_task.cancel()
-
-        keyboard = InlineKeyboardMarkup([[
-            InlineKeyboardButton("✅ Выложить в Instagram", callback_data="ig_confirm"),
-            InlineKeyboardButton("❌ Отмена", callback_data="ig_cancel"),
-        ]])
-        await update.message.reply_text(
-            f"📸 Готово к публикации в @hair_love_company\n\n*Подпись:*\n{caption}",
-            parse_mode="Markdown",
-            reply_markup=keyboard,
-        )
-    except Exception as exc:
-        stop_event.set()
-        typing_task.cancel()
-        print(f"Photo handler error: {exc}")
-        await update.message.reply_text("Ошибка при обработке фото. Попробуй ещё раз.")
-
-
-async def handle_instagram_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    uid = query.from_user.id
-    pending = _pending_instagram.pop(uid, None)
-
-    if query.data == "ig_confirm" and pending:
-        await query.edit_message_text("⏳ Публикую в Instagram...")
-        try:
-            import instagram_client
-            vps_url = os.environ.get("VPS_URL", "http://188.166.67.237")
-            image_url = f"{vps_url}/static/uploads/{pending['temp_name']}"
-            loop = asyncio.get_running_loop()
-            await loop.run_in_executor(
-                None, partial(instagram_client.post_photo, image_url, pending["caption"])
-            )
-            try:
-                import google_drive_client
-                await loop.run_in_executor(
-                    None, partial(google_drive_client.upload_to_posted, pending["image_bytes"])
-                )
-            except Exception as e:
-                print(f"Drive upload error (non-fatal): {e}")
-            try:
-                os.remove(pending["temp_path"])
-            except Exception:
-                pass
-            await query.edit_message_text("✅ Пост опубликован в Instagram @hair_love_company!")
-        except Exception as exc:
-            print(f"Instagram post error: {exc}")
-            await query.edit_message_text(f"❌ Ошибка публикации: {exc}")
-    elif query.data == "ig_cancel":
-        if pending:
-            try:
-                os.remove(pending["temp_path"])
-            except Exception:
-                pass
-        await query.edit_message_text("❌ Отменено")
-
-
 def run() -> None:
     token = os.environ["TELEGRAM_BOT_TOKEN"]
     app = Application.builder().token(token).build()
@@ -408,12 +298,9 @@ def run() -> None:
     app.add_handler(CommandHandler("new", cmd_new))
     app.add_handler(CommandHandler("help", cmd_help))
     app.add_handler(CommandHandler("trello", cmd_trello))
-    app.add_handler(CommandHandler("instagram", cmd_instagram))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
-    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_handler(CallbackQueryHandler(handle_send_callback, pattern="^send_"))
-    app.add_handler(CallbackQueryHandler(handle_instagram_callback, pattern="^ig_"))
 
     print("Telegram bot started.")
     app.run_polling(drop_pending_updates=True)

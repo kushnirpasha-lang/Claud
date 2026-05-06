@@ -1,0 +1,63 @@
+name: Instagram Token Diagnostic
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Check token permissions
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        run: |
+          ME=$(curl -s "https://graph.instagram.com/v21.0/me?fields=id,username,account_type&access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Me: $ME"
+
+          DEBUG=$(curl -s "https://graph.facebook.com/debug_token?input_token=${INSTAGRAM_ACCESS_TOKEN}&access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Token debug: $DEBUG"
+
+          python3 - << PYEOF
+          import os, json, requests
+
+          me = os.environ.get('ME_RESULT', '')
+          debug = os.environ.get('DEBUG_RESULT', '')
+
+          token = os.environ['INSTAGRAM_ACCESS_TOKEN']
+          user_id = os.environ['INSTAGRAM_USER_ID']
+          gh_token = os.environ['GH_TOKEN']
+
+          me = requests.get(
+              f"https://graph.instagram.com/v21.0/me",
+              params={"fields": "id,username,account_type", "access_token": token}
+          ).json()
+
+          debug = requests.get(
+              "https://graph.facebook.com/debug_token",
+              params={"input_token": token, "access_token": token}
+          ).json()
+
+          data = debug.get("data", {})
+          scopes = data.get("scopes", [])
+          expires = data.get("expires_at", 0)
+          is_valid = data.get("is_valid", False)
+
+          body = f"""Instagram Token Diagnostic:
+          Me: {json.dumps(me, ensure_ascii=False)}
+          Valid: {is_valid}
+          Expires: {expires}
+          Scopes: {scopes}
+          Has instagram_content_publish: {'instagram_content_publish' in scopes}
+          """
+
+          r = requests.post(
+              "https://api.github.com/repos/kushnirpasha-lang/Claud/issues/1/comments",
+              headers={"Authorization": f"token {gh_token}", "Content-Type": "application/json"},
+              json={"body": body}
+          )
+          print("Comment posted:", r.status_code)
+          PYEOF

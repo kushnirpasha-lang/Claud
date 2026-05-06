@@ -1,0 +1,34 @@
+name: Server Check
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Check server and write summary
+        run: |
+          OUTPUT=$(ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} "
+            echo SESSION_FILES:
+            ls -la /opt/assistant/user_session* 2>/dev/null || echo none
+            echo HASH_FILE:
+            ls -la /tmp/tg_phone_hash 2>/dev/null && cat /tmp/tg_phone_hash || echo none
+            echo ENV_TG:
+            grep TELEGRAM /opt/assistant/.env | grep -v KEY
+            echo SERVICE:
+            systemctl is-active assistant
+            echo TELETHON_LOG:
+            journalctl -u assistant -n 5 --no-pager 2>/dev/null | tail -5
+          " 2>&1)
+          echo "$OUTPUT"
+          echo "## Server State" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
