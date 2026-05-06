@@ -156,6 +156,7 @@ header {
   background:var(--surface); border:1px solid var(--border);
   border-radius:var(--r); padding:13px 12px 12px;
   width:148px; box-shadow:var(--sh);
+  text-align:center;
   transition: box-shadow .25s, border-color .25s, background .35s;
 }
 .node:hover .card {
@@ -390,12 +391,12 @@ header {
 const PRJ = 'hairlove';
 
 const AG = [
-  { k:'strategy',    n:'Стратегия',     cmd:'/hairlove-strategy',   ico:'🎯', d:'Дорожная карта',           px:22, py:16, def:'working' },
-  { k:'copy',        n:'Тексты',        cmd:'/hairlove-texts',       ico:'✍️', d:'Контент для всех каналов', px: 7, py:37, def:'active'  },
-  { k:'site',        n:'Сайт',          cmd:'/hairlove-site',        ico:'🌐', d:'B2B витрина',               px:38, py:29, def:'next'    },
-  { k:'competitors', n:'Конкуренты',    cmd:'/hairlove-competitors', ico:'🔍', d:'Анализ рынка',              px: 7, py:63, def:'wait'    },
-  { k:'ads',         n:'Реклама',       cmd:'/hairlove-ads',         ico:'📣', d:'Meta Ads, таргетинг',      px:38, py:71, def:'stage'   },
-  { k:'instagram',   n:'Instagram',     cmd:'/hairlove-insta',       ico:'📸', d:'Публикация постов',         px:22, py:84, def:'active'  },
+  { k:'strategy',    n:'Стратегия',  cmd:'/hairlove-strategy',   ico:'🎯', d:'Дорожная карта.',           px:22, py:16, def:'working' },
+  { k:'copy',        n:'Тексты',     cmd:'/hairlove-texts',       ico:'✍️', d:'Контент для всех каналов.', px: 7, py:37, def:'active'  },
+  { k:'site',        n:'Сайт',       cmd:'/hairlove-site',        ico:'🌐', d:'B2B-витрина.',               px:38, py:29, def:'next'    },
+  { k:'competitors', n:'Конкуренты', cmd:'/hairlove-competitors', ico:'🔍', d:'Анализ рынка.',              px: 7, py:63, def:'wait'    },
+  { k:'ads',         n:'Реклама',    cmd:'/hairlove-ads',         ico:'📣', d:'Meta Ads, таргетинг.',      px:38, py:71, def:'stage'   },
+  { k:'instagram',   n:'Instagram',  cmd:'/hairlove-insta',       ico:'📸', d:'Публикация постов.',         px:22, py:84, def:'active'  },
 ];
 const HUB  = { px:22, py:50 };
 const OWN  = { px:64, py:50 };
@@ -518,7 +519,7 @@ function render(){
      <div class="c-name">HairLove</div>
      <div class="c-sub">ГАЛАКТИКА</div>
      <span class="c-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(event,'/hairlove')">/hairlove</span>
-     <div class="c-desc">Косметика для волос</div>
+     <div class="c-desc">Косметика для волос.</div>
      <span class="badge b-hub">⚡ /full-cycle</span>
    </div>`;
    el.addEventListener('click',()=>openP({t:'project'}));
