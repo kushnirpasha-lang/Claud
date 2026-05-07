@@ -20,7 +20,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 1. Прочитай файл передачи из `handoffs/`.
 2. Отправь событие:
    ```bash
-   bash ~/.claude/событие.sh <ИМЯ_ПРОЕКТА> strategy start "<суть задачи>"
+   bash ~/.claude/событие.sh hairlove strategy start "<суть задачи>"
    ```
 3. Проанализируй входные данные. Сформулируй решение с обоснованием.
 4. Определи направление и следующий шаг (ads / instagram / site / copy / growth).

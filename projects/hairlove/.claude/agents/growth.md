@@ -20,7 +20,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch
 1. Прочитай файл передачи.
 2. Отправь событие:
    ```bash
-   bash ~/.claude/событие.sh <ИМЯ_ПРОЕКТА> growth start "<суть задачи>"
+   bash ~/.claude/событие.sh hairlove growth start "<суть задачи>"
    ```
 3. Проанализируй точки роста: SEO, партнёрства, UGC, реферальные программы, комьюнити.
 4. Сформируй приоритизированный список с обоснованием.

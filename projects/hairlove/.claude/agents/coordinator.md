@@ -12,7 +12,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash, Task
 1. Получи задачу от пользователя.
 2. Отправь событие старта:
    ```bash
-   bash ~/.claude/событие.sh <ИМЯ_ПРОЕКТА> coordinator start "получил задачу: <суть>"
+   bash ~/.claude/событие.sh hairlove coordinator start "получил задачу: <суть>"
    ```
 3. Прочитай `routes.md` — выбери подходящий маршрут. Если ни один не подходит — спроси пользователя.
 4. Прочитай `team-state.md` — проверь текущее состояние.

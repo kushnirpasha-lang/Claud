@@ -18,7 +18,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch
 1. Прочитай файл передачи из `handoffs/` (последний для тебя).
 2. Отправь событие:
    ```bash
-   bash ~/.claude/событие.sh <ИМЯ_ПРОЕКТА> competitors start "<суть задачи>"
+   bash ~/.claude/событие.sh hairlove competitors start "<суть задачи>"
    ```
 3. Проведи исследование. На каждом существенном шаге — событие type=step.
 4. Сохрани отчёт в `artifacts/competitors/ГГГГ-ММ-ДД-<тема>.md` по протоколу.

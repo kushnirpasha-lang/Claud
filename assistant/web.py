@@ -92,6 +92,11 @@ def new_dashboard():
     return send_from_directory("static", "dashboard.html")
 
 
+@app.route("/map")
+def agent_map():
+    return send_from_directory("static", "map.html")
+
+
 @app.route("/api/agents/stream")
 def api_stream():
     project = request.args.get("project")
