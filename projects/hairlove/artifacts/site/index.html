@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HAiR L♡VE — Професійна косметика для волосся</title>
-  <meta name="description" content="HAiR L♡VE — три формули для волосся. Розроблено в Італії. Для майстрів, салонів та дистриб'юторів." />
+  <meta name="description" content="HAiR L♡VE — професійна косметика для волосся. Крем-спрей 20в1, термо-протектор, ламелярна маска. Розроблено в Італії." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -21,6 +21,8 @@
       --rose-light: #EDE0E0;
       --sage:       #B4CEB4;
       --sage-light: #E0EDE0;
+      --gold:       #C4A96A;
+      --gold-light: #F0E8D4;
       --ink:        #1A1A18;
       --gray:       #6B7280;
       --gray-light: #9CA3AF;
@@ -57,6 +59,7 @@
     .reveal-delay-2 { transition-delay: 0.22s; }
     .reveal-delay-3 { transition-delay: 0.36s; }
     .reveal-delay-4 { transition-delay: 0.52s; }
+    .reveal-delay-5 { transition-delay: 0.66s; }
 
     /* ── NAV ────────────────────────────────────────── */
     .nav {
@@ -140,7 +143,6 @@
       font-size: 16px; font-weight: 300;
       color: var(--gray); max-width: 420px; line-height: 1.7;
       opacity: 0; animation: fadeUp 1s 0.6s cubic-bezier(.16,1,.3,1) forwards;
-      data-ua data-ru data-en;
     }
     .hero__cta {
       margin-top: 48px;
@@ -220,7 +222,7 @@
     .product__inner {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 80px; align-items: center;
+      gap: 80px; align-items: start;
     }
     .product--reverse .product__inner { direction: rtl; }
     .product--reverse .product__inner > * { direction: ltr; }
@@ -230,12 +232,7 @@
       position: relative;
       display: flex; align-items: center; justify-content: center;
       overflow: hidden;
-    }
-    .product__color-block::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: inherit;
-      opacity: 0.06;
+      border-radius: 2px;
     }
     .product__number {
       font-family: var(--serif);
@@ -252,6 +249,16 @@
       letter-spacing: 0.2em; text-transform: uppercase;
       position: absolute; bottom: 32px; left: 32px;
       opacity: 0.5;
+    }
+    .product__badge {
+      position: absolute; top: 28px; right: 28px;
+      font-family: var(--sans);
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--cream);
+      background: var(--gold);
+      padding: 6px 14px;
+      border-radius: 2px;
     }
 
     .product__content {}
@@ -271,31 +278,77 @@
       font-family: var(--serif);
       font-size: clamp(20px, 2.5vw, 28px);
       font-weight: 300; font-style: italic;
-      color: var(--gray); margin-bottom: 40px;
+      color: var(--gray); margin-bottom: 32px;
     }
     .product__divider {
       width: 40px; height: 1px;
       background: var(--ink); opacity: 0.2;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
     .product__claim {
-      font-size: 18px; font-weight: 300; line-height: 1.6;
-      color: var(--ink); margin-bottom: 36px;
-      max-width: 400px;
+      font-size: 17px; font-weight: 300; line-height: 1.65;
+      color: var(--ink); margin-bottom: 40px;
+      max-width: 420px;
     }
-    .product__ingredients {
-      display: flex; flex-wrap: wrap; gap: 8px;
+
+    /* ── INGREDIENT DETAIL TABLE ────────────────────── */
+    .ingredient-table {
+      margin-bottom: 44px;
+      border-top: 1px solid var(--cream-dark);
+    }
+    .ingredient-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 20px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--cream-dark);
+      align-items: baseline;
+    }
+    .ingredient-row__name {
+      font-size: 12px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink);
+    }
+    .ingredient-row__desc {
+      font-size: 14px; font-weight: 300;
+      color: var(--gray); line-height: 1.55;
+    }
+    @media (max-width: 600px) {
+      .ingredient-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+
+    /* ── USAGE STEPS ────────────────────────────────── */
+    .usage-block {
       margin-bottom: 40px;
     }
-    .product__tag {
-      font-size: 11px; font-weight: 500;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--gray);
-      border: 1px solid var(--cream-dark);
-      padding: 6px 14px;
-      transition: border-color 0.3s, color 0.3s;
+    .usage-block__label {
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 18px;
     }
-    .product__tag:hover { border-color: var(--teal-mid); color: var(--teal); }
+    .usage-steps { display: flex; flex-direction: column; gap: 0; }
+    .usage-step {
+      display: flex; gap: 20px; align-items: baseline;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    .usage-step:last-child { border-bottom: none; }
+    .usage-step__num {
+      font-family: var(--serif);
+      font-size: 22px; font-weight: 300;
+      color: var(--teal); opacity: 0.5;
+      min-width: 28px; flex-shrink: 0;
+      line-height: 1;
+      margin-top: 2px;
+    }
+    .usage-step__text {
+      font-size: 14px; font-weight: 300;
+      color: var(--gray); line-height: 1.55;
+    }
+    .usage-step__text strong {
+      font-weight: 500; color: var(--ink);
+    }
+
     .product__meta {
       display: flex; gap: 24px; align-items: center;
       font-size: 12px; font-weight: 400;
@@ -306,6 +359,14 @@
       font-family: var(--serif);
       font-size: 16px; font-style: italic;
       color: var(--gray); font-weight: 300;
+    }
+
+    /* ── COMING SOON PRODUCT ────────────────────────── */
+    .product--soon .product__color-block {
+      opacity: 0.6;
+    }
+    .product--soon .product__content {
+      opacity: 0.75;
     }
 
     @media (max-width: 1024px) {
@@ -542,10 +603,10 @@
         </span>
       </h1>
       <p class="hero__sub"
-         data-ua="Три формули — крем-спрей, термо-захист, ламелярна маска. Розроблено в Італії. Для волосся, яке заслуговує на більше."
-         data-ru="Три формулы — крем-спрей, термозащита, ламелярная маска. Разработано в Италии. Для волос, которые заслуживают большего."
-         data-en="Three formulas — cream-spray, thermo-protection, lamellar mask. Developed in Italy. For hair that deserves more.">
-        Три формули — крем-спрей, термо-захист, ламелярна маска. Розроблено в Італії. Для волосся, яке заслуговує на більше.
+         data-ua="Крем-спрей, термо-захист, ламелярна маска. Розроблено в Італії. Для волосся, яке заслуговує на більше."
+         data-ru="Крем-спрей, термозащита, ламелярная маска. Разработано в Италии. Для волос, которые заслуживают большего."
+         data-en="Cream-spray, thermo-protection, lamellar mask. Developed in Italy. For hair that deserves more.">
+        Крем-спрей, термо-захист, ламелярна маска. Розроблено в Італії. Для волосся, яке заслуговує на більше.
       </p>
       <div class="hero__cta">
         <a href="#products" class="btn-primary"
@@ -584,7 +645,7 @@
   <!-- ═══════════════════════════════════ PRODUCTS ═══ -->
   <div id="products">
 
-    <!-- PRODUCT 01 — CREAM-SPRAY -->
+    <!-- ─── PRODUCT 01 — CREAM-SPRAY ─── -->
     <article class="product">
       <div class="container">
         <div class="product__inner">
@@ -594,7 +655,7 @@
             <span class="product__icon">200 мл</span>
           </div>
           <div class="product__content">
-            <p class="product__index reveal">01 / 03</p>
+            <p class="product__index reveal">01</p>
             <h2 class="product__name reveal reveal-delay-1"
                 data-ua="Крем-спрей<br>20 в 1"
                 data-ru="Крем-спрей<br>20 в 1"
@@ -612,15 +673,103 @@
                data-en="Applied to damp hair. Leave-in. Nourishes, hydrates, removes frizz — without weighing down.">
               Наноситься на вологе волосся. Не змивається. Живить, зволожує, прибирає пухнастість — і не обтяжує.
             </p>
-            <div class="product__ingredients reveal reveal-delay-3">
-              <span class="product__tag" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
-              <span class="product__tag" data-ua="Масло арганії" data-ru="Масло арганы" data-en="Argan oil">Масло арганії</span>
-              <span class="product__tag" data-ua="Шовк" data-ru="Шёлк" data-en="Silk">Шовк</span>
-              <span class="product__tag" data-ua="Макадамія" data-ru="Макадамия" data-en="Macadamia">Макадамія</span>
-              <span class="product__tag" data-ua="Пантенол" data-ru="Пантенол" data-en="Panthenol">Пантенол</span>
-              <span class="product__tag" data-ua="Сфінголіпіди" data-ru="Сфинголипиды" data-en="Sphingolipids">Сфінголіпіди</span>
+
+            <!-- склад -->
+            <div class="ingredient-table reveal reveal-delay-3">
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Заповнює мікропошкодження і пори волосся, відновлює структуру зсередини, зменшує пухнастість"
+                      data-ru="Заполняет микроповреждения и поры волоса, восстанавливает структуру изнутри, уменьшает пушистость"
+                      data-en="Fills micro-damage and hair pores, restores structure from within, reduces frizz">
+                  Заповнює мікропошкодження і пори волосся, відновлює структуру зсередини, зменшує пухнастість
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Масло арганії" data-ru="Масло арганы" data-en="Argan oil">Масло арганії</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Живить волокна, захищає від втрати вологи, надає природний блиск без жирності"
+                      data-ru="Питает волокна, защищает от потери влаги, придаёт естественный блеск без жирности"
+                      data-en="Nourishes fibres, locks in moisture, adds natural shine without greasiness">
+                  Живить волокна, захищає від втрати вологи, надає природний блиск без жирності
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Шовк" data-ru="Шёлк" data-en="Silk">Шовк</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Робить волосся слухняним і легким, полегшує розчісування, захищає від механічного пошкодження"
+                      data-ru="Делает волосы послушными и лёгкими, облегчает расчёсывание, защищает от механического повреждения"
+                      data-en="Makes hair soft and manageable, eases detangling, protects from mechanical damage">
+                  Робить волосся слухняним і легким, полегшує розчісування, захищає від механічного пошкодження
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Макадамія" data-ru="Макадамия" data-en="Macadamia">Макадамія</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Відновлює ліпідний шар кутикули, захищає від зламу, надає м'якість на дотик"
+                      data-ru="Восстанавливает липидный слой кутикулы, защищает от ломкости, придаёт мягкость на ощупь"
+                      data-en="Restores the cuticle lipid layer, protects against breakage, adds softness">
+                  Відновлює ліпідний шар кутикули, захищає від зламу, надає м'якість на дотик
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Пантенол" data-ru="Пантенол" data-en="Panthenol">Пантенол</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Зволожує волосся зсередини, захищає від сонячного впливу, підвищує еластичність"
+                      data-ru="Увлажняет волосы изнутри, защищает от солнечного воздействия, повышает эластичность"
+                      data-en="Moisturises from within, shields from UV, increases elasticity">
+                  Зволожує волосся зсередині, захищає від сонячного впливу, підвищує еластичність
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Сфінголіпіди" data-ru="Сфинголипиды" data-en="Sphingolipids">Сфінголіпіди</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Зміцнюють захисну оболонку волосся, запечатують лусочки кутикули, утримують вологу"
+                      data-ru="Укрепляют защитную оболочку волоса, запечатывают чешуйки кутикулы, удерживают влагу"
+                      data-en="Reinforce the hair's protective layer, seal cuticle scales, retain moisture">
+                  Зміцнюють захисну оболонку волосся, запечатують лусочки кутикули, утримують вологу
+                </span>
+              </div>
             </div>
-            <div class="product__meta reveal reveal-delay-4">
+
+            <!-- як використовувати -->
+            <div class="usage-block reveal reveal-delay-4">
+              <p class="usage-block__label"
+                 data-ua="Як використовувати"
+                 data-ru="Как использовать"
+                 data-en="How to use">Як використовувати</p>
+              <div class="usage-steps">
+                <div class="usage-step">
+                  <span class="usage-step__num">1</span>
+                  <span class="usage-step__desc"
+                        data-ua="Вимийте волосся шампунем, злегка промокніть рушником — волосся має бути <strong>вологим, не мокрим</strong>"
+                        data-ru="Вымойте волосы шампунем, слегка промокните полотенцем — волосы должны быть <strong>влажными, не мокрыми</strong>"
+                        data-en="Wash hair with shampoo, blot with towel — hair should be <strong>damp, not soaking wet</strong>">
+                    Вимийте волосся шампунем, злегка промокніть рушником — волосся має бути <strong>вологим, не мокрим</strong>
+                  </span>
+                </div>
+                <div class="usage-step">
+                  <span class="usage-step__num">2</span>
+                  <span class="usage-step__desc"
+                        data-ua="Нанесіть крем-спрей по всій довжині, <strong>уникаючи коренів</strong>"
+                        data-ru="Нанесите крем-спрей по всей длине, <strong>избегая корней</strong>"
+                        data-en="Apply cream-spray along the full length, <strong>avoiding the roots</strong>">
+                    Нанесіть крем-спрей по всій довжині, <strong>уникаючи коренів</strong>
+                  </span>
+                </div>
+                <div class="usage-step">
+                  <span class="usage-step__num">3</span>
+                  <span class="usage-step__desc"
+                        data-ua="<strong>Не змивайте</strong> — укладайте феном або залиште сохнути природньо"
+                        data-ru="<strong>Не смывайте</strong> — укладывайте феном или оставьте сохнуть естественно"
+                        data-en="<strong>Do not rinse</strong> — blow-dry or air-dry as usual">
+                    <strong>Не змивайте</strong> — укладайте феном або залиште сохнути природньо
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="product__meta reveal reveal-delay-5">
               <span class="product__vol">200 · 50 · 20 мл</span>
               <span>pH 4.5–5.0</span>
             </div>
@@ -629,7 +778,7 @@
       </div>
     </article>
 
-    <!-- PRODUCT 02 — THERMO -->
+    <!-- ─── PRODUCT 02 — THERMO ─── -->
     <article class="product product--reverse">
       <div class="container">
         <div class="product__inner">
@@ -639,7 +788,7 @@
             <span class="product__icon">200 мл</span>
           </div>
           <div class="product__content">
-            <p class="product__index reveal">02 / 03</p>
+            <p class="product__index reveal">02</p>
             <h2 class="product__name reveal reveal-delay-1"
                 data-ua="Термо-<br>протектор"
                 data-ru="Термо-<br>протектор"
@@ -652,18 +801,99 @@
                data-en="protective spray">спрей-захист</p>
             <div class="product__divider reveal reveal-delay-2"></div>
             <p class="product__claim reveal reveal-delay-3"
-               data-ua="Захист до 220°C. На мокре або сухе волосся. Від спеки, сонця та морозу — одним нанесенням."
-               data-ru="Защита до 220°C. На влажные или сухие волосы. От жара, солнца и мороза — одним нанесением."
-               data-en="Protection up to 220°C. On wet or dry hair. From heat, sun and frost — one application.">
-              Захист до 220°C. На мокре або сухе волосся. Від спеки, сонця та морозу — одним нанесенням.
+               data-ua="Захист до 220°C. Від жару фену та праски, від сонця, від морозу — все в одному нанесенні."
+               data-ru="Защита до 220°C. От жара фена и утюжка, от солнца, от мороза — всё в одном нанесении."
+               data-en="Protection up to 220°C. From heat tools, sun and frost — all in one application.">
+              Захист до 220°C. Від жару фену та праски, від сонця, від морозу — все в одному нанесенні.
             </p>
-            <div class="product__ingredients reveal reveal-delay-3">
-              <span class="product__tag">Кератин</span>
-              <span class="product__tag" data-ua="Аргінін" data-ru="Аргинин" data-en="Arginine">Аргінін</span>
-              <span class="product__tag" data-ua="Екстракт винограду" data-ru="Экстракт винограда" data-en="Grape extract">Екстракт винограду</span>
-              <span class="product__tag" data-ua="Авокадо" data-ru="Авокадо" data-en="Avocado">Авокадо</span>
+
+            <!-- склад -->
+            <div class="ingredient-table reveal reveal-delay-3">
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Відновлює волокна волосся, утворює захисний шар навколо стрижня під час теплового впливу"
+                      data-ru="Восстанавливает волокна волоса, образует защитный слой вокруг стержня при тепловом воздействии"
+                      data-en="Repairs hair fibres, forms a protective shield around the hair shaft during heat styling">
+                  Відновлює волокна волосся, утворює захисний шар навколо стрижня під час теплового впливу
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Аргінін" data-ru="Аргинин" data-en="Arginine">Аргінін</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Амінокислота — підтримує мікроструктуру волосся при нагріванні, зменшує теплове пошкодження"
+                      data-ru="Аминокислота — поддерживает микроструктуру волоса при нагревании, уменьшает тепловое повреждение"
+                      data-en="Amino acid — supports hair microstructure under heat, reduces thermal damage">
+                  Амінокислота — підтримує мікроструктуру волосся при нагріванні, зменшує теплове пошкодження
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Аланін · Серін" data-ru="Аланин · Серин" data-en="Alanine · Serine">Аланін · Серін</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Амінокислоти зволоження — утримують воду всередині структури волосся навіть під феном"
+                      data-ru="Аминокислоты увлажнения — удерживают воду внутри структуры волоса даже под феном"
+                      data-en="Moisturising amino acids — retain water inside the hair structure even under heat">
+                  Амінокислоти зволоження — утримують воду всередині структури волосся навіть під феном
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Екстракт винограду" data-ru="Экстракт винограда" data-en="Grape extract">Екстракт винограду</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Антиоксидант — нейтралізує вільні радикали від УФ і теплового стресу, захищає від вигорання"
+                      data-ru="Антиоксидант — нейтрализует свободные радикалы от УФ и теплового стресса, защищает от выгорания"
+                      data-en="Antioxidant — neutralises free radicals from UV and heat stress, protects from colour fade">
+                  Антиоксидант — нейтралізує вільні радикали від УФ і теплового стресу, захищає від вигорання
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Авокадо" data-ru="Авокадо" data-en="Avocado">Авокадо</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Пом'якшує і живить, захищає від сухості в мороз і від агресивного сонця влітку"
+                      data-ru="Смягчает и питает, защищает от сухости в мороз и от агрессивного солнца летом"
+                      data-en="Softens and nourishes, protects from winter dryness and harsh summer sun">
+                  Пом'якшує і живить, захищає від сухості в мороз і від агресивного сонця влітку
+                </span>
+              </div>
             </div>
-            <div class="product__meta reveal reveal-delay-4">
+
+            <!-- як використовувати -->
+            <div class="usage-block reveal reveal-delay-4">
+              <p class="usage-block__label"
+                 data-ua="Як використовувати"
+                 data-ru="Как использовать"
+                 data-en="How to use">Як використовувати</p>
+              <div class="usage-steps">
+                <div class="usage-step">
+                  <span class="usage-step__num">1</span>
+                  <span class="usage-step__desc"
+                        data-ua="Нанесіть на <strong>вологе або сухе волосся</strong> рівномірно по всій довжині"
+                        data-ru="Нанесите на <strong>влажные или сухие волосы</strong> равномерно по всей длине"
+                        data-en="Apply to <strong>wet or dry hair</strong> evenly along the full length">
+                    Нанесіть на <strong>вологе або сухе волосся</strong> рівномірно по всій довжині
+                  </span>
+                </div>
+                <div class="usage-step">
+                  <span class="usage-step__num">2</span>
+                  <span class="usage-step__desc"
+                        data-ua="Зачекайте <strong>30 секунд</strong> перед використанням фену або праски — засіб має розподілитися"
+                        data-ru="Подождите <strong>30 секунд</strong> перед использованием фена или утюжка — средство должно распределиться"
+                        data-en="Wait <strong>30 seconds</strong> before using a hairdryer or straightener — let the product distribute">
+                    Зачекайте <strong>30 секунд</strong> перед використанням фену або праски — засіб має розподілитися
+                  </span>
+                </div>
+                <div class="usage-step">
+                  <span class="usage-step__num">3</span>
+                  <span class="usage-step__desc"
+                        data-ua="Укладайте як звично — захист активний до <strong>220°C</strong>, повторне нанесення не потрібне"
+                        data-ru="Укладывайте как обычно — защита активна до <strong>220°C</strong>, повторное нанесение не нужно"
+                        data-en="Style as usual — protection is active up to <strong>220°C</strong>, no reapplication needed">
+                    Укладайте як звично — захист активний до <strong>220°C</strong>, повторне нанесення не потрібне
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="product__meta reveal reveal-delay-5">
               <span class="product__vol">200 · 50 · 20 мл</span>
               <span>pH 4.5–5.0</span>
             </div>
@@ -672,7 +902,7 @@
       </div>
     </article>
 
-    <!-- PRODUCT 03 — FILLER MASK -->
+    <!-- ─── PRODUCT 03 — FILLER MASK ─── -->
     <article class="product">
       <div class="container">
         <div class="product__inner">
@@ -682,7 +912,7 @@
             <span class="product__icon">200 мл</span>
           </div>
           <div class="product__content">
-            <p class="product__index reveal">03 / 03</p>
+            <p class="product__index reveal">03</p>
             <h2 class="product__name reveal reveal-delay-1"
                 data-ua="Ламелярна<br>маска-філлер"
                 data-ru="Ламелярная<br>маска-филлер"
@@ -695,21 +925,150 @@
                data-en="liquid lamellar">рідка ламелярна</p>
             <div class="product__divider reveal reveal-delay-2"></div>
             <p class="product__claim reveal reveal-delay-3"
-               data-ua="15–30 секунд — щоденний бальзам. До 30 хвилин — інтенсивна маска-філлер. Два режими в одному флаконі."
-               data-ru="15–30 секунд — ежедневный бальзам. До 30 минут — интенсивная маска-филлер. Два режима в одном флаконе."
-               data-en="15–30 seconds — daily conditioner. Up to 30 minutes — intensive filler mask. Two modes in one bottle.">
-              15–30 секунд — щоденний бальзам. До 30 хвилин — інтенсивна маска-філлер. Два режими в одному флаконі.
+               data-ua="Два режими в одному флаконі: 15–30 секунд — щоденний бальзам, до 30 хвилин — інтенсивне відновлення."
+               data-ru="Два режима в одном флаконе: 15–30 секунд — ежедневный бальзам, до 30 минут — интенсивное восстановление."
+               data-en="Two modes in one bottle: 15–30 seconds — daily conditioner, up to 30 minutes — intensive repair.">
+              Два режими в одному флаконі: 15–30 секунд — щоденний бальзам, до 30 хвилин — інтенсивне відновлення.
             </p>
-            <div class="product__ingredients reveal reveal-delay-3">
-              <span class="product__tag">Кератин</span>
-              <span class="product__tag" data-ua="Колаген" data-ru="Коллаген" data-en="Collagen">Колаген</span>
-              <span class="product__tag" data-ua="Алое вера" data-ru="Алоэ вера" data-en="Aloe vera">Алое вера</span>
-              <span class="product__tag" data-ua="Протеїн пшениці" data-ru="Протеин пшеницы" data-en="Wheat protein">Протеїн пшениці</span>
-              <span class="product__tag" data-ua="Протеїн рису" data-ru="Протеин риса" data-en="Rice protein">Протеїн рису</span>
+
+            <!-- склад -->
+            <div class="ingredient-table reveal reveal-delay-3">
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Заповнює мікротріщини по всій довжині волосся — це і є ефект «філлера»: волосся стає зрительно густішим"
+                      data-ru="Заполняет микротрещины по всей длине волоса — именно это и есть эффект «филлера»: волосы становятся визуально гуще"
+                      data-en="Fills micro-cracks along the hair length — the actual filler effect: hair looks visibly thicker">
+                  Заповнює мікротріщини по всій довжині волосся — це і є ефект «філлера»: волосся стає зрительно густішим
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Колаген" data-ru="Коллаген" data-en="Collagen">Колаген</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Формує захисну плівку навколо волосся, додає об'єм і пружність, захищає від зовнішніх пошкоджень"
+                      data-ru="Формирует защитную плёнку вокруг волоса, добавляет объём и упругость, защищает от внешних повреждений"
+                      data-en="Forms a protective film around each hair, adds volume and bounce, shields from external damage">
+                  Формує захисну плівку навколо волосся, додає об'єм і пружність, захищає від зовнішніх пошкоджень
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Алое вера" data-ru="Алоэ вера" data-en="Aloe vera">Алое вера</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Заспокоює і зволожує, м'яко відновлює pH шкіри голови, полегшує нанесення по всій довжині"
+                      data-ru="Успокаивает и увлажняет, мягко восстанавливает pH кожи головы, облегчает нанесение по всей длине"
+                      data-en="Soothes and moisturises, gently balances scalp pH, makes application easy along full length">
+                  Заспокоює і зволожує, м'яко відновлює pH шкіри голови, полегшує нанесення по всій довжині
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Протеїн пшениці" data-ru="Протеин пшеницы" data-en="Wheat protein">Протеїн пшениці</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Зміцнює внутрішню структуру волосся, запобігає ламкості та січам, надає густоту"
+                      data-ru="Укрепляет внутреннюю структуру волоса, предотвращает ломкость и секущиеся кончики, придаёт густоту"
+                      data-en="Strengthens internal hair structure, prevents breakage and split ends, adds density">
+                  Зміцнює внутрішню структуру волосся, запобігає ламкості та січам, надає густоту
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Протеїн рису" data-ru="Протеин риса" data-en="Rice protein">Протеїн рису</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Розгладжує лусочки кутикули, надає волоссю блиск і шовковистість, полегшує розчісування"
+                      data-ru="Разглаживает чешуйки кутикулы, придаёт волосам блеск и шелковистость, облегчает расчёсывание"
+                      data-en="Smooths cuticle scales, adds shine and silkiness, makes detangling easier">
+                  Розгладжує лусочки кутикули, надає волоссю блиск і шовковистість, полегшує розчісування
+                </span>
+              </div>
+              <div class="ingredient-row">
+                <span class="ingredient-row__name" data-ua="Пантенол" data-ru="Пантенол" data-en="Panthenol">Пантенол</span>
+                <span class="ingredient-row__desc"
+                      data-ua="Утримує вологу всередині волосся після змивання, захищає від пересушення феном і сонцем"
+                      data-ru="Удерживает влагу внутри волоса после смывания, защищает от пересушивания феном и солнцем"
+                      data-en="Locks moisture inside the hair after rinsing, protects from overdrying by heat and sun">
+                  Утримує вологу всередині волосся після змивання, захищає від пересушення феном і сонцем
+                </span>
+              </div>
             </div>
-            <div class="product__meta reveal reveal-delay-4">
+
+            <!-- як використовувати -->
+            <div class="usage-block reveal reveal-delay-4">
+              <p class="usage-block__label"
+                 data-ua="Як використовувати"
+                 data-ru="Как использовать"
+                 data-en="How to use">Як використовувати</p>
+              <div class="usage-steps">
+                <div class="usage-step">
+                  <span class="usage-step__num">1</span>
+                  <span class="usage-step__desc"
+                        data-ua="Нанесіть на <strong>вологе волосся після шампуню</strong> по всій довжині, уникаючи коренів"
+                        data-ru="Нанесите на <strong>влажные волосы после шампуня</strong> по всей длине, избегая корней"
+                        data-en="Apply to <strong>wet hair after shampooing</strong> along the full length, avoiding roots">
+                    Нанесіть на <strong>вологе волосся після шампуню</strong> по всій довжині, уникаючи коренів
+                  </span>
+                </div>
+                <div class="usage-step">
+                  <span class="usage-step__num">2</span>
+                  <span class="usage-step__desc"
+                        data-ua="<strong>Режим бальзаму</strong> — тримайте 15–30 секунд і змийте. Щоденний догляд"
+                        data-ru="<strong>Режим бальзама</strong> — держите 15–30 секунд и смойте. Ежедневный уход"
+                        data-en="<strong>Conditioner mode</strong> — leave for 15–30 seconds, then rinse. Daily care">
+                    <strong>Режим бальзаму</strong> — тримайте 15–30 секунд і змийте. Щоденний догляд
+                  </span>
+                </div>
+                <div class="usage-step">
+                  <span class="usage-step__num">3</span>
+                  <span class="usage-step__desc"
+                        data-ua="<strong>Режим маски-філлера</strong> — тримайте до 30 хвилин і змийте. Для інтенсивного відновлення 1–2 рази на тиждень"
+                        data-ru="<strong>Режим маски-филлера</strong> — держите до 30 минут и смойте. Для интенсивного восстановления 1–2 раза в неделю"
+                        data-en="<strong>Filler mask mode</strong> — leave up to 30 minutes, then rinse. For intensive repair 1–2 times a week">
+                    <strong>Режим маски-філлера</strong> — тримайте до 30 хвилин і змийте. Для інтенсивного відновлення 1–2 рази на тиждень
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="product__meta reveal reveal-delay-5">
               <span class="product__vol">200 · 50 · 20 мл</span>
               <span>pH 5.0–6.0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ─── PRODUCT 04 — SILK (coming soon) ─── -->
+    <article class="product product--reverse product--soon">
+      <div class="container">
+        <div class="product__inner">
+          <div class="product__color-block reveal"
+               style="background: var(--gold-light);">
+            <span class="product__number" style="color: var(--gold);">04</span>
+            <span class="product__icon">30 мл</span>
+            <span class="product__badge"
+                  data-ua="Скоро"
+                  data-ru="Скоро"
+                  data-en="Coming soon">Скоро</span>
+          </div>
+          <div class="product__content">
+            <p class="product__index reveal">04</p>
+            <h2 class="product__name reveal reveal-delay-1"
+                data-ua="Шовкова<br>інфузія"
+                data-ru="Шёлковая<br>инфузия"
+                data-en="Silk<br>infusion">
+              Шовкова<br>інфузія
+            </h2>
+            <p class="product__sub reveal reveal-delay-2"
+               data-ua="концентрований догляд"
+               data-ru="концентрированный уход"
+               data-en="concentrated care">концентрований догляд</p>
+            <div class="product__divider reveal reveal-delay-2"></div>
+            <p class="product__claim reveal reveal-delay-3"
+               data-ua="Зараз проходить випробування. Слідкуйте за оновленнями в Instagram @hair_love_company."
+               data-ru="Сейчас проходит испытания. Следите за обновлениями в Instagram @hair_love_company."
+               data-en="Currently in testing. Follow updates on Instagram @hair_love_company.">
+              Зараз проходить випробування. Слідкуйте за оновленнями в Instagram @hair_love_company.
+            </p>
+            <div class="product__meta reveal reveal-delay-4">
+              <span class="product__vol">30 мл</span>
             </div>
           </div>
         </div>
@@ -767,10 +1126,10 @@
               data-ru="Тестовый набор"
               data-en="Test kit">Тестовий набір</h3>
           <p class="step__text"
-             data-ua="Три флакончики по 20 мл — по одному на кожен продукт. Спробуйте на клієнтах, отримайте перший фідбек."
-             data-ru="Три флакончика по 20 мл — по одному на каждый продукт. Попробуйте на клиентах, получите первый фидбек."
-             data-en="Three 20ml testers — one per product. Try on clients, get your first feedback.">
-            Три флакончики по 20 мл — по одному на кожен продукт. Спробуйте на клієнтах, отримайте перший фідбек.
+             data-ua="Флакончики по 20 мл — по одному на кожен продукт. Спробуйте на клієнтах, отримайте перший фідбек."
+             data-ru="Флакончики по 20 мл — по одному на каждый продукт. Попробуйте на клиентах, получите первый фидбек."
+             data-en="20ml testers — one per product. Try on clients, get your first feedback.">
+            Флакончики по 20 мл — по одному на кожен продукт. Спробуйте на клієнтах, отримайте перший фідбек.
           </p>
         </div>
         <div class="step reveal reveal-delay-1">
@@ -820,7 +1179,7 @@
           </p>
           <div class="contact__info reveal reveal-delay-2">
             <div class="contact__item">
-              <span class="contact__label" data-ua="Instagram" data-ru="Instagram" data-en="Instagram">Instagram</span>
+              <span class="contact__label">Instagram</span>
               <span class="contact__val">
                 <a href="https://instagram.com/hair_love_company" target="_blank">@hair_love_company</a>
               </span>
@@ -918,7 +1277,6 @@
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return;
         if (val) el.innerHTML = val;
       });
-      // placeholders
       document.querySelectorAll('[data-' + lang + '-placeholder]').forEach(el => {
         el.placeholder = el.getAttribute('data-' + lang + '-placeholder');
       });
@@ -938,7 +1296,7 @@
           observer.unobserve(e.target);
         }
       });
-    }, { threshold: 0.12 });
+    }, { threshold: 0.1 });
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
