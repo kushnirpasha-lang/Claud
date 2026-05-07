@@ -341,6 +341,22 @@
       .ingredient-row { grid-template-columns: 1fr; gap: 4px; }
     }
 
+    /* ── INGREDIENT TAGS ────────────────────────────── */
+    .product__tags {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 40px;
+    }
+    .product__tag {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--ink);
+      border: 1px solid var(--cream-dark);
+      border-radius: 2px;
+      padding: 6px 12px;
+      background: transparent;
+      line-height: 1;
+    }
+
     /* ── USAGE STEPS ────────────────────────────────── */
     .usage-block {
       margin-bottom: 40px;
@@ -930,98 +946,13 @@
             </p>
 
             <!-- склад -->
-            <div class="ingredient-table reveal reveal-delay-3">
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Заповнює мікропошкодження і пори волосся, відновлює структуру зсередини, зменшує пухнастість"
-                      data-ru="Заполняет микроповреждения и поры волоса, восстанавливает структуру изнутри, уменьшает пушистость"
-                      data-en="Fills micro-damage and hair pores, restores structure from within, reduces frizz">
-                  Заповнює мікропошкодження і пори волосся, відновлює структуру зсередини, зменшує пухнастість
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Масло арганії" data-ru="Масло арганы" data-en="Argan oil">Масло арганії</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Живить волокна, захищає від втрати вологи, надає природний блиск без жирності"
-                      data-ru="Питает волокна, защищает от потери влаги, придаёт естественный блеск без жирности"
-                      data-en="Nourishes fibres, locks in moisture, adds natural shine without greasiness">
-                  Живить волокна, захищає від втрати вологи, надає природний блиск без жирності
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Шовк" data-ru="Шёлк" data-en="Silk">Шовк</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Робить волосся слухняним і легким, полегшує розчісування, захищає від механічного пошкодження"
-                      data-ru="Делает волосы послушными и лёгкими, облегчает расчёсывание, защищает от механического повреждения"
-                      data-en="Makes hair soft and manageable, eases detangling, protects from mechanical damage">
-                  Робить волосся слухняним і легким, полегшує розчісування, захищає від механічного пошкодження
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Макадамія" data-ru="Макадамия" data-en="Macadamia">Макадамія</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Відновлює ліпідний шар кутикули, захищає від зламу, надає м'якість на дотик"
-                      data-ru="Восстанавливает липидный слой кутикулы, защищает от ломкости, придаёт мягкость на ощупь"
-                      data-en="Restores the cuticle lipid layer, protects against breakage, adds softness">
-                  Відновлює ліпідний шар кутикули, захищає від зламу, надає м'якість на дотик
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Пантенол" data-ru="Пантенол" data-en="Panthenol">Пантенол</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Зволожує волосся зсередини, захищає від сонячного впливу, підвищує еластичність"
-                      data-ru="Увлажняет волосы изнутри, защищает от солнечного воздействия, повышает эластичность"
-                      data-en="Moisturises from within, shields from UV, increases elasticity">
-                  Зволожує волосся зсередині, захищає від сонячного впливу, підвищує еластичність
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Сфінголіпіди" data-ru="Сфинголипиды" data-en="Sphingolipids">Сфінголіпіди</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Зміцнюють захисну оболонку волосся, запечатують лусочки кутикули, утримують вологу"
-                      data-ru="Укрепляют защитную оболочку волоса, запечатывают чешуйки кутикулы, удерживают влагу"
-                      data-en="Reinforce the hair's protective layer, seal cuticle scales, retain moisture">
-                  Зміцнюють захисну оболонку волосся, запечатують лусочки кутикули, утримують вологу
-                </span>
-              </div>
-            </div>
-
-            <!-- як використовувати -->
-            <div class="usage-block reveal reveal-delay-4">
-              <p class="usage-block__label"
-                 data-ua="Як використовувати"
-                 data-ru="Как использовать"
-                 data-en="How to use">Як використовувати</p>
-              <div class="usage-steps">
-                <div class="usage-step">
-                  <span class="usage-step__num">1</span>
-                  <span class="usage-step__desc"
-                        data-ua="Вимийте волосся шампунем, злегка промокніть рушником — волосся має бути <strong>вологим, не мокрим</strong>"
-                        data-ru="Вымойте волосы шампунем, слегка промокните полотенцем — волосы должны быть <strong>влажными, не мокрыми</strong>"
-                        data-en="Wash hair with shampoo, blot with towel — hair should be <strong>damp, not soaking wet</strong>">
-                    Вимийте волосся шампунем, злегка промокніть рушником — волосся має бути <strong>вологим, не мокрим</strong>
-                  </span>
-                </div>
-                <div class="usage-step">
-                  <span class="usage-step__num">2</span>
-                  <span class="usage-step__desc"
-                        data-ua="Нанесіть крем-спрей по всій довжині, <strong>уникаючи коренів</strong>"
-                        data-ru="Нанесите крем-спрей по всей длине, <strong>избегая корней</strong>"
-                        data-en="Apply cream-spray along the full length, <strong>avoiding the roots</strong>">
-                    Нанесіть крем-спрей по всій довжині, <strong>уникаючи коренів</strong>
-                  </span>
-                </div>
-                <div class="usage-step">
-                  <span class="usage-step__num">3</span>
-                  <span class="usage-step__desc"
-                        data-ua="<strong>Не змивайте</strong> — укладайте феном або залиште сохнути природньо"
-                        data-ru="<strong>Не смывайте</strong> — укладывайте феном или оставьте сохнуть естественно"
-                        data-en="<strong>Do not rinse</strong> — blow-dry or air-dry as usual">
-                    <strong>Не змивайте</strong> — укладайте феном або залиште сохнути природньо
-                  </span>
-                </div>
-              </div>
+            <div class="product__tags reveal reveal-delay-3">
+              <span class="product__tag" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
+              <span class="product__tag" data-ua="Масло арганії" data-ru="Масло арганы" data-en="Argan oil">Масло арганії</span>
+              <span class="product__tag" data-ua="Шовк" data-ru="Шёлк" data-en="Silk">Шовк</span>
+              <span class="product__tag" data-ua="Макадамія" data-ru="Макадамия" data-en="Macadamia">Макадамія</span>
+              <span class="product__tag" data-ua="Пантенол" data-ru="Пантенол" data-en="Panthenol">Пантенол</span>
+              <span class="product__tag" data-ua="Сфінголіпіди" data-ru="Сфинголипиды" data-en="Sphingolipids">Сфінголіпіди</span>
             </div>
 
             <div class="product__meta reveal reveal-delay-5">
@@ -1069,123 +1000,13 @@
             </p>
 
             <!-- склад -->
-            <div class="ingredient-table reveal reveal-delay-3">
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Відновлює волокна волосся, утворює захисний шар навколо стрижня під час теплового впливу"
-                      data-ru="Восстанавливает волокна волоса, образует защитный слой вокруг стержня при тепловом воздействии"
-                      data-en="Repairs hair fibres, forms a protective shield around the hair shaft during heat styling">
-                  Відновлює волокна волосся, утворює захисний шар навколо стрижня під час теплового впливу
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Аргінін" data-ru="Аргинин" data-en="Arginine">Аргінін</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Амінокислота — підтримує мікроструктуру волосся при нагріванні, зменшує теплове пошкодження"
-                      data-ru="Аминокислота — поддерживает микроструктуру волоса при нагревании, уменьшает тепловое повреждение"
-                      data-en="Amino acid — supports hair microstructure under heat, reduces thermal damage">
-                  Амінокислота — підтримує мікроструктуру волосся при нагріванні, зменшує теплове пошкодження
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Аланін · Серін" data-ru="Аланин · Серин" data-en="Alanine · Serine">Аланін · Серін</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Амінокислоти зволоження — утримують воду всередині структури волосся навіть під феном"
-                      data-ru="Аминокислоты увлажнения — удерживают воду внутри структуры волоса даже под феном"
-                      data-en="Moisturising amino acids — retain water inside the hair structure even under heat">
-                  Амінокислоти зволоження — утримують воду всередині структури волосся навіть під феном
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Екстракт винограду" data-ru="Экстракт винограда" data-en="Grape extract">Екстракт винограду</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Антиоксидант — нейтралізує вільні радикали від УФ і теплового стресу, захищає від вигорання"
-                      data-ru="Антиоксидант — нейтрализует свободные радикалы от УФ и теплового стресса, защищает от выгорания"
-                      data-en="Antioxidant — neutralises free radicals from UV and heat stress, protects from colour fade">
-                  Антиоксидант — нейтралізує вільні радикали від УФ і теплового стресу, захищає від вигорання
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Авокадо" data-ru="Авокадо" data-en="Avocado">Авокадо</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Пом'якшує і живить, захищає від сухості в мороз і від агресивного сонця влітку"
-                      data-ru="Смягчает и питает, защищает от сухости в мороз и от агрессивного солнца летом"
-                      data-en="Softens and nourishes, protects from winter dryness and harsh summer sun">
-                  Пом'якшує і живить, захищає від сухості в мороз і від агресивного сонця влітку
-                </span>
-              </div>
-            </div>
-
-            <!-- як використовувати -->
-            <div class="usage-block reveal reveal-delay-4">
-              <p class="usage-block__label"
-                 data-ua="Як використовувати"
-                 data-ru="Как использовать"
-                 data-en="How to use">Як використовувати</p>
-              <div class="usage-steps">
-                <div class="usage-step">
-                  <span class="usage-step__num">1</span>
-                  <span class="usage-step__desc"
-                        data-ua="Нанесіть на <strong>вологе або сухе волосся</strong> рівномірно по всій довжині"
-                        data-ru="Нанесите на <strong>влажные или сухие волосы</strong> равномерно по всей длине"
-                        data-en="Apply to <strong>wet or dry hair</strong> evenly along the full length">
-                    Нанесіть на <strong>вологе або сухе волосся</strong> рівномірно по всій довжині
-                  </span>
-                </div>
-                <div class="usage-step">
-                  <span class="usage-step__num">2</span>
-                  <span class="usage-step__desc"
-                        data-ua="Зачекайте <strong>30 секунд</strong> перед використанням фену або праски — засіб має розподілитися"
-                        data-ru="Подождите <strong>30 секунд</strong> перед использованием фена или утюжка — средство должно распределиться"
-                        data-en="Wait <strong>30 seconds</strong> before using a hairdryer or straightener — let the product distribute">
-                    Зачекайте <strong>30 секунд</strong> перед використанням фену або праски — засіб має розподілитися
-                  </span>
-                </div>
-                <div class="usage-step">
-                  <span class="usage-step__num">3</span>
-                  <span class="usage-step__desc"
-                        data-ua="Укладайте як звично — захист активний до <strong>220°C</strong>, повторне нанесення не потрібне"
-                        data-ru="Укладывайте как обычно — защита активна до <strong>220°C</strong>, повторное нанесение не нужно"
-                        data-en="Style as usual — protection is active up to <strong>220°C</strong>, no reapplication needed">
-                    Укладайте як звично — захист активний до <strong>220°C</strong>, повторне нанесення не потрібне
-                  </span>
-                </div>
-              </div>
-
-              <!-- temperature reference -->
-              <div class="temp-ref">
-                <p class="temp-ref__label"
-                   data-ua="Температура інструментів — довідка"
-                   data-ru="Температура инструментов — справка"
-                   data-en="Tool temperature reference">Температура інструментів — довідка</p>
-                <div class="temp-ref__rows">
-                  <div class="temp-ref__row">
-                    <span data-ua="Фен (BaByliss, Dyson та ін.) — 1-й режим"
-                          data-ru="Фен (BaByliss, Dyson и др.) — 1-й режим"
-                          data-en="Hairdryer (BaByliss, Dyson etc.) — low heat">Фен (BaByliss, Dyson та ін.) — 1-й режим</span>
-                    <span>60–80°C</span>
-                  </div>
-                  <div class="temp-ref__row">
-                    <span data-ua="Фен — 2-й режим"
-                          data-ru="Фен — 2-й режим"
-                          data-en="Hairdryer — high heat">Фен — 2-й режим</span>
-                    <span>80–120°C</span>
-                  </div>
-                  <div class="temp-ref__row">
-                    <span data-ua="Праска / плойка без термостату"
-                          data-ru="Утюжок / плойка без термостата"
-                          data-en="Straightener / curler without thermostat">Праска / плойка без термостату</span>
-                    <span>180–210°C</span>
-                  </div>
-                  <div class="temp-ref__row">
-                    <span data-ua="Праска з регулятором, максимум"
-                          data-ru="Утюжок с регулятором, максимум"
-                          data-en="Straightener with dial, maximum">Праска з регулятором, максимум</span>
-                    <span>220–230°C</span>
-                  </div>
-                </div>
-              </div>
+            <div class="product__tags reveal reveal-delay-3">
+              <span class="product__tag" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
+              <span class="product__tag" data-ua="Аргінін" data-ru="Аргинин" data-en="Arginine">Аргінін</span>
+              <span class="product__tag" data-ua="Аланін" data-ru="Аланин" data-en="Alanine">Аланін</span>
+              <span class="product__tag" data-ua="Серін" data-ru="Серин" data-en="Serine">Серін</span>
+              <span class="product__tag" data-ua="Екстракт винограду" data-ru="Экстракт винограда" data-en="Grape extract">Екстракт винограду</span>
+              <span class="product__tag" data-ua="Авокадо" data-ru="Авокадо" data-en="Avocado">Авокадо</span>
             </div>
 
             <div class="product__meta reveal reveal-delay-5">
@@ -1233,98 +1054,13 @@
             </p>
 
             <!-- склад -->
-            <div class="ingredient-table reveal reveal-delay-3">
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Заповнює мікротріщини по всій довжині волосся — це і є ефект «філлера»: волосся стає зрительно густішим"
-                      data-ru="Заполняет микротрещины по всей длине волоса — именно это и есть эффект «филлера»: волосы становятся визуально гуще"
-                      data-en="Fills micro-cracks along the hair length — the actual filler effect: hair looks visibly thicker">
-                  Заповнює мікротріщини по всій довжині волосся — це і є ефект «філлера»: волосся стає зрительно густішим
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Колаген" data-ru="Коллаген" data-en="Collagen">Колаген</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Формує захисну плівку навколо волосся, додає об'єм і пружність, захищає від зовнішніх пошкоджень"
-                      data-ru="Формирует защитную плёнку вокруг волоса, добавляет объём и упругость, защищает от внешних повреждений"
-                      data-en="Forms a protective film around each hair, adds volume and bounce, shields from external damage">
-                  Формує захисну плівку навколо волосся, додає об'єм і пружність, захищає від зовнішніх пошкоджень
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Алое вера" data-ru="Алоэ вера" data-en="Aloe vera">Алое вера</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Заспокоює і зволожує, м'яко відновлює pH шкіри голови, полегшує нанесення по всій довжині"
-                      data-ru="Успокаивает и увлажняет, мягко восстанавливает pH кожи головы, облегчает нанесение по всей длине"
-                      data-en="Soothes and moisturises, gently balances scalp pH, makes application easy along full length">
-                  Заспокоює і зволожує, м'яко відновлює pH шкіри голови, полегшує нанесення по всій довжині
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Протеїн пшениці" data-ru="Протеин пшеницы" data-en="Wheat protein">Протеїн пшениці</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Зміцнює внутрішню структуру волосся, запобігає ламкості та січам, надає густоту"
-                      data-ru="Укрепляет внутреннюю структуру волоса, предотвращает ломкость и секущиеся кончики, придаёт густоту"
-                      data-en="Strengthens internal hair structure, prevents breakage and split ends, adds density">
-                  Зміцнює внутрішню структуру волосся, запобігає ламкості та січам, надає густоту
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Протеїн рису" data-ru="Протеин риса" data-en="Rice protein">Протеїн рису</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Розгладжує лусочки кутикули, надає волоссю блиск і шовковистість, полегшує розчісування"
-                      data-ru="Разглаживает чешуйки кутикулы, придаёт волосам блеск и шелковистость, облегчает расчёсывание"
-                      data-en="Smooths cuticle scales, adds shine and silkiness, makes detangling easier">
-                  Розгладжує лусочки кутикули, надає волоссю блиск і шовковистість, полегшує розчісування
-                </span>
-              </div>
-              <div class="ingredient-row">
-                <span class="ingredient-row__name" data-ua="Пантенол" data-ru="Пантенол" data-en="Panthenol">Пантенол</span>
-                <span class="ingredient-row__desc"
-                      data-ua="Утримує вологу всередині волосся після змивання, захищає від пересушення феном і сонцем"
-                      data-ru="Удерживает влагу внутри волоса после смывания, защищает от пересушивания феном и солнцем"
-                      data-en="Locks moisture inside the hair after rinsing, protects from overdrying by heat and sun">
-                  Утримує вологу всередині волосся після змивання, захищає від пересушення феном і сонцем
-                </span>
-              </div>
-            </div>
-
-            <!-- як використовувати -->
-            <div class="usage-block reveal reveal-delay-4">
-              <p class="usage-block__label"
-                 data-ua="Як використовувати"
-                 data-ru="Как использовать"
-                 data-en="How to use">Як використовувати</p>
-              <div class="usage-steps">
-                <div class="usage-step">
-                  <span class="usage-step__num">1</span>
-                  <span class="usage-step__desc"
-                        data-ua="Нанесіть на <strong>вологе волосся після шампуню</strong> по всій довжині, уникаючи коренів"
-                        data-ru="Нанесите на <strong>влажные волосы после шампуня</strong> по всей длине, избегая корней"
-                        data-en="Apply to <strong>wet hair after shampooing</strong> along the full length, avoiding roots">
-                    Нанесіть на <strong>вологе волосся після шампуню</strong> по всій довжині, уникаючи коренів
-                  </span>
-                </div>
-                <div class="usage-step">
-                  <span class="usage-step__num">2</span>
-                  <span class="usage-step__desc"
-                        data-ua="<strong>Режим бальзаму</strong> — тримайте 15–30 секунд і змийте. Щоденний догляд"
-                        data-ru="<strong>Режим бальзама</strong> — держите 15–30 секунд и смойте. Ежедневный уход"
-                        data-en="<strong>Conditioner mode</strong> — leave for 15–30 seconds, then rinse. Daily care">
-                    <strong>Режим бальзаму</strong> — тримайте 15–30 секунд і змийте. Щоденний догляд
-                  </span>
-                </div>
-                <div class="usage-step">
-                  <span class="usage-step__num">3</span>
-                  <span class="usage-step__desc"
-                        data-ua="<strong>Режим маски-філлера</strong> — тримайте до 30 хвилин і змийте. Для інтенсивного відновлення 1–2 рази на тиждень"
-                        data-ru="<strong>Режим маски-филлера</strong> — держите до 30 минут и смойте. Для интенсивного восстановления 1–2 раза в неделю"
-                        data-en="<strong>Filler mask mode</strong> — leave up to 30 minutes, then rinse. For intensive repair 1–2 times a week">
-                    <strong>Режим маски-філлера</strong> — тримайте до 30 хвилин і змийте. Для інтенсивного відновлення 1–2 рази на тиждень
-                  </span>
-                </div>
-              </div>
+            <div class="product__tags reveal reveal-delay-3">
+              <span class="product__tag" data-ua="Кератин" data-ru="Кератин" data-en="Keratin">Кератин</span>
+              <span class="product__tag" data-ua="Колаген" data-ru="Коллаген" data-en="Collagen">Колаген</span>
+              <span class="product__tag" data-ua="Алое вера" data-ru="Алоэ вера" data-en="Aloe vera">Алое вера</span>
+              <span class="product__tag" data-ua="Протеїн пшениці" data-ru="Протеин пшеницы" data-en="Wheat protein">Протеїн пшениці</span>
+              <span class="product__tag" data-ua="Протеїн рису" data-ru="Протеин риса" data-en="Rice protein">Протеїн рису</span>
+              <span class="product__tag" data-ua="Пантенол" data-ru="Пантенол" data-en="Panthenol">Пантенол</span>
             </div>
 
             <div class="product__meta reveal reveal-delay-5">
