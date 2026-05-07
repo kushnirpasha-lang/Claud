@@ -590,6 +590,237 @@
     @media (max-width: 768px) {
       .footer { flex-direction: column; gap: 16px; text-align: center; }
     }
+
+    /* ── PRODUCT DETAIL BUTTON ──────────────────────── */
+    .btn-detail {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--sans); font-size: 12px; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--teal);
+      border-bottom: 1px solid var(--teal-mid);
+      padding-bottom: 2px; margin-top: 28px;
+      cursor: pointer; background: none; border-top: none;
+      border-left: none; border-right: none;
+      transition: color 0.25s, border-color 0.25s;
+    }
+    .btn-detail:hover { color: var(--ink); border-color: var(--ink); }
+    .btn-detail__arrow { transition: transform 0.25s; }
+    .btn-detail:hover .btn-detail__arrow { transform: translateX(4px); }
+
+    /* ── PRODUCT MODAL ──────────────────────────────── */
+    .pmodal {
+      position: fixed; inset: 0; z-index: 200;
+      display: flex; align-items: stretch;
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.35s cubic-bezier(.16,1,.3,1);
+    }
+    .pmodal.open {
+      pointer-events: all; opacity: 1;
+    }
+    .pmodal__backdrop {
+      position: absolute; inset: 0;
+      background: rgba(26,26,24,0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .pmodal__drawer {
+      position: relative; z-index: 1;
+      margin-left: auto;
+      width: min(860px, 100vw);
+      height: 100vh;
+      background: var(--cream);
+      display: flex; flex-direction: column;
+      transform: translateX(60px);
+      transition: transform 0.4s cubic-bezier(.16,1,.3,1);
+      overflow: hidden;
+    }
+    .pmodal.open .pmodal__drawer { transform: translateX(0); }
+
+    .pmodal__head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 40px 24px;
+      border-bottom: 1px solid var(--cream-dark);
+      flex-shrink: 0;
+    }
+    .pmodal__brand {
+      font-family: var(--serif); font-size: 17px; font-weight: 400;
+      letter-spacing: 0.04em; color: var(--ink);
+    }
+    .pmodal__brand span { color: var(--teal); }
+    .pmodal__close {
+      width: 40px; height: 40px;
+      background: var(--cream-dark); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--gray);
+      transition: background 0.2s, color 0.2s;
+      border-radius: 2px;
+    }
+    .pmodal__close:hover { background: var(--ink); color: var(--cream); }
+
+    .pmodal__body {
+      flex: 1; overflow-y: auto;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+    }
+    @media (max-width: 640px) {
+      .pmodal__body { grid-template-columns: 1fr; }
+    }
+
+    .pmodal__visual {
+      position: sticky; top: 0;
+      height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 24px;
+      border-right: 1px solid var(--cream-dark);
+    }
+    @media (max-width: 640px) {
+      .pmodal__visual {
+        position: static; height: 220px;
+        border-right: none; border-bottom: 1px solid var(--cream-dark);
+      }
+    }
+    .pmodal__num {
+      font-family: var(--serif);
+      font-size: 120px; font-weight: 300; line-height: 1;
+      opacity: 0.14; color: inherit;
+      user-select: none;
+    }
+    .pmodal__vol-tags {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-top: 24px; width: 100%;
+    }
+    .pmodal__vol-tag {
+      font-size: 12px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gray);
+      padding: 8px 16px;
+      background: var(--cream);
+      border: 1px solid var(--cream-dark);
+      text-align: center;
+    }
+    .pmodal__ph {
+      margin-top: 20px;
+      font-size: 11px; font-weight: 400; letter-spacing: 0.1em;
+      color: var(--gray-light); text-transform: uppercase;
+    }
+
+    .pmodal__content {
+      padding: 40px 44px 60px;
+      overflow-y: auto;
+    }
+    @media (max-width: 640px) {
+      .pmodal__content { padding: 28px 24px 48px; }
+    }
+
+    .pmodal__index {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--gray-light);
+      margin-bottom: 12px;
+    }
+    .pmodal__name {
+      font-family: var(--serif);
+      font-size: clamp(34px, 4vw, 52px);
+      font-weight: 300; line-height: 1.05;
+      letter-spacing: -0.01em; margin-bottom: 6px;
+    }
+    .pmodal__sub {
+      font-family: var(--serif);
+      font-size: 20px; font-weight: 300; font-style: italic;
+      color: var(--gray); margin-bottom: 28px;
+    }
+    .pmodal__claim {
+      font-size: 16px; font-weight: 300; line-height: 1.7;
+      color: var(--ink); margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .pmodal__section-label {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--teal);
+      margin-bottom: 18px;
+    }
+    .pmodal__ing-table { margin-bottom: 40px; }
+    .pmodal__ing-row {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 16px; padding: 12px 0;
+      border-bottom: 1px solid var(--cream-dark);
+      align-items: baseline;
+    }
+    .pmodal__ing-row:first-child { border-top: 1px solid var(--cream-dark); }
+    .pmodal__ing-name {
+      font-size: 12px; font-weight: 500;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--ink);
+    }
+    .pmodal__ing-desc {
+      font-size: 13px; font-weight: 300;
+      color: var(--gray); line-height: 1.55;
+    }
+    @media (max-width: 480px) {
+      .pmodal__ing-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+
+    .pmodal__steps { margin-bottom: 32px; }
+    .pmodal__step {
+      display: flex; gap: 18px; align-items: baseline;
+      padding: 12px 0; border-bottom: 1px solid var(--cream-dark);
+    }
+    .pmodal__step:first-child { border-top: 1px solid var(--cream-dark); }
+    .pmodal__step-num {
+      font-family: var(--serif);
+      font-size: 24px; font-weight: 300;
+      color: var(--teal); opacity: 0.5;
+      min-width: 28px; flex-shrink: 0;
+      line-height: 1; margin-top: 2px;
+    }
+    .pmodal__step-text {
+      font-size: 14px; font-weight: 300;
+      color: var(--gray); line-height: 1.6;
+    }
+    .pmodal__step-text strong { font-weight: 500; color: var(--ink); }
+
+    .pmodal__tempref {
+      padding: 14px 18px;
+      background: rgba(28,28,24,0.04);
+      border-left: 2px solid var(--cream-dark);
+      margin-bottom: 40px;
+    }
+    .pmodal__tempref-label {
+      font-size: 9px; font-weight: 500; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gray-light); margin-bottom: 10px;
+    }
+    .pmodal__tempref-row {
+      display: flex; justify-content: space-between; gap: 12px;
+      font-size: 12px; font-weight: 300; color: var(--gray-light);
+      padding: 4px 0;
+    }
+    .pmodal__tempref-row span:last-child { font-weight: 500; color: var(--gray); white-space: nowrap; }
+
+    .pmodal__cta {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      padding-top: 32px; border-top: 1px solid var(--cream-dark);
+    }
+    .pmodal__cta-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: var(--sans); font-size: 12px; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 14px 28px; cursor: pointer;
+      transition: background 0.25s, color 0.25s;
+      border: 1.5px solid var(--ink);
+      background: var(--ink); color: var(--cream);
+    }
+    .pmodal__cta-btn:hover { background: var(--teal); border-color: var(--teal); }
+    .pmodal__cta-ghost {
+      font-family: var(--sans); font-size: 12px; font-weight: 400;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gray); border-bottom: 1px solid var(--gray-light);
+      padding-bottom: 2px; cursor: pointer; align-self: center;
+      transition: color 0.25s;
+    }
+    .pmodal__cta-ghost:hover { color: var(--ink); border-color: var(--ink); }
   </style>
 </head>
 
@@ -797,6 +1028,12 @@
               <span class="product__vol">200 · 50 · 20 мл</span>
               <span>pH 4.5–5.0</span>
             </div>
+            <button class="btn-detail reveal reveal-delay-5" onclick="openModal('cream')"
+                    data-ua="Детальніше про продукт"
+                    data-ru="Подробнее о продукте"
+                    data-en="Full product details">
+              Детальніше про продукт <span class="btn-detail__arrow">→</span>
+            </button>
           </div>
         </div>
       </div>
@@ -955,6 +1192,12 @@
               <span class="product__vol">200 · 50 · 20 мл</span>
               <span>pH 4.5–5.0</span>
             </div>
+            <button class="btn-detail reveal reveal-delay-5" onclick="openModal('thermo')"
+                    data-ua="Детальніше про продукт"
+                    data-ru="Подробнее о продукте"
+                    data-en="Full product details">
+              Детальніше про продукт <span class="btn-detail__arrow">→</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1088,6 +1331,12 @@
               <span class="product__vol">200 · 50 · 20 мл</span>
               <span>pH 5.0–6.0</span>
             </div>
+            <button class="btn-detail reveal reveal-delay-5" onclick="openModal('filler')"
+                    data-ua="Детальніше про продукт"
+                    data-ru="Подробнее о продукте"
+                    data-en="Full product details">
+              Детальніше про продукт <span class="btn-detail__arrow">→</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1321,6 +1570,27 @@
     </div>
   </footer>
 
+  <!-- ═══════════════════════════════════ PRODUCT MODAL ═══ -->
+  <div class="pmodal" id="pmodal" role="dialog" aria-modal="true">
+    <div class="pmodal__backdrop" onclick="closeModal()"></div>
+    <div class="pmodal__drawer">
+      <div class="pmodal__head">
+        <span class="pmodal__brand">HAiR <span>L♡VE</span></span>
+        <button class="pmodal__close" onclick="closeModal()" aria-label="Закрити">✕</button>
+      </div>
+      <div class="pmodal__body">
+        <!-- left: color panel -->
+        <div class="pmodal__visual" id="pmodal-visual">
+          <span class="pmodal__num" id="pmodal-num">01</span>
+          <div class="pmodal__vol-tags" id="pmodal-vols"></div>
+          <p class="pmodal__ph" id="pmodal-ph"></p>
+        </div>
+        <!-- right: content -->
+        <div class="pmodal__content" id="pmodal-content"></div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ── LANGUAGE ─────────────────────────────────────────
     let currentLang = 'ua';
@@ -1357,6 +1627,204 @@
     }, { threshold: 0.1 });
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ── PRODUCT MODAL DATA ───────────────────────────────
+    const PRODUCTS = {
+      cream: {
+        num: '01',
+        bg: '#D6EDED', color: '#1E5C5C',
+        vols: ['200 мл', '50 мл', '20 мл (тестер)'],
+        ph: 'pH 4.5–5.0',
+        name: { ua: 'Крем-спрей<br>20 в 1', ru: 'Крем-спрей<br>20 в 1', en: 'Cream-spray<br>20 in 1' },
+        sub:  { ua: 'для всіх типів волосся', ru: 'для всех типов волос', en: 'for all hair types' },
+        claim: {
+          ua: 'Наноситься на вологе волосся. Не змивається. Живить, зволожує, прибирає пухнастість — і не обтяжує. 20 функцій в одному флаконі: від термозахисту до розгладження та блиску.',
+          ru: 'Наносится на влажные волосы. Не смывается. Питает, увлажняет, убирает пушистость — и не утяжеляет. 20 функций в одном флаконе: от термозащиты до разглаживания и блеска.',
+          en: 'Applied to damp hair. Leave-in formula. Nourishes, hydrates, removes frizz — without weighing down. 20 functions in one bottle: from heat protection to smoothing and shine.'
+        },
+        ings: [
+          { name: { ua:'Кератин', ru:'Кератин', en:'Keratin' },
+            desc: { ua:'Заповнює мікропошкодження і пори волосся, відновлює структуру зсередини, зменшує пухнастість', ru:'Заполняет микроповреждения и поры волоса, восстанавливает структуру изнутри, уменьшает пушистость', en:'Fills micro-damage, restores structure from within, reduces frizz' } },
+          { name: { ua:'Масло арганії', ru:'Масло арганы', en:'Argan oil' },
+            desc: { ua:'Живить волокна, захищає від втрати вологи, надає природний блиск без жирності', ru:'Питает волокна, защищает от потери влаги, придаёт блеск без жирности', en:'Nourishes fibres, locks moisture, adds natural shine without greasiness' } },
+          { name: { ua:'Шовк', ru:'Шёлк', en:'Silk' },
+            desc: { ua:'Робить волосся слухняним і легким, полегшує розчісування, захищає від механічного пошкодження', ru:'Делает волосы послушными и лёгкими, облегчает расчёсывание', en:'Makes hair manageable, eases detangling, protects from mechanical damage' } },
+          { name: { ua:'Макадамія', ru:'Макадамия', en:'Macadamia' },
+            desc: { ua:'Відновлює ліпідний шар кутикули, захищає від зламу, надає м\'якість на дотик', ru:'Восстанавливает липидный слой кутикулы, защищает от ломкости', en:'Restores the cuticle lipid layer, protects against breakage' } },
+          { name: { ua:'Пантенол', ru:'Пантенол', en:'Panthenol' },
+            desc: { ua:'Зволожує зсередини, захищає від сонячного впливу, підвищує еластичність', ru:'Увлажняет изнутри, защищает от солнца, повышает эластичность', en:'Moisturises from within, shields from UV, increases elasticity' } },
+          { name: { ua:'Сфінголіпіди', ru:'Сфинголипиды', en:'Sphingolipids' },
+            desc: { ua:'Зміцнюють захисну оболонку волосся, запечатують лусочки кутикули, утримують вологу', ru:'Укрепляют защитную оболочку, запечатывают кутикулу, удерживают влагу', en:'Strengthen hair\'s protective layer, seal cuticle scales, retain moisture' } },
+        ],
+        steps: [
+          { ua:'Вимийте волосся шампунем, злегка промокніть рушником — волосся має бути <strong>вологим, не мокрим</strong>', ru:'Вымойте волосы шампунем, промокните полотенцем — волосы должны быть <strong>влажными, не мокрыми</strong>', en:'Shampoo hair, blot with towel — hair should be <strong>damp, not soaking wet</strong>' },
+          { ua:'Нанесіть крем-спрей по всій довжині, <strong>уникаючи коренів</strong>', ru:'Нанесите по всей длине, <strong>избегая корней</strong>', en:'Apply along full length, <strong>avoiding roots</strong>' },
+          { ua:'<strong>Не змивайте</strong> — укладайте феном або залиште сохнути природньо', ru:'<strong>Не смывайте</strong> — укладывайте феном или оставьте сохнуть', en:'<strong>Do not rinse</strong> — blow-dry or air-dry as usual' },
+        ],
+        tempref: null,
+      },
+      thermo: {
+        num: '02',
+        bg: '#EDE0E0', color: '#C9A8A8',
+        vols: ['200 мл', '50 мл', '20 мл (тестер)'],
+        ph: 'pH 4.5–5.0',
+        name: { ua: 'Термо-<br>протектор', ru: 'Термо-<br>протектор', en: 'Thermo<br>protector' },
+        sub:  { ua: 'спрей-захист', ru: 'спрей-защита', en: 'protective spray' },
+        claim: {
+          ua: 'Захист до 220°C. Від жару фену та праски, від сонця, від морозу — все в одному нанесенні. На вологе або сухе волосся перед укладкою.',
+          ru: 'Защита до 220°C. От жара фена и утюжка, от солнца, от мороза — всё в одном нанесении. На влажные или сухие волосы перед укладкой.',
+          en: 'Protection up to 220°C. From heat tools, sun and frost — all in one application. On wet or dry hair before styling.'
+        },
+        ings: [
+          { name: { ua:'Кератин', ru:'Кератин', en:'Keratin' },
+            desc: { ua:'Відновлює волокна волосся, утворює захисний шар навколо стрижня під час теплового впливу', ru:'Восстанавливает волокна, образует защитный слой под тепловым воздействием', en:'Repairs hair fibres, forms a protective shield during heat styling' } },
+          { name: { ua:'Аргінін', ru:'Аргинин', en:'Arginine' },
+            desc: { ua:'Амінокислота — підтримує мікроструктуру волосся при нагріванні, зменшує теплове пошкодження', ru:'Аминокислота — поддерживает микроструктуру при нагревании, уменьшает повреждение', en:'Amino acid — supports hair microstructure under heat, reduces thermal damage' } },
+          { name: { ua:'Аланін · Серін', ru:'Аланин · Серин', en:'Alanine · Serine' },
+            desc: { ua:'Амінокислоти зволоження — утримують воду всередині структури волосся навіть під феном', ru:'Аминокислоты увлажнения — удерживают воду внутри структуры даже под феном', en:'Moisturising amino acids — retain water inside the hair structure even under heat' } },
+          { name: { ua:'Екстракт винограду', ru:'Экстракт винограда', en:'Grape extract' },
+            desc: { ua:'Антиоксидант — нейтралізує вільні радикали від УФ і теплового стресу, захищає від вигорання', ru:'Антиоксидант — нейтрализует свободные радикалы, защищает от выгорания', en:'Antioxidant — neutralises free radicals from UV and heat stress' } },
+          { name: { ua:'Авокадо', ru:'Авокадо', en:'Avocado' },
+            desc: { ua:'Пом\'якшує і живить, захищає від сухості в мороз і від агресивного сонця влітку', ru:'Смягчает и питает, защищает от сухости в мороз и от солнца летом', en:'Softens and nourishes, protects from winter dryness and harsh summer sun' } },
+        ],
+        steps: [
+          { ua:'Нанесіть на <strong>вологе або сухе волосся</strong> рівномірно по всій довжині', ru:'Нанесите на <strong>влажные или сухие волосы</strong> равномерно по всей длине', en:'Apply to <strong>wet or dry hair</strong> evenly along the full length' },
+          { ua:'Зачекайте <strong>30 секунд</strong> перед використанням фену або праски', ru:'Подождите <strong>30 секунд</strong> перед феном или утюжком', en:'Wait <strong>30 seconds</strong> before using a hairdryer or straightener' },
+          { ua:'Укладайте як звично — захист активний до <strong>220°C</strong>', ru:'Укладывайте как обычно — защита активна до <strong>220°C</strong>', en:'Style as usual — protection is active up to <strong>220°C</strong>' },
+        ],
+        tempref: {
+          label: { ua:'Температура інструментів — довідка', ru:'Температура инструментов — справка', en:'Tool temperature reference' },
+          rows: [
+            { label: { ua:'Фен (BaByliss, Dyson та ін.) — 1-й режим', ru:'Фен (BaByliss, Dyson и др.) — 1-й режим', en:'Hairdryer — low heat' }, val:'60–80°C' },
+            { label: { ua:'Фен — 2-й режим', ru:'Фен — 2-й режим', en:'Hairdryer — high heat' }, val:'80–120°C' },
+            { label: { ua:'Праска / плойка без термостату', ru:'Утюжок / плойка без термостата', en:'Straightener / curler without thermostat' }, val:'180–210°C' },
+            { label: { ua:'Праска з регулятором, максимум', ru:'Утюжок с регулятором, максимум', en:'Straightener with dial, max' }, val:'220–230°C' },
+          ]
+        },
+      },
+      filler: {
+        num: '03',
+        bg: '#E0EDE0', color: '#B4CEB4',
+        vols: ['200 мл', '50 мл', '20 мл (тестер)'],
+        ph: 'pH 5.0–6.0',
+        name: { ua: 'Ламелярна<br>маска-філлер', ru: 'Ламелярная<br>маска-филлер', en: 'Lamellar<br>filler-mask' },
+        sub:  { ua: 'рідка ламелярна', ru: 'жидкая ламелярная', en: 'liquid lamellar' },
+        claim: {
+          ua: 'Два режими в одному флаконі. 15–30 секунд — щоденний бальзам після шампуню. До 30 хвилин — інтенсивна маска-філлер для глибокого відновлення 1–2 рази на тиждень.',
+          ru: 'Два режима в одном флаконе. 15–30 секунд — ежедневный бальзам после шампуня. До 30 минут — интенсивная маска-филлер для глубокого восстановления 1–2 раза в неделю.',
+          en: 'Two modes in one bottle. 15–30 seconds — daily conditioner after shampoo. Up to 30 minutes — intensive filler mask for deep repair 1–2 times a week.'
+        },
+        ings: [
+          { name: { ua:'Кератин', ru:'Кератин', en:'Keratin' },
+            desc: { ua:'Заповнює мікротріщини по всій довжині волосся — це і є ефект «філлера»: волосся стає зрительно густішим', ru:'Заполняет микротрещины — эффект «филлера»: волосы становятся визуально гуще', en:'Fills micro-cracks along the hair length — the actual filler effect: hair looks visibly thicker' } },
+          { name: { ua:'Колаген', ru:'Коллаген', en:'Collagen' },
+            desc: { ua:'Формує захисну плівку, додає об\'єм і пружність, захищає від зовнішніх пошкоджень', ru:'Формирует защитную плёнку, добавляет объём и упругость', en:'Forms a protective film, adds volume and bounce, shields from external damage' } },
+          { name: { ua:'Алое вера', ru:'Алоэ вера', en:'Aloe vera' },
+            desc: { ua:'Заспокоює і зволожує, м\'яко відновлює pH шкіри голови', ru:'Успокаивает и увлажняет, мягко восстанавливает pH кожи головы', en:'Soothes and moisturises, gently balances scalp pH' } },
+          { name: { ua:'Протеїн пшениці', ru:'Протеин пшеницы', en:'Wheat protein' },
+            desc: { ua:'Зміцнює внутрішню структуру волосся, запобігає ламкості та січам', ru:'Укрепляет структуру, предотвращает ломкость и секущиеся кончики', en:'Strengthens internal hair structure, prevents breakage and split ends' } },
+          { name: { ua:'Протеїн рису', ru:'Протеин риса', en:'Rice protein' },
+            desc: { ua:'Розгладжує лусочки кутикули, надає блиск і шовковистість', ru:'Разглаживает кутикулу, придаёт блеск и шелковистость', en:'Smooths cuticle scales, adds shine and silkiness' } },
+          { name: { ua:'Пантенол', ru:'Пантенол', en:'Panthenol' },
+            desc: { ua:'Утримує вологу всередині волосся після змивання, захищає від пересушення', ru:'Удерживает влагу после смывания, защищает от пересушивания', en:'Locks moisture after rinsing, protects from overdrying' } },
+        ],
+        steps: [
+          { ua:'Нанесіть на <strong>вологе волосся після шампуню</strong> по всій довжині, уникаючи коренів', ru:'Нанесите на <strong>влажные волосы после шампуня</strong> по всей длине, избегая корней', en:'Apply to <strong>wet hair after shampooing</strong> along full length, avoiding roots' },
+          { ua:'<strong>Режим бальзаму</strong> — тримайте 15–30 секунд і змийте', ru:'<strong>Режим бальзама</strong> — держите 15–30 секунд и смойте', en:'<strong>Conditioner mode</strong> — leave 15–30 seconds, then rinse' },
+          { ua:'<strong>Режим маски-філлера</strong> — тримайте до 30 хвилин і змийте. 1–2 рази на тиждень', ru:'<strong>Режим маски-филлера</strong> — держите до 30 минут и смойте. 1–2 раза в неделю', en:'<strong>Filler mask mode</strong> — leave up to 30 minutes, rinse. 1–2 times a week' },
+        ],
+        tempref: null,
+      },
+    };
+
+    const L = {
+      ingredients: { ua:'Склад та дія', ru:'Состав и действие', en:'Ingredients & action' },
+      howto:       { ua:'Як використовувати', ru:'Как использовать', en:'How to use' },
+      contact:     { ua:'Зв\'язатися з нами', ru:'Связаться с нами', en:'Get in touch' },
+      tester:      { ua:'Замовити тестер', ru:'Заказать тестер', en:'Request tester' },
+    };
+
+    function openModal(key) {
+      const p = PRODUCTS[key];
+      const lang = currentLang;
+
+      // visual panel
+      const visual = document.getElementById('pmodal-visual');
+      visual.style.background = p.bg;
+      visual.style.color = p.color;
+      document.getElementById('pmodal-num').textContent = p.num;
+      document.getElementById('pmodal-vols').innerHTML =
+        p.vols.map(v => `<span class="pmodal__vol-tag">${v}</span>`).join('');
+      document.getElementById('pmodal-ph').textContent = p.ph;
+
+      // content
+      let html = `
+        <p class="pmodal__index">${p.num}</p>
+        <h2 class="pmodal__name">${p.name[lang]}</h2>
+        <p class="pmodal__sub">${p.sub[lang]}</p>
+        <p class="pmodal__claim">${p.claim[lang]}</p>
+
+        <p class="pmodal__section-label">${L.ingredients[lang]}</p>
+        <div class="pmodal__ing-table">
+          ${p.ings.map(ing => `
+            <div class="pmodal__ing-row">
+              <span class="pmodal__ing-name">${ing.name[lang]}</span>
+              <span class="pmodal__ing-desc">${ing.desc[lang]}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <p class="pmodal__section-label">${L.howto[lang]}</p>
+        <div class="pmodal__steps">
+          ${p.steps.map((s,i) => `
+            <div class="pmodal__step">
+              <span class="pmodal__step-num">${i+1}</span>
+              <span class="pmodal__step-text">${s[lang]}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      if (p.tempref) {
+        html += `
+          <div class="pmodal__tempref">
+            <p class="pmodal__tempref-label">${p.tempref.label[lang]}</p>
+            ${p.tempref.rows.map(r => `
+              <div class="pmodal__tempref-row">
+                <span>${r.label[lang]}</span>
+                <span>${r.val}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="pmodal__cta">
+          <a href="#contact" class="pmodal__cta-btn" onclick="closeModal()">
+            ${L.contact[lang]}
+          </a>
+          <a href="#contact" class="pmodal__cta-ghost" onclick="closeModal()">
+            ${L.tester[lang]}
+          </a>
+        </div>
+      `;
+
+      document.getElementById('pmodal-content').innerHTML = html;
+      document.getElementById('pmodal-content').scrollTop = 0;
+
+      document.getElementById('pmodal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('pmodal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
 
     // ── FORM ─────────────────────────────────────────────
     function handleSubmit(e) {
