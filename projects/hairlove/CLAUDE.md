@@ -20,6 +20,7 @@
 | instagram | контент и соцсети | artifacts/instagram/ |
 | copy | тексты и копирайтинг | artifacts/copy/ |
 | text-editor | финальная вычитка | — |
+| brandbook | визуальная и вербальная идентичность | artifacts/brandbook/ |
 
 ## База знаний
 Читать перед любой задачей: `knowledge/`
