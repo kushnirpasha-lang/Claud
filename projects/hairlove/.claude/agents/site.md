@@ -11,6 +11,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch
 - `knowledge/компания.md`
 - `knowledge/продукт.md`
 - `knowledge/аудитория.md`
+- `CLAUDE.md` — полный контекст проекта (продукты, цены, бренд)
 - `knowledge/бренд.md`
 - последний файл из `artifacts/strategy/`
 - последние 2 файла из `artifacts/site/` (если есть)
