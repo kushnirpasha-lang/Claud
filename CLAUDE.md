@@ -18,12 +18,16 @@
 - **Main ветка:** только для workflow файлов (tg-check.yml, deploy.yml)
 - **Deploy:** автоматически при push в `claude/obshak`
 
-## Git Push — ОБЯЗАТЕЛЬНО при старте каждой сессии
-Прокси Claude Code не имеет write-доступа к GitHub. **Первая команда в любой сессии:**
+## Git Push — как это работает
+
+Push настроен автоматически через `/usr/bin/git` wrapper и `pushurl` в `.git/config`.
+**Ничего не нужно делать вручную при старте сессии — просто пушь как обычно.**
+
+Если вдруг ошибка "токен не найден" или 403:
 ```bash
-git remote set-url --push origin https://kushnirpasha-lang:$(git config --global github.token)@github.com/kushnirpasha-lang/Claud.git
+git config --global github.token $(cat /home/user/Claud/.git/pat)
 ```
-Токен хранится в `~/.gitconfig` (ключ `github.token`). Без этого — 403 на каждый push.
+Токен хранится в `/home/user/Claud/.git/pat` — этот файл не в git-репозитории, но сохраняется между сессиями на одной VM.
 
 ## Структура ассистента (`/opt/assistant/`)
 ```
