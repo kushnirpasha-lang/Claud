@@ -1,3 +1,4 @@
 2026-05-07 — coordinator: запуск, старт онбординга
 2026-05-07 — coordinator: онбординг завершён, база знаний записана, переход к scaffold (Этап 1)
 2026-05-07 — scaffold-agent: TypeScript-скелет создан в /home/user/mikhtavai/, git init, initial commit d5780f2
+2026-05-07 — coordinator: репо kushnirpasha-lang/mikhtavai создан, код запушен, ANTHROPIC_API_KEY добавлен в Secrets — Этап 1 завершён
