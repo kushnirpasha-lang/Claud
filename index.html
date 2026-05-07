@@ -292,6 +292,30 @@
     }
 
     /* ── INGREDIENT DETAIL TABLE ────────────────────── */
+    /* ── TEMPERATURE REFERENCE ─────────────────────── */
+    .temp-ref {
+      margin-top: 24px;
+      padding: 14px 18px;
+      background: rgba(28,28,28,0.03);
+      border-left: 2px solid var(--cream-dark);
+    }
+    .temp-ref__label {
+      font-size: 9px; font-weight: 500;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gray-light); margin-bottom: 10px;
+    }
+    .temp-ref__rows { display: flex; flex-direction: column; gap: 5px; }
+    .temp-ref__row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 16px;
+      font-size: 12px; font-weight: 300;
+      color: var(--gray-light); line-height: 1.4;
+    }
+    .temp-ref__row span:last-child {
+      font-weight: 500; color: var(--gray);
+      white-space: nowrap; flex-shrink: 0;
+    }
+
     .ingredient-table {
       margin-bottom: 44px;
       border-top: 1px solid var(--cream-dark);
@@ -889,6 +913,40 @@
                         data-en="Style as usual — protection is active up to <strong>220°C</strong>, no reapplication needed">
                     Укладайте як звично — захист активний до <strong>220°C</strong>, повторне нанесення не потрібне
                   </span>
+                </div>
+              </div>
+
+              <!-- temperature reference -->
+              <div class="temp-ref">
+                <p class="temp-ref__label"
+                   data-ua="Температура інструментів — довідка"
+                   data-ru="Температура инструментов — справка"
+                   data-en="Tool temperature reference">Температура інструментів — довідка</p>
+                <div class="temp-ref__rows">
+                  <div class="temp-ref__row">
+                    <span data-ua="Фен (BaByliss, Dyson та ін.) — 1-й режим"
+                          data-ru="Фен (BaByliss, Dyson и др.) — 1-й режим"
+                          data-en="Hairdryer (BaByliss, Dyson etc.) — low heat">Фен (BaByliss, Dyson та ін.) — 1-й режим</span>
+                    <span>60–80°C</span>
+                  </div>
+                  <div class="temp-ref__row">
+                    <span data-ua="Фен — 2-й режим"
+                          data-ru="Фен — 2-й режим"
+                          data-en="Hairdryer — high heat">Фен — 2-й режим</span>
+                    <span>80–120°C</span>
+                  </div>
+                  <div class="temp-ref__row">
+                    <span data-ua="Праска / плойка без термостату"
+                          data-ru="Утюжок / плойка без термостата"
+                          data-en="Straightener / curler without thermostat">Праска / плойка без термостату</span>
+                    <span>180–210°C</span>
+                  </div>
+                  <div class="temp-ref__row">
+                    <span data-ua="Праска з регулятором, максимум"
+                          data-ru="Утюжок с регулятором, максимум"
+                          data-en="Straightener with dial, maximum">Праска з регулятором, максимум</span>
+                    <span>220–230°C</span>
+                  </div>
                 </div>
               </div>
             </div>
