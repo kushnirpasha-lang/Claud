@@ -18,7 +18,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py,assistant/instagram_client.py,assistant/google_drive_client.py,assistant/image_processor.py,assistant/image_ai_processor.py,assistant/static/agents.html,assistant/static/index.html,assistant/static/instagram.html,assistant/static/dashboard.html"
+          source: "assistant/main.py,assistant/telethon_user.py,assistant/requirements.txt,assistant/bot.py,assistant/claude_client.py,assistant/web.py,assistant/trello_client.py,assistant/instagram_client.py,assistant/google_drive_client.py,assistant/image_processor.py,assistant/image_ai_processor.py,assistant/static/agents.html,assistant/static/index.html,assistant/static/instagram.html,assistant/static/dashboard.html,assistant/static/map.html"
           target: /opt/assistant
           strip_components: 1
 
