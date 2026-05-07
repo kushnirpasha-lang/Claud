@@ -14,9 +14,16 @@
 
 ## Репозиторий
 - **GitHub:** `kushnirpasha-lang/Claud`
-- **Рабочая ветка:** `claude/setup-digitalocean-vps-4Ij39`
+- **Рабочая ветка:** `claude/obshak`
 - **Main ветка:** только для workflow файлов (tg-check.yml, deploy.yml)
-- **Deploy:** автоматически при push в `claude/setup-digitalocean-vps-4Ij39`
+- **Deploy:** автоматически при push в `claude/obshak`
+
+## Git Push — ОБЯЗАТЕЛЬНО при старте каждой сессии
+Прокси Claude Code не имеет write-доступа к GitHub. **Первая команда в любой сессии:**
+```bash
+git remote set-url --push origin https://kushnirpasha-lang:$(git config --global github.token)@github.com/kushnirpasha-lang/Claud.git
+```
+Токен хранится в `~/.gitconfig` (ключ `github.token`). Без этого — 403 на каждый push.
 
 ## Структура ассистента (`/opt/assistant/`)
 ```
