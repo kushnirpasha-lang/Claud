@@ -1,0 +1,26 @@
+name: Deploy assistant to server
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assistant/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy files and restart via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 188.166.67.237
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /opt/assistant
+            git fetch origin main
+            git checkout origin/main -- static/
+            systemctl restart assistant.service
+            echo "Deployed $(date)"
