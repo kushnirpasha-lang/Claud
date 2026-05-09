@@ -61,6 +61,7 @@
   .panel { display: none; }
   .panel.active { display: block; }
 
+  /* ── OVERVIEW ── */
   .overview { padding: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   @media (max-width: 860px) { .overview { grid-template-columns: 1fr; } }
 
@@ -133,7 +134,7 @@
   .file-remove { cursor: pointer; font-size: 14px; opacity: 0.6; flex-shrink: 0; }
   .file-remove:hover { opacity: 1; }
 
-  /* UPLOAD PANEL */
+  /* ── UPLOAD PANEL ── */
   .upload-panel { padding: 20px 16px; max-width: 680px; }
   .upload-panel h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
   .upload-panel > p { font-size: 13px; color: var(--gray); line-height: 1.5; margin-bottom: 16px; }
@@ -157,7 +158,133 @@
   .upload-item-del:hover { opacity: 1; }
   .upload-empty { text-align: center; padding: 30px; color: var(--gray-light); font-size: 13px; }
 
-  /* REGULATORY PANEL */
+  /* ── TASKS PANEL ── */
+  .tasks-panel { padding: 16px; max-width: 860px; }
+  .tasks-panel-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .tasks-panel-top h2 { font-size: 16px; font-weight: 700; }
+  .btn-add { display: inline-flex; align-items: center; gap: 5px; background: var(--teal); color: white;
+             font-size: 12px; font-weight: 600; border: none; border-radius: 8px; padding: 8px 14px;
+             cursor: pointer; transition: opacity 0.15s; }
+  .btn-add:hover { opacity: 0.85; }
+
+  .task-filters { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .task-filter-btn { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+                     border: 1px solid var(--border); background: white; cursor: pointer;
+                     color: var(--gray); transition: all 0.15s; }
+  .task-filter-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
+
+  .task-list { display: flex; flex-direction: column; gap: 8px; }
+  .task-card { background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .task-card.done-task { opacity: 0.6; }
+  .task-card-main { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; cursor: pointer; }
+  .task-cb { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+             flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+             font-size: 12px; cursor: pointer; transition: all 0.15s; margin-top: 1px; }
+  .task-card.done-task .task-cb { background: var(--green); border-color: var(--green); color: white; }
+  .task-card-body { flex: 1; min-width: 0; }
+  .task-title { font-size: 13px; font-weight: 600; line-height: 1.35; }
+  .task-card.done-task .task-title { text-decoration: line-through; color: var(--gray); }
+  .task-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; align-items: center; }
+  .task-assignee { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
+  .task-assignee.pavlo  { background: #E8F4FF; color: #1565C0; }
+  .task-assignee.maks   { background: #FFF3E0; color: #E65100; }
+  .task-assignee.both   { background: #F3E5F5; color: #6A1B9A; }
+  .task-priority { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .task-priority.critical { background: #FFEBEE; color: var(--red); }
+  .task-priority.urgent   { background: #FFF8E1; color: #E65100; }
+  .task-priority.normal   { background: #E8F5E9; color: #2E7D32; }
+  .task-toggle { color: var(--gray-light); font-size: 10px; flex-shrink: 0; margin-top: 3px; }
+
+  .task-expand { display: none; padding: 0 14px 12px 46px; }
+  .task-card.open-task .task-expand { display: block; }
+  .task-note-input { width: 100%; border: 1px solid var(--border); border-radius: 6px;
+                     padding: 6px 8px; font-size: 12px; font-family: inherit;
+                     resize: vertical; min-height: 44px; color: var(--ink);
+                     background: var(--cream); outline: none; }
+  .task-note-input:focus { border-color: var(--teal); }
+  .task-del-btn { margin-top: 8px; font-size: 11px; color: var(--red); cursor: pointer;
+                  background: none; border: none; padding: 0; opacity: 0.7; }
+  .task-del-btn:hover { opacity: 1; }
+
+  .task-form-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+                       z-index: 100; align-items: center; justify-content: center; }
+  .task-form-overlay.open { display: flex; }
+  .task-form { background: white; border-radius: 14px; padding: 24px; width: 100%; max-width: 420px;
+               margin: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+  .task-form h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+  .form-row { margin-bottom: 12px; }
+  .form-label { font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase;
+                letter-spacing: 0.08em; display: block; margin-bottom: 4px; }
+  .form-input { width: 100%; border: 1px solid var(--border); border-radius: 7px;
+                padding: 8px 10px; font-size: 13px; font-family: inherit; color: var(--ink);
+                background: var(--cream); outline: none; }
+  .form-input:focus { border-color: var(--teal); }
+  .form-select { width: 100%; border: 1px solid var(--border); border-radius: 7px;
+                 padding: 8px 10px; font-size: 13px; font-family: inherit; color: var(--ink);
+                 background: var(--cream); outline: none; cursor: pointer; }
+  .form-select:focus { border-color: var(--teal); }
+  .form-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .btn-cancel { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px;
+                border: 1px solid var(--border); background: white; cursor: pointer; color: var(--gray); }
+  .btn-save { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px;
+              border: none; background: var(--teal); color: white; cursor: pointer; }
+  .task-empty { text-align: center; padding: 40px; color: var(--gray-light); font-size: 13px; }
+
+  /* ── COMMS PANEL ── */
+  .comms-panel { padding: 16px; max-width: 860px; }
+  .comms-panel-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .comms-panel-top h2 { font-size: 16px; font-weight: 700; }
+
+  .comm-card { background: white; border: 1px solid var(--border); border-radius: 10px;
+               overflow: hidden; margin-bottom: 10px; }
+  .comm-card-header { display: flex; align-items: flex-start; gap: 10px; padding: 14px;
+                      cursor: pointer; }
+  .comm-card-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .comm-card-info { flex: 1; min-width: 0; }
+  .comm-card-title { font-size: 13px; font-weight: 700; line-height: 1.3; }
+  .comm-card-sub   { font-size: 11px; color: var(--gray); margin-top: 3px; }
+  .comm-status { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .comm-status.sent    { background: #E8F4FF; color: #1565C0; }
+  .comm-status.waiting { background: #FFF8E1; color: #E65100; }
+  .comm-status.replied { background: #E8F5E9; color: #2E7D32; }
+  .comm-toggle { color: var(--gray-light); font-size: 10px; flex-shrink: 0; margin-top: 4px; }
+
+  .comm-body { display: none; padding: 0 14px 14px; }
+  .comm-card.open-comm .comm-body { display: block; }
+
+  .comm-section-label { font-size: 10px; font-weight: 700; color: var(--teal); text-transform: uppercase;
+                         letter-spacing: 0.08em; margin-bottom: 5px; margin-top: 12px; }
+  .comm-letter { background: var(--cream); border: 1px solid var(--border); border-radius: 8px;
+                 padding: 12px 14px; font-size: 12px; line-height: 1.7; white-space: pre-wrap;
+                 color: var(--ink); max-height: 300px; overflow-y: auto; }
+  .comm-copy-btn { margin-top: 6px; font-size: 11px; font-weight: 600; color: var(--teal);
+                   background: var(--teal-light); border: none; border-radius: 6px;
+                   padding: 5px 12px; cursor: pointer; transition: opacity 0.15s; }
+  .comm-copy-btn:hover { opacity: 0.8; }
+  .comm-response-area { width: 100%; border: 1px solid var(--border); border-radius: 8px;
+                        padding: 10px 12px; font-size: 12px; font-family: inherit;
+                        resize: vertical; min-height: 80px; color: var(--ink);
+                        background: var(--cream); outline: none; margin-top: 4px; }
+  .comm-response-area:focus { border-color: var(--teal); }
+  .comm-status-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .comm-status-btn { font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px;
+                     border: 1px solid var(--border); background: white; cursor: pointer;
+                     color: var(--gray); transition: all 0.15s; }
+  .comm-status-btn.active.sent    { background: #1565C0; color: white; border-color: #1565C0; }
+  .comm-status-btn.active.waiting { background: #E65100; color: white; border-color: #E65100; }
+  .comm-status-btn.active.replied { background: var(--green); color: white; border-color: var(--green); }
+
+  .comm-del-btn { margin-top: 10px; font-size: 11px; color: var(--red); cursor: pointer;
+                  background: none; border: none; padding: 0; opacity: 0.7; }
+  .comm-del-btn:hover { opacity: 1; }
+
+  /* New comm form */
+  .new-comm-form { background: white; border: 1px dashed var(--border); border-radius: 10px;
+                   padding: 16px; margin-top: 10px; display: none; }
+  .new-comm-form.open { display: block; }
+  .new-comm-form h4 { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+
+  /* ── REGULATORY PANEL ── */
   .reg-panel { padding: 20px 16px; max-width: 860px; }
   .reg-hero { background: var(--teal); color: white; border-radius: 12px;
               padding: 20px 24px; margin-bottom: 20px; }
@@ -253,6 +380,12 @@ alter publication supabase_realtime add table tracker_state;</div>
   <div class="tab" onclick="switchTab('upload')">
     &#128204; Документи <span class="tab-badge" id="badge-upload">0</span>
   </div>
+  <div class="tab" onclick="switchTab('tasks')">
+    &#9989; Завдання <span class="tab-badge" id="badge-tasks">0</span>
+  </div>
+  <div class="tab" onclick="switchTab('comms')">
+    &#128140; Комунікації <span class="tab-badge" id="badge-comms">0</span>
+  </div>
   <div class="tab" onclick="switchTab('regulatory')">
     &#128218; Нормативна база
   </div>
@@ -288,6 +421,53 @@ alter publication supabase_realtime add table tracker_state;</div>
            onchange="handleGlobalUpload(this.files)">
     <div class="upload-list" id="globalUploadList">
       <div class="upload-empty">Документів ще немає</div>
+    </div>
+  </div>
+</div>
+
+<!-- TASKS -->
+<div class="panel" id="panel-tasks">
+  <div class="tasks-panel">
+    <div class="tasks-panel-top">
+      <h2>&#9989; Завдання по сертифікації</h2>
+      <button class="btn-add" onclick="openTaskForm()">&#43; Нове завдання</button>
+    </div>
+    <div class="task-filters">
+      <button class="task-filter-btn active" onclick="setTaskFilter('all',this)">Всі</button>
+      <button class="task-filter-btn" onclick="setTaskFilter('open',this)">Відкриті</button>
+      <button class="task-filter-btn" onclick="setTaskFilter('pavlo',this)">Павло</button>
+      <button class="task-filter-btn" onclick="setTaskFilter('maks',this)">Максим</button>
+    </div>
+    <div class="task-list" id="taskList"></div>
+  </div>
+</div>
+
+<!-- COMMS -->
+<div class="panel" id="panel-comms">
+  <div class="comms-panel">
+    <div class="comms-panel-top">
+      <h2>&#128140; Комунікації</h2>
+      <button class="btn-add" onclick="openNewCommForm()">&#43; Нова комунікація</button>
+    </div>
+    <div id="commList"></div>
+    <div class="new-comm-form" id="newCommForm">
+      <h4>Нова комунікація</h4>
+      <div class="form-row">
+        <label class="form-label">Назва / тема</label>
+        <input class="form-input" id="nc-title" placeholder="Наприклад: Запит до biolab.com.ua">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Кому надсилається</label>
+        <input class="form-input" id="nc-to" placeholder="Завод / biolab.com.ua / Dominanta...">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Текст листа / запиту</label>
+        <textarea class="comm-response-area" id="nc-letter" style="min-height:120px" placeholder="Вставте або напишіть текст листа..."></textarea>
+      </div>
+      <div class="form-btns">
+        <button class="btn-cancel" onclick="closeNewCommForm()">Скасувати</button>
+        <button class="btn-save" onclick="addComm()">Зберегти</button>
+      </div>
     </div>
   </div>
 </div>
@@ -422,6 +602,37 @@ alter publication supabase_realtime add table tracker_state;</div>
 </div>
 </div>
 
+<!-- TASK FORM OVERLAY -->
+<div class="task-form-overlay" id="taskFormOverlay">
+  <div class="task-form">
+    <h3>Нове завдання</h3>
+    <div class="form-row">
+      <label class="form-label">Завдання</label>
+      <input class="form-input" id="tf-title" placeholder="Що потрібно зробити?">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Виконавець</label>
+      <select class="form-select" id="tf-assignee">
+        <option value="maks">Максим</option>
+        <option value="pavlo">Павло</option>
+        <option value="both">Обидва</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Пріоритет</label>
+      <select class="form-select" id="tf-priority">
+        <option value="critical">&#128308; Критично</option>
+        <option value="urgent">&#128993; Терміново</option>
+        <option value="normal">&#128994; Звичайна</option>
+      </select>
+    </div>
+    <div class="form-btns">
+      <button class="btn-cancel" onclick="closeTaskForm()">Скасувати</button>
+      <button class="btn-save" onclick="addTask()">Додати</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ─── ★ НАЛАШТУВАННЯ ─────────────────────────────────────────────────────────
@@ -477,13 +688,81 @@ const DOCS = [
   ]},
 ];
 
+const DEFAULT_TASKS = [
+  { title:"Надіслати запит на завод: документи для сертифікації", assignee:"maks", priority:"critical", note:"" },
+  { title:"Запустити прискорені тести стабільності (28 днів при 40°C)", assignee:"maks", priority:"critical", note:"Стандартне тестування 4-5 міс. — не встигаємо. Потрібна акредитована лабораторія." },
+  { title:"Знайти токсиколога для CPSR (biolab.com.ua / vsg-consult.com.ua)", assignee:"maks", priority:"critical", note:"" },
+  { title:"Призначити Відповідальну особу (ВО) — оформити документально", assignee:"maks", priority:"urgent", note:"ВО = Dominanta або юр. особа виробника. Без ВО — нотифікація неможлива." },
+  { title:"Уточнити в biolab.com.ua: готові сертифіковані формули (white label)", assignee:"maks", priority:"urgent", note:"Якщо є готова формула з документами — можна зекономити 3-4 місяці." },
+  { title:"Перевірити маркування всіх трьох продуктів (українська мова)", assignee:"pavlo", priority:"normal", note:"" },
+];
+
+const DEFAULT_COMMS = [
+  {
+    id: "comm_factory_001",
+    title: "Запит на завод: документи для сертифікації",
+    to: "Завод-виробник",
+    date: "Травень 2026",
+    status: "waiting",
+    letter: `Шановні партнери,
+
+у зв'язку з набранням чинності Технічного регламенту на косметичну продукцію (Постанова КМУ №65 від 20.01.2021) та закінченням перехідного періоду 3 серпня 2026 року, HAiR L♡VE зобов'язана пройти процедуру нотифікації продуктів у системі e-Cosmetics МОЗ України.
+
+Просимо надати наступні документи для кожного з трьох продуктів:
+— Крем-спрей 20 в 1 (200 мл / 50 мл / 20 мл)
+— Термо-протектор (200 мл / 50 мл / 20 мл)
+— Ламелярна маска-філлер (200 мл / 50 мл / 20 мл)
+
+ПЕРЕЛІК НЕОБХІДНИХ ДОКУМЕНТІВ:
+
+1. Рецептура (формула) з відсотковим вмістом кожного інгредієнту
+   Необхідна для складання Звіту безпеки продукту (CPSR) токсикологом. Без повної формули токсиколог не може розпочати роботу.
+
+2. INCI-назви всіх інгредієнтів
+   Міжнародні найменування за стандартом INCI — для маркування та CPSR.
+
+3. Сертифікати якості (CoA) на кожну сировину
+   Certificate of Analysis від постачальника кожного інгредієнту.
+
+4. Технічні умови (ТУ) або специфікація на готовий продукт
+   Фізико-хімічні показники, методи контролю якості, термін придатності.
+
+5. Протоколи мікробіологічних випробувань готового продукту
+   Якщо такі випробування не проводились — готові обговорити їх замовлення.
+
+6. Протоколи тестів на стабільність (stability testing)
+   Стрес-тести на температурні перепади, підтвердження заявленого терміну придатності.
+
+7. Опис виробничого процесу
+   В будь-якому вигляді, прийнятному для включення в Product Information File (PIF). Конфіденційні деталі можуть бути узагальнені.
+
+8. Сертифікат GMP / ISO 22716 або декларація виробника про відповідність GMP-вимогам
+   Якщо сертифікат наявний — просимо надати копію. Якщо ні — достатньо письмової декларації.
+
+ВАЖЛИВО: Щодо пункту 1 (рецептура). Якщо формула є комерційною таємницею, ми готові організувати підписання угоди про нерозголошення (NDA) між заводом та токсикологом, який складатиме CPSR. Токсиколог не передаватиме дані третім особам.
+
+ДЕДЛАЙН: нотифікація всіх трьох продуктів має бути завершена до 3 серпня 2026 року. Для дотримання строків нам потрібно отримати документи якнайшвидше.
+
+Будь ласка, підтвердіть отримання цього листа та орієнтовні строки підготовки документів.
+
+З повагою,
+Максим
+HAiR L♡VE`,
+    response: ""
+  }
+];
+
 const SRC      = { mfg:"tag-mfg", cert:"tag-cert", gov:"tag-gov", own:"tag-own" };
 const TOTAL    = DOCS.flatMap(s => s.items).length;
 const STATE_ID = 'hairlove';
 
-let state          = {};
-let localOpen      = {};
-let commentTimers  = {};
+let state         = {};
+let localOpen     = {};
+let commentTimers = {};
+let taskFilter    = 'all';
+let localTaskOpen = {};
+let localCommOpen = {};
+let commTimers    = {};
 
 function setSyncStatus(type, text) {
   document.getElementById('syncDot').className    = 'sync-dot ' + type;
@@ -491,13 +770,16 @@ function setSyncStatus(type, text) {
 }
 
 async function init() {
-  localOpen = JSON.parse(localStorage.getItem('hl_open') || '{}');
+  localOpen     = JSON.parse(localStorage.getItem('hl_open')     || '{}');
+  localTaskOpen = JSON.parse(localStorage.getItem('hl_task_open')|| '{}');
+  localCommOpen = JSON.parse(localStorage.getItem('hl_comm_open')|| '{}');
 
   if (!CONFIGURED) {
     document.getElementById('setupBanner').style.display = 'block';
     document.getElementById('dropSubText').textContent   = 'PDF, DOCX, XLSX (зберігається локально — налаштуй Supabase для хмарної синхронізації)';
     state = JSON.parse(localStorage.getItem('hl_cert_v3') || '{}');
     setSyncStatus('off', 'Локальний режим — налаштуй Supabase для синхронізації між двома партнерами');
+    ensureDefaults();
     renderAll();
     return;
   }
@@ -507,14 +789,29 @@ async function init() {
     const { data, error } = await sb.from('tracker_state').select('data').eq('id', STATE_ID).single();
     if (error) throw error;
     state = data?.data || {};
+    ensureDefaults();
     setSyncStatus('ok', 'Підключено');
     renderAll();
     subscribeRealtime();
   } catch (e) {
     console.error(e);
     state = JSON.parse(localStorage.getItem('hl_cert_v3') || '{}');
+    ensureDefaults();
     setSyncStatus('err', "Помилка з'єднання — локальний режим");
     renderAll();
+  }
+}
+
+function ensureDefaults() {
+  if (!state._tasks || state._tasks.length === 0) {
+    state._tasks = DEFAULT_TASKS.map((t,i) => ({
+      id: 'task_' + i + '_' + Date.now(),
+      title: t.title, assignee: t.assignee, priority: t.priority,
+      note: t.note, done: false, created: new Date().toLocaleDateString('uk-UA')
+    }));
+  }
+  if (!state._comms || state._comms.length === 0) {
+    state._comms = DEFAULT_COMMS;
   }
 }
 
@@ -548,7 +845,9 @@ async function saveState() {
   if (error) { console.error(error); setSyncStatus('err', 'Помилка збереження'); }
 }
 
-function saveLocalOpen() { localStorage.setItem('hl_open', JSON.stringify(localOpen)); }
+function saveLocalOpen()     { localStorage.setItem('hl_open',      JSON.stringify(localOpen)); }
+function saveLocalTaskOpen() { localStorage.setItem('hl_task_open', JSON.stringify(localTaskOpen)); }
+function saveLocalCommOpen() { localStorage.setItem('hl_comm_open', JSON.stringify(localCommOpen)); }
 
 function getPublicUrl(path) { return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl; }
 async function uploadFile(path, file) {
@@ -618,14 +917,228 @@ function onComment(key, val) {
   commentTimers[key] = setTimeout(() => saveState(), 1200);
 }
 
+// ── TASKS ────────────────────────────────────────────────────────────────────
+function openTaskForm()  { document.getElementById('taskFormOverlay').classList.add('open'); document.getElementById('tf-title').focus(); }
+function closeTaskForm() { document.getElementById('taskFormOverlay').classList.remove('open'); document.getElementById('tf-title').value = ''; }
+
+async function addTask() {
+  const title = document.getElementById('tf-title').value.trim();
+  if (!title) return;
+  if (!state._tasks) state._tasks = [];
+  state._tasks.push({
+    id: 'task_' + Date.now(),
+    title,
+    assignee: document.getElementById('tf-assignee').value,
+    priority:  document.getElementById('tf-priority').value,
+    note: '', done: false,
+    created: new Date().toLocaleDateString('uk-UA')
+  });
+  closeTaskForm();
+  await saveState();
+  renderTasks();
+}
+
+async function toggleTask(id) {
+  const t = (state._tasks||[]).find(t => t.id === id);
+  if (t) { t.done = !t.done; await saveState(); renderTasks(); }
+}
+
+function toggleTaskOpen(id) {
+  localTaskOpen[id] = !localTaskOpen[id];
+  saveLocalTaskOpen(); renderTasks();
+}
+
+function onTaskNote(id, val) {
+  const t = (state._tasks||[]).find(t => t.id === id);
+  if (!t) return;
+  t.note = val;
+  localStorage.setItem('hl_cert_v3', JSON.stringify(state));
+  clearTimeout(commentTimers['task_'+id]);
+  commentTimers['task_'+id] = setTimeout(() => saveState(), 1200);
+}
+
+async function deleteTask(id) {
+  if (!confirm('Видалити завдання?')) return;
+  state._tasks = (state._tasks||[]).filter(t => t.id !== id);
+  await saveState(); renderTasks();
+}
+
+function setTaskFilter(f, btn) {
+  taskFilter = f;
+  document.querySelectorAll('.task-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
+
+const PRIORITY_LABELS = { critical:'Критично', urgent:'Терміново', normal:'Звичайна' };
+const ASSIGNEE_LABELS = { pavlo:'Павло', maks:'Максим', both:'Обидва' };
+
+function renderTasks() {
+  const list = document.getElementById('taskList');
+  let tasks = state._tasks || [];
+
+  if (taskFilter === 'open')  tasks = tasks.filter(t => !t.done);
+  if (taskFilter === 'pavlo') tasks = tasks.filter(t => t.assignee === 'pavlo' || t.assignee === 'both');
+  if (taskFilter === 'maks')  tasks = tasks.filter(t => t.assignee === 'maks'  || t.assignee === 'both');
+
+  const openCount = (state._tasks||[]).filter(t => !t.done).length;
+  document.getElementById('badge-tasks').textContent = openCount;
+
+  if (!tasks.length) {
+    list.innerHTML = '<div class="task-empty">Завдань немає</div>';
+    return;
+  }
+
+  list.innerHTML = tasks.map(t => {
+    const isOpen = localTaskOpen[t.id] || false;
+    return `<div class="task-card${t.done?' done-task':''}${isOpen?' open-task':''}" id="tc_${t.id}">
+      <div class="task-card-main" onclick="toggleTaskOpen('${t.id}')">
+        <div class="task-cb" onclick="event.stopPropagation();toggleTask('${t.id}')">${t.done?'&#10003;':''}</div>
+        <div class="task-card-body">
+          <div class="task-title">${t.title}</div>
+          <div class="task-meta">
+            <span class="task-assignee ${t.assignee}">${ASSIGNEE_LABELS[t.assignee]||t.assignee}</span>
+            <span class="task-priority ${t.priority}">${PRIORITY_LABELS[t.priority]||t.priority}</span>
+            ${t.created ? `<span style="font-size:10px;color:var(--gray-light)">${t.created}</span>` : ''}
+          </div>
+        </div>
+        <div class="task-toggle">${isOpen?'&#9650;':'&#9660;'}</div>
+      </div>
+      <div class="task-expand">
+        <div class="field-label">Нотатка</div>
+        <textarea class="task-note-input" placeholder="Деталі, контакти, результат..."
+          oninput="onTaskNote('${t.id}',this.value)">${t.note||''}</textarea>
+        <button class="task-del-btn" onclick="deleteTask('${t.id}')">&#128465; Видалити завдання</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── COMMUNICATIONS ───────────────────────────────────────────────────────────
+function openNewCommForm() {
+  const f = document.getElementById('newCommForm');
+  f.classList.toggle('open');
+  if (f.classList.contains('open')) document.getElementById('nc-title').focus();
+}
+function closeNewCommForm() { document.getElementById('newCommForm').classList.remove('open'); }
+
+async function addComm() {
+  const title = document.getElementById('nc-title').value.trim();
+  if (!title) return;
+  if (!state._comms) state._comms = [];
+  state._comms.push({
+    id: 'comm_' + Date.now(),
+    title,
+    to: document.getElementById('nc-to').value.trim() || '—',
+    date: new Date().toLocaleDateString('uk-UA'),
+    status: 'sent',
+    letter: document.getElementById('nc-letter').value.trim(),
+    response: ''
+  });
+  document.getElementById('nc-title').value = '';
+  document.getElementById('nc-to').value = '';
+  document.getElementById('nc-letter').value = '';
+  closeNewCommForm();
+  await saveState();
+  renderComms();
+}
+
+function toggleCommOpen(id) {
+  localCommOpen[id] = !localCommOpen[id];
+  saveLocalCommOpen(); renderComms();
+}
+
+async function setCommStatus(id, status) {
+  const c = (state._comms||[]).find(c => c.id === id);
+  if (c) { c.status = status; await saveState(); renderComms(); }
+}
+
+function onCommResponse(id, val) {
+  const c = (state._comms||[]).find(c => c.id === id);
+  if (!c) return;
+  c.response = val;
+  localStorage.setItem('hl_cert_v3', JSON.stringify(state));
+  clearTimeout(commTimers[id]);
+  commTimers[id] = setTimeout(() => saveState(), 1200);
+}
+
+async function deleteComm(id) {
+  if (!confirm('Видалити комунікацію?')) return;
+  state._comms = (state._comms||[]).filter(c => c.id !== id);
+  await saveState(); renderComms();
+}
+
+function copyLetter(id) {
+  const c = (state._comms||[]).find(c => c.id === id);
+  if (!c) return;
+  navigator.clipboard.writeText(c.letter).then(() => {
+    const btn = document.getElementById('copy_'+id);
+    if (btn) { btn.textContent = '✓ Скопійовано'; setTimeout(() => { btn.textContent = '📋 Копіювати текст'; }, 2000); }
+  });
+}
+
+const COMM_STATUS_LABELS = { sent:'Надіслано', waiting:'Очікуємо відповідь', replied:'Відповідь отримана' };
+
+function renderComms() {
+  const list = document.getElementById('commList');
+  const comms = state._comms || [];
+  document.getElementById('badge-comms').textContent = comms.length;
+
+  if (!comms.length) {
+    list.innerHTML = '<div class="task-empty">Комунікацій ще немає</div>';
+    return;
+  }
+
+  list.innerHTML = comms.map(c => {
+    const isOpen = localCommOpen[c.id] || false;
+    const statusClass = c.status || 'waiting';
+    return `<div class="comm-card${isOpen?' open-comm':''}" id="cc_${c.id}">
+      <div class="comm-card-header" onclick="toggleCommOpen('${c.id}')">
+        <div class="comm-card-icon">&#128140;</div>
+        <div class="comm-card-info">
+          <div class="comm-card-title">${c.title}</div>
+          <div class="comm-card-sub">Кому: ${c.to} &middot; ${c.date||''}</div>
+        </div>
+        <span class="comm-status ${statusClass}">${COMM_STATUS_LABELS[statusClass]||statusClass}</span>
+        <div class="comm-toggle">${isOpen?'&#9650;':'&#9660;'}</div>
+      </div>
+      <div class="comm-body">
+        ${c.letter ? `
+        <div class="comm-section-label">Текст листа</div>
+        <div class="comm-letter">${escHtml(c.letter)}</div>
+        <button class="comm-copy-btn" id="copy_${c.id}" onclick="copyLetter('${c.id}')">&#128203; Копіювати текст</button>
+        ` : ''}
+        <div class="comm-section-label">Відповідь</div>
+        <textarea class="comm-response-area"
+          placeholder="Вставте або напишіть відповідь, яку ви отримали..."
+          oninput="onCommResponse('${c.id}',this.value)">${escHtml(c.response||'')}</textarea>
+        <div class="comm-section-label">Статус</div>
+        <div class="comm-status-row">
+          <button class="comm-status-btn${c.status==='sent'?' active sent':''}" onclick="setCommStatus('${c.id}','sent')">Надіслано</button>
+          <button class="comm-status-btn${c.status==='waiting'?' active waiting':''}" onclick="setCommStatus('${c.id}','waiting')">Очікуємо відповідь</button>
+          <button class="comm-status-btn${c.status==='replied'?' active replied':''}" onclick="setCommStatus('${c.id}','replied')">Відповідь отримана</button>
+        </div>
+        <button class="comm-del-btn" onclick="deleteComm('${c.id}')">&#128465; Видалити</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+const TAB_NAMES = ['overview','upload','tasks','comms','regulatory'];
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i) =>
-    t.classList.toggle('active', ['overview','upload','regulatory'][i] === name));
+    t.classList.toggle('active', TAB_NAMES[i] === name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
 }
 
-function renderAll() { PRODUCTS.forEach(renderColumn); updateGlobal(); renderUploadList(); }
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll() { PRODUCTS.forEach(renderColumn); updateGlobal(); renderUploadList(); renderTasks(); renderComms(); }
 
 function fileHtml(f, key, fi) {
   const name = f.name || f;
@@ -732,6 +1245,10 @@ const dz = document.getElementById('dropZone');
 dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('over'); });
 dz.addEventListener('dragleave', () => dz.classList.remove('over'));
 dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); handleGlobalUpload(e.dataTransfer.files); });
+
+document.getElementById('taskFormOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeTaskForm();
+});
 
 init();
 </script>
