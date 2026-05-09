@@ -232,7 +232,7 @@ create policy "anon_all" on tracker_state for all to anon using (true) with chec
 alter publication supabase_realtime add table tracker_state;</div>
   <div class="setup-step"><b>3.</b> В <b>Storage &#8594; New Bucket</b>: назва <span class="setup-inline">hairlove-docs</span>, увімкни <b>Public bucket</b></div>
   <div class="setup-step"><b>4.</b> В <b>Settings &#8594; API</b> скопіюй <b>Project URL</b> та <b>anon key</b></div>
-  <div class="setup-step"><b>5.</b> Встав їх у цей HTML-файл замість <span class="setup-inline">YOUR_SUPABASE_URL</span> та <span class="setup-inline">YOUR_ANON_KEY</span></div>
+  <div class="setup-step"><b>5.</b> Встав їх у цей HTML-файл замість <span class="setup-inline">https://qezcnewojlmnpputmhuf.supabase.co</span> та <span class="setup-inline">sb_publishable_d9W00fbikKYjn0Jk8FQu6w_JZ98Oixs</span></div>
 </div>
 
 <div class="header">
@@ -425,8 +425,8 @@ alter publication supabase_realtime add table tracker_state;</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ─── ★ НАЛАШТУВАННЯ ─────────────────────────────────────────────────────────
-const SUPABASE_URL      = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+const SUPABASE_URL      = 'https://qezcnewojlmnpputmhuf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_d9W00fbikKYjn0Jk8FQu6w_JZ98Oixs';
 const BUCKET            = 'hairlove-docs';
 // ────────────────────────────────────────────────────────────────────────────
 
