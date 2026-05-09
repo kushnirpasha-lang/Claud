@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HAiR L♡VE — Документы сертификации</title>
+<title>HAiR L&#9825;VE — Сертифікація</title>
 <style>
   :root {
     --teal: #1E5C5C;
@@ -11,269 +11,447 @@
     --cream: #F5F2EC;
     --ink: #1A1A1A;
     --gray: #666;
+    --gray-light: #999;
     --red: #C0392B;
     --green: #1E7A4A;
-    --amber: #B7770D;
     --border: #DDD8CF;
+    --col-spray: #1E5C5C;
+    --col-thermo: #8B4513;
+    --col-mask: #4A6741;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-         background: var(--cream); color: var(--ink); font-size: 15px; }
+         background: var(--cream); color: var(--ink); font-size: 14px; }
 
-  .header { background: var(--teal); color: white; padding: 24px 20px 20px; }
-  .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-  .header p  { font-size: 13px; opacity: 0.75; }
-  .deadline  { display: inline-block; margin-top: 10px; background: var(--red);
-               color: white; font-size: 12px; font-weight: 600;
-               padding: 4px 10px; border-radius: 4px; }
+  .header { background: var(--teal); color: white; padding: 20px 20px 16px; }
+  .header h1 { font-size: 20px; font-weight: 700; margin-bottom: 3px; }
+  .header p  { font-size: 12px; opacity: 0.75; }
+  .deadline  { display: inline-block; margin-top: 8px; background: var(--red);
+               color: white; font-size: 11px; font-weight: 700;
+               padding: 3px 10px; border-radius: 4px; }
 
-  .progress-bar { background: white; padding: 14px 20px; border-bottom: 1px solid var(--border);
-                  display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
-  .progress-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-  .progress-fill  { height: 100%; background: var(--green); border-radius: 4px; transition: width 0.3s; }
-  .progress-label { font-size: 13px; color: var(--gray); white-space: nowrap; }
+  .tabs { background: white; border-bottom: 2px solid var(--border);
+          display: flex; position: sticky; top: 0; z-index: 20; }
+  .tab { padding: 12px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+         border-bottom: 2px solid transparent; margin-bottom: -2px;
+         white-space: nowrap; color: var(--gray); transition: all 0.15s; }
+  .tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .tab:hover:not(.active) { color: var(--ink); }
+  .tab-badge { display: inline-block; margin-left: 6px; background: var(--teal-light);
+               color: var(--teal); font-size: 10px; font-weight: 700; padding: 1px 6px;
+               border-radius: 10px; }
+  .tab.active .tab-badge { background: var(--teal); color: white; }
 
-  .section { padding: 0 16px; }
-  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-                   text-transform: uppercase; color: var(--teal);
-                   padding: 20px 4px 8px; border-bottom: 2px solid var(--teal-light); }
+  .progress-row { background: white; padding: 10px 16px; border-bottom: 1px solid var(--border);
+                  display: flex; align-items: center; gap: 12px; }
+  .progress-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-fill  { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
+  .progress-label { font-size: 12px; color: var(--gray); white-space: nowrap; }
 
-  .doc-card { background: white; border: 1px solid var(--border); border-radius: 10px;
-              margin: 10px 0; overflow: hidden; transition: box-shadow 0.2s; }
-  .doc-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-  .doc-card.done { opacity: 0.6; }
+  .panel { display: none; }
+  .panel.active { display: block; }
 
-  .doc-main { display: flex; align-items: flex-start; gap: 12px; padding: 14px 14px 12px; cursor: pointer; }
+  .overview { padding: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 860px) { .overview { grid-template-columns: 1fr; } }
 
-  .checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+  .product-col { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+  .product-col-header { padding: 12px 14px; color: white; font-weight: 700; font-size: 13px; }
+  .product-col-header.spray  { background: var(--col-spray); }
+  .product-col-header.thermo { background: var(--col-thermo); }
+  .product-col-header.mask   { background: var(--col-mask); }
+  .product-col-header small  { font-weight: 400; font-size: 11px; opacity: 0.8; display: block; margin-top: 2px; }
+
+  .col-progress { padding: 8px 14px; border-bottom: 1px solid var(--border); background: #fafafa;
+                  display: flex; align-items: center; gap: 8px; }
+  .col-progress-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .col-progress-fill  { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .col-progress-fill.spray  { background: var(--col-spray); }
+  .col-progress-fill.thermo { background: var(--col-thermo); }
+  .col-progress-fill.mask   { background: var(--col-mask); }
+  .col-progress-label { font-size: 11px; color: var(--gray); white-space: nowrap; }
+
+  .section-divider { padding: 7px 14px 3px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+                     text-transform: uppercase; color: var(--gray);
+                     border-bottom: 1px solid var(--border); background: #fafafa; }
+
+  .doc-item { border-bottom: 1px solid var(--border); }
+  .doc-item:last-child { border-bottom: none; }
+
+  .doc-item-main { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px 8px; cursor: pointer; }
+  .checkbox { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--border);
               flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-              font-size: 13px; transition: all 0.15s; margin-top: 1px; }
-  .doc-card.done .checkbox { background: var(--green); border-color: var(--green); color: white; }
+              font-size: 11px; cursor: pointer; transition: all 0.15s; margin-top: 1px; }
+  .doc-item.done .checkbox { background: var(--green); border-color: var(--green); color: white; }
 
-  .doc-info { flex: 1; min-width: 0; }
-  .doc-name  { font-size: 15px; font-weight: 600; line-height: 1.3; }
-  .doc-card.done .doc-name { text-decoration: line-through; color: var(--gray); }
-  .doc-meta  { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .tag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
-  .tag-source-mfg  { background: #E8F4FF; color: #1565C0; }
-  .tag-source-cert { background: #FFF3E0; color: #E65100; }
-  .tag-source-gov  { background: #E8F5E9; color: #2E7D32; }
-  .tag-source-own  { background: #F3E5F5; color: #6A1B9A; }
-  .tag-prod  { background: var(--teal-light); color: var(--teal); }
-  .tag-urgent{ background: #FFEBEE; color: var(--red); }
+  .doc-item-body { flex: 1; min-width: 0; }
+  .doc-item-name { font-size: 12px; font-weight: 600; line-height: 1.35; }
+  .doc-item.done .doc-item-name { text-decoration: line-through; color: var(--gray); }
 
-  .doc-expand { padding: 0 14px 12px 48px; display: none; }
-  .doc-card.open .doc-expand { display: block; }
-  .doc-desc { font-size: 13px; color: var(--gray); line-height: 1.5; margin-bottom: 10px; }
+  .doc-item-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .tag { font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 10px; }
+  .tag-mfg  { background: #E8F4FF; color: #1565C0; }
+  .tag-cert { background: #FFF3E0; color: #E65100; }
+  .tag-gov  { background: #E8F5E9; color: #2E7D32; }
+  .tag-own  { background: #F3E5F5; color: #6A1B9A; }
+  .tag-urgent { background: #FFEBEE; color: var(--red); font-weight: 700; }
+  .tag-files  { background: #E8F5E9; color: #2E7D32; }
 
-  .comment-label { font-size: 11px; font-weight: 600; color: var(--teal);
-                   text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
-  .comment-input { width: 100%; border: 1px solid var(--border); border-radius: 8px;
-                   padding: 8px 10px; font-size: 13px; font-family: inherit;
-                   resize: vertical; min-height: 60px; color: var(--ink);
+  .toggle-arrow { color: var(--gray-light); font-size: 10px; margin-top: 2px; flex-shrink: 0; }
+
+  .doc-item-expand { display: none; padding: 0 14px 10px 44px; }
+  .doc-item.open .doc-item-expand { display: block; }
+  .doc-item-desc { font-size: 12px; color: var(--gray); line-height: 1.5; margin-bottom: 8px; }
+
+  .field-label { font-size: 10px; font-weight: 700; color: var(--teal); text-transform: uppercase;
+                 letter-spacing: 0.08em; margin-bottom: 3px; margin-top: 8px; }
+  .comment-input { width: 100%; border: 1px solid var(--border); border-radius: 6px;
+                   padding: 6px 8px; font-size: 12px; font-family: inherit;
+                   resize: vertical; min-height: 50px; color: var(--ink);
                    background: var(--cream); outline: none; }
   .comment-input:focus { border-color: var(--teal); }
 
-  .toggle-btn { background: none; border: none; color: var(--gray); font-size: 18px;
-                cursor: pointer; padding: 2px; flex-shrink: 0; margin-top: 1px; }
+  .file-area { margin-top: 8px; }
+  .file-btn-label { display: inline-flex; align-items: center; gap: 5px; font-size: 11px;
+                    font-weight: 600; color: var(--teal); border: 1px dashed var(--teal);
+                    border-radius: 6px; padding: 5px 10px; cursor: pointer; background: none;
+                    transition: all 0.15s; }
+  .file-btn-label:hover { background: var(--teal-light); }
+  .file-input-hidden { display: none; }
+  .file-list { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .file-chip { display: flex; align-items: center; gap: 6px; background: var(--teal-light);
+               border-radius: 5px; padding: 4px 8px; font-size: 11px; color: var(--teal); }
+  .file-chip-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-remove { cursor: pointer; font-size: 14px; opacity: 0.6; flex-shrink: 0; }
+  .file-remove:hover { opacity: 1; }
+  .file-note { font-size: 10px; color: var(--gray-light); margin-top: 4px; font-style: italic; }
 
-  .summary { padding: 20px 20px 40px; text-align: center; color: var(--gray); font-size: 13px; }
-  .summary b { color: var(--ink); }
+  /* UPLOAD PANEL */
+  .upload-panel { padding: 20px 16px; max-width: 640px; }
+  .upload-panel h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .upload-panel > p { font-size: 13px; color: var(--gray); line-height: 1.5; margin-bottom: 16px; }
 
-  @media (max-width: 480px) {
-    .doc-name { font-size: 14px; }
-  }
+  .upload-drop { border: 2px dashed var(--teal); border-radius: 12px; padding: 40px 20px;
+                 text-align: center; cursor: pointer; transition: all 0.2s; background: white; }
+  .upload-drop.over { background: var(--teal-light); }
+  .upload-drop-icon { font-size: 36px; margin-bottom: 10px; }
+  .upload-drop-text { font-size: 14px; font-weight: 600; color: var(--teal); margin-bottom: 4px; }
+  .upload-drop-sub  { font-size: 12px; color: var(--gray); }
+  .global-file-input { display: none; }
+
+  .upload-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .upload-item { background: white; border: 1px solid var(--border); border-radius: 8px;
+                 padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+  .upload-item-icon { font-size: 22px; flex-shrink: 0; }
+  .upload-item-info { flex: 1; min-width: 0; }
+  .upload-item-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .upload-item-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
+  .upload-item-del  { cursor: pointer; color: var(--red); font-size: 20px; opacity: 0.6; flex-shrink: 0; }
+  .upload-item-del:hover { opacity: 1; }
+
+  .upload-note { background: #FFF8E1; border: 1px solid #FFD54F; border-radius: 8px;
+                 padding: 12px 14px; margin-top: 16px; font-size: 12px; color: #5D4037; line-height: 1.5; }
+  .upload-note strong { display: block; margin-bottom: 4px; font-size: 13px; }
+
+  .summary { padding: 16px 20px 40px; text-align: center; color: var(--gray-light); font-size: 12px; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>HAiR L♡VE</h1>
-  <p>Чеклист документов для сертификации по Техрегламенту Украины</p>
-  <span class="deadline">⏰ Дедлайн: 3 августа 2026</span>
+  <h1>HAiR L&#9825;VE &mdash; Сертифікація</h1>
+  <p>Технічний регламент України &middot; KMU №65 (2021) &middot; гармонізований з EU 1223/2009</p>
+  <span class="deadline">&#9200; Дедлайн: 3 серпня 2026</span>
 </div>
 
-<div class="progress-bar">
-  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-  <div class="progress-label" id="progressLabel">0 / 0 готово</div>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overview')">
+    По продуктах <span class="tab-badge" id="badge-overview">0/13</span>
+  </div>
+  <div class="tab" onclick="switchTab('upload')">
+    &#128204; Вкладення <span class="tab-badge" id="badge-upload">0</span>
+  </div>
 </div>
 
-<div class="section" id="app"></div>
+<div class="progress-row">
+  <div class="progress-track"><div class="progress-fill" id="globalFill"></div></div>
+  <div class="progress-label" id="globalLabel">0 / 0</div>
+</div>
 
-<div class="summary">
-  Нажми на карточку чтобы открыть · Нажми на чекбокс чтобы отметить выполненным<br>
-  Комментарии и статус сохраняются автоматически
+<div class="panel active" id="panel-overview">
+  <div class="overview">
+    <div class="product-col" id="col-spray"></div>
+    <div class="product-col" id="col-thermo"></div>
+    <div class="product-col" id="col-mask"></div>
+  </div>
+  <div class="summary">Натисни картку щоб відкрити &middot; Чекбокс — позначити виконаним &middot; Зберігається автоматично</div>
+</div>
+
+<div class="panel" id="panel-upload">
+  <div class="upload-panel">
+    <h2>Вкладення документів</h2>
+    <p>Завантаж отримані документи тут. Після завантаження відкрий новий чат з Claude, прикріпи файл і попроси перевірити відповідність вимогам.</p>
+
+    <div class="upload-drop" id="dropZone" onclick="document.getElementById('globalFileInput').click()">
+      <div class="upload-drop-icon">&#128196;</div>
+      <div class="upload-drop-text">Натисни або перетягни файл</div>
+      <div class="upload-drop-sub">PDF, DOCX, XLSX, JPG, PNG</div>
+    </div>
+    <input type="file" id="globalFileInput" class="global-file-input" multiple
+           accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.zip"
+           onchange="handleGlobalUpload(this.files)">
+
+    <div class="upload-list" id="globalUploadList"></div>
+
+    <div class="upload-note">
+      <strong>&#128161; Як аналізувати документи через Claude</strong>
+      Відкрий новий чат, прикріпи файл (рецептура, CPSR, CoA тощо) і напиши:
+      <em>«Перевір цей документ на відповідність вимогам PIF / CPSR для сертифікації косметики в Україні (Технічний регламент KMU №65)»</em>.
+      Claude проаналізує і скаже чого не вистачає.
+    </div>
+  </div>
 </div>
 
 <script>
-const DOCS = [
-  {
-    section: "Запросить у производства",
-    items: [
-      { id:"d01", name:"Рецептура (формула) продукта с % каждого ингредиента",
-        source:"mfg", sourceLabel:"У завода",
-        prods:["Крем-спрей","Термо","Маска"],
-        desc:"Полная формула каждого продукта с указанием точных процентных концентраций всех ингредиентов. Это основа для CPSR. Без этого сертификационная компания не начнёт работу." },
-      { id:"d02", name:"INCI-наименования всех ингредиентов",
-        source:"mfg", sourceLabel:"У завода",
-        prods:["Все продукты"],
-        desc:"Международные наименования ингредиентов по стандарту INCI. Нужны для маркировки и для CPSR. Производитель обязан предоставить." },
-      { id:"d03", name:"Сертификаты качества / CoA на каждое сырьё",
-        source:"mfg", sourceLabel:"У завода",
-        prods:["Все продукты"],
-        desc:"Certificate of Analysis на каждый ингредиент от поставщика сырья. Подтверждают чистоту и безопасность компонентов. Часть может быть закрытой — зафиксируй что дали." },
-      { id:"d04", name:"Технические условия / спецификация (ТУ) на готовый продукт",
-        source:"mfg", sourceLabel:"У завода",
-        prods:["Все продукты"],
-        desc:"Нормативный документ на готовый продукт. Содержит физико-химические параметры, методы контроля качества, срок годности. Часть PIF." },
-      { id:"d05", name:"Результаты микробиологических испытаний",
-        source:"mfg", sourceLabel:"У завода или лаборатория",
-        prods:["Все продукты"],
-        desc:"Подтверждение что продукт безопасен с точки зрения микробиологии. Если завод не делал — нужно заказать в аккредитованной лаборатории." },
-      { id:"d06", name:"Результаты испытаний на стабильность",
-        source:"mfg", sourceLabel:"У завода или лаборатория",
-        prods:["Все продукты"],
-        desc:"Стресс-тесты: продукт выдерживает температурные перепады, UV, время. Подтверждают заявленный срок годности. Если нет — можно заказать или описать в CPSR по косвенным данным." },
-      { id:"d07", name:"Описание производственного процесса",
-        source:"mfg", sourceLabel:"У завода",
-        prods:["Все продукты"],
-        desc:"Краткое описание как производится продукт. Входит в PIF. Производитель может предоставить в упрощённом виде — для конфиденциальности." },
-      { id:"d08", name:"Сертификат GMP или ISO производства",
-        source:"mfg", sourceLabel:"У завода",
-        prods:["Все продукты"],
-        desc:"Если завод имеет GMP (Good Manufacturing Practice) или ISO 22716 — это большой плюс. Если нет — не блокирует сертификацию, но нужно отразить в PIF." },
-    ]
-  },
-  {
-    section: "Заказать у сертификационной компании",
-    items: [
-      { id:"d09", name:"CPSR — Отчёт безопасности продукта",
-        source:"cert", sourceLabel:"Сертиф. компания",
-        prods:["На каждый продукт"],
-        urgent: true,
-        desc:"Cosmetic Product Safety Report. Составляется квалифицированным токсикологом. Оценивает каждый ингредиент и даёт заключение о безопасности. Стоимость: от 200€ за продукт. Рекомендуем: biolab.com.ua, vsg-consult.com.ua, inveran.com.ua" },
-      { id:"d10", name:"PIF — Досье продукта (Product Information File)",
-        source:"cert", sourceLabel:"Сертиф. компания",
-        prods:["На каждый продукт"],
-        urgent: true,
-        desc:"Главный сводный документ. Включает CPSR, рецептуру, испытания, описание производства, маркировку. Обычно составляется вместе с CPSR одной компанией. Хранится у Ответственного лица." },
-    ]
-  },
-  {
-    section: "Организационные документы",
-    items: [
-      { id:"d11", name:"Назначение Ответственного лица",
-        source:"own", sourceLabel:"Оформить самим",
-        prods:["Все продукты"],
-        urgent: true,
-        desc:"Обязательное требование нового регламента. Ответственное лицо = производитель (если резидент Украины) или уполномоченный дистрибьютор (Dominanta). Оформить письменное уполномочие." },
-      { id:"d12", name:"Проверка и обновление маркировки этикеток",
-        source:"own", sourceLabel:"Бренд + консультант",
-        prods:["Все продукты"],
-        desc:"Этикетка должна содержать: название, данные ответственного лица, срок годности, условия хранения, предупреждения, INCI-список, страну происхождения. Текст — на украинском языке. Проверить все три продукта." },
-    ]
-  },
-  {
-    section: "Государственная регистрация",
-    items: [
-      { id:"d13", name:"Нотификация в системе e-Cosmetics (МОЗ Украины)",
-        source:"gov", sourceLabel:"Портал МОЗ",
-        prods:["Каждый продукт"],
-        urgent: true,
-        desc:"Электронное уведомление на портале Министерства здравоохранения Украины. Подаётся Ответственным лицом после готовности PIF и CPSR. Срок рассмотрения — 5 рабочих дней. Без нотификации продукт не может легально продаваться после 3 августа 2026." },
-    ]
-  }
+const PRODUCTS = [
+  { id:"spray",  label:"Крем-спрей 20 в 1",     sub:"200 мл / 50 мл / 20 мл тестер", cls:"spray"  },
+  { id:"thermo", label:"Термо-протектор",        sub:"200 мл / 50 мл / 20 мл тестер", cls:"thermo" },
+  { id:"mask",   label:"Ламелярна маска-філлер", sub:"200 мл / 50 мл / 20 мл тестер", cls:"mask"   },
 ];
 
-const sourceClass = { mfg:"tag-source-mfg", cert:"tag-source-cert", gov:"tag-source-gov", own:"tag-source-own" };
+const DOCS = [
+  { section:"Від виробника", items:[
+    { id:"d01", name:"Рецептура (формула) з % кожного інгредієнту",
+      source:"mfg", sl:"Завод", urgent:true,
+      desc:"Повна формула з точними % всіх інгредієнтів — основа для CPSR. Без неї токсиколог не почне роботу. Запитувати офіційно у відділі якості заводу." },
+    { id:"d02", name:"INCI-назви всіх інгредієнтів",
+      source:"mfg", sl:"Завод", urgent:false,
+      desc:"Міжнародні найменування за стандартом INCI. Потрібні для маркування та CPSR. Виробник зобов'язаний надати — це частина договору поставки." },
+    { id:"d03", name:"CoA — сертифікати якості на кожну сировину",
+      source:"mfg", sl:"Завод", urgent:false,
+      desc:"Certificate of Analysis від постачальника сировини на кожен інгредієнт. Підтверджують чистоту та безпеку компонентів. Частина може бути закритою." },
+    { id:"d04", name:"Технічні умови (ТУ) / специфікація на готовий продукт",
+      source:"mfg", sl:"Завод", urgent:false,
+      desc:"Фізико-хімічні параметри, методи контролю якості, термін придатності. Є частиною PIF." },
+    { id:"d05", name:"Мікробіологічні випробування",
+      source:"mfg", sl:"Завод або лабораторія", urgent:false,
+      desc:"Підтвердження мікробіологічної безпеки. Якщо завод не робив — замовити в акредитованій лабораторії (biolab.com.ua). Без цього CPSR не підпишуть." },
+    { id:"d06", name:"Тести на стабільність (stability testing)",
+      source:"mfg", sl:"Завод або лабораторія", urgent:false,
+      desc:"Стрес-тести: температурні перепади, UV, час. Підтверджують заявлений термін придатності. Якщо немає — токсиколог може описати за непрямими даними." },
+    { id:"d07", name:"Опис виробничого процесу",
+      source:"mfg", sl:"Завод", urgent:false,
+      desc:"Коротке описання як виробляється продукт. Входить до PIF. Завод може надати в спрощеному вигляді для конфіденційності." },
+    { id:"d08", name:"Сертифікат GMP / ISO 22716 виробництва",
+      source:"mfg", sl:"Завод", urgent:false,
+      desc:"Якщо завод має GMP або ISO 22716 — великий плюс. Якщо ні — не блокує сертифікацію, але треба відобразити в PIF." },
+  ]},
+  { section:"Замовити у сертифікаційної компанії", items:[
+    { id:"d09", name:"CPSR — Звіт безпеки продукту (токсиколог)",
+      source:"cert", sl:"Сертиф. компанія", urgent:true,
+      desc:"Cosmetic Product Safety Report. Складається кваліфікованим токсикологом. Від 200€ за продукт. Компанії: biolab.com.ua, vsg-consult.com.ua, inveran.com.ua, cratia.ua" },
+    { id:"d10", name:"PIF — Досьє продукту (Product Information File)",
+      source:"cert", sl:"Сертиф. компанія", urgent:true,
+      desc:"Головний документ: CPSR, рецептура, випробування, опис виробництва, маркування. Зазвичай складається разом з CPSR однією компанією. Зберігається у Відповідальної особи." },
+  ]},
+  { section:"Організаційні та маркування", items:[
+    { id:"d11", name:"Призначення Відповідальної особи (ВО)",
+      source:"own", sl:"Оформити самим", urgent:true,
+      desc:"Обов'язкова вимога нового регламенту. ВО = виробник (резидент України) або уповноважений дистриб'ютор. Потрібне письмове уповноваження. Без ВО — нотифікація неможлива." },
+    { id:"d12", name:"Перевірка маркування етикеток (українська мова)",
+      source:"own", sl:"Бренд + консультант", urgent:false,
+      desc:"Обов'язково: назва, дані ВО, термін придатності, умови зберігання, попередження, повний INCI-список, країна походження. Текст — українською мовою." },
+  ]},
+  { section:"Державна нотифікація", items:[
+    { id:"d13", name:"Нотифікація в e-Cosmetics (МОЗ України)",
+      source:"gov", sl:"Портал МОЗ", urgent:true,
+      desc:"Електронне повідомлення на порталі МОЗ. Подається ВО після готовності PIF та CPSR. Строк — 5 робочих днів. Увага: портал e-Cosmetics ще тестується, слідкуй за оновленнями." },
+  ]},
+];
 
-function loadState() {
-  try { return JSON.parse(localStorage.getItem("hairlove_docs") || "{}"); } catch { return {}; }
+const SRC = { mfg:"tag-mfg", cert:"tag-cert", gov:"tag-gov", own:"tag-own" };
+const TOTAL = DOCS.flatMap(s => s.items).length;
+
+function load(k,d) { try { return JSON.parse(localStorage.getItem(k)||JSON.stringify(d)); } catch { return d; } }
+function save(k,v) { localStorage.setItem(k, JSON.stringify(v)); }
+
+let state   = load("hl_cert_v3", {});
+let uploads = load("hl_uploads_v1", []);
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) =>
+    t.classList.toggle('active', ['overview','upload'][i] === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
 }
-function saveState(state) {
-  localStorage.setItem("hairlove_docs", JSON.stringify(state));
+
+function renderAll() {
+  PRODUCTS.forEach(renderColumn);
+  updateGlobal();
+  renderUploadList();
 }
 
-let state = loadState();
+function renderColumn(prod) {
+  const col   = document.getElementById('col-'+prod.id);
+  const items = DOCS.flatMap(s => s.items);
+  const done  = items.filter(it => state[prod.id+'_'+it.id]?.done).length;
+  const pct   = Math.round(done / TOTAL * 100);
 
-function render() {
-  const app = document.getElementById("app");
-  app.innerHTML = "";
+  let h = `
+    <div class="product-col-header ${prod.cls}">${prod.label}<small>${prod.sub}</small></div>
+    <div class="col-progress">
+      <div class="col-progress-track"><div class="col-progress-fill ${prod.cls}" style="width:${pct}%"></div></div>
+      <div class="col-progress-label">${done}/${TOTAL}</div>
+    </div>`;
 
-  DOCS.forEach(section => {
-    const st = document.createElement("p");
-    st.className = "section-title";
-    st.textContent = section.section;
-    app.appendChild(st);
+  DOCS.forEach(sec => {
+    h += `<div class="section-divider">${sec.section}</div>`;
+    sec.items.forEach(item => {
+      const key   = prod.id+'_'+item.id;
+      const s     = state[key] || {};
+      const isDone = s.done||false, isOpen = s.open||false;
+      const files  = s.files||[];
 
-    section.items.forEach(item => {
-      const done = state[item.id]?.done || false;
-      const comment = state[item.id]?.comment || "";
-      const open = state[item.id]?.open || false;
+      const urgTag  = item.urgent ? `<span class="tag tag-urgent">&#9888; Терміново</span>` : '';
+      const fileTag = files.length ? `<span class="tag tag-files">&#128204; ${files.length}</span>` : '';
+      const fChips  = files.map((f,fi) => `
+        <div class="file-chip">
+          <span>&#128204;</span>
+          <span class="file-chip-name" title="${f}">${f}</span>
+          <span class="file-remove" onclick="rmFile('${key}',${fi});event.stopPropagation()">&times;</span>
+        </div>`).join('');
 
-      const card = document.createElement("div");
-      card.className = "doc-card" + (done ? " done" : "") + (open ? " open" : "");
-      card.id = "card_" + item.id;
-
-      const prodsHtml = item.prods.map(p => `<span class="tag tag-prod">${p}</span>`).join("");
-      const urgentHtml = item.urgent ? `<span class="tag tag-urgent">Срочно</span>` : "";
-
-      card.innerHTML = `
-        <div class="doc-main" onclick="toggleOpen('${item.id}')">
-          <div class="checkbox" onclick="event.stopPropagation(); toggleDone('${item.id}')">${done ? "✓" : ""}</div>
-          <div class="doc-info">
-            <div class="doc-name">${item.name}</div>
-            <div class="doc-meta">
-              <span class="tag ${sourceClass[item.source]}">${item.sourceLabel}</span>
-              ${prodsHtml}
-              ${urgentHtml}
+      h += `
+        <div class="doc-item${isDone?' done':''}${isOpen?' open':''}" id="i_${key}">
+          <div class="doc-item-main" onclick="toggleOpen('${key}')">
+            <div class="checkbox" onclick="event.stopPropagation();toggleDone('${key}')">${isDone?'&#10003;':''}</div>
+            <div class="doc-item-body">
+              <div class="doc-item-name">${item.name}</div>
+              <div class="doc-item-tags">
+                <span class="tag ${SRC[item.source]}">${item.sl}</span>${urgTag}${fileTag}
+              </div>
+            </div>
+            <div class="toggle-arrow">${isOpen?'&#9650;':'&#9660;'}</div>
+          </div>
+          <div class="doc-item-expand">
+            <div class="doc-item-desc">${item.desc}</div>
+            <div class="field-label">Коментар / статус</div>
+            <textarea class="comment-input" placeholder="Статус, контакт, дата..."
+              oninput="saveComment('${key}',this.value)">${s.comment||''}</textarea>
+            <div class="file-area">
+              <div class="field-label">Прикріплені файли</div>
+              <label class="file-btn-label">
+                &#128204; Прикріпити файл
+                <input type="file" class="file-input-hidden" multiple
+                  onchange="attachFile('${key}',this.files)">
+              </label>
+              ${files.length ? `<div class="file-list">${fChips}</div>` : ''}
+              <div class="file-note">Назва зберігається локально. Для аналізу — поділись файлом у чаті з Claude.</div>
             </div>
           </div>
-          <button class="toggle-btn">${open ? "▲" : "▼"}</button>
-        </div>
-        <div class="doc-expand">
-          <div class="doc-desc">${item.desc}</div>
-          <div class="comment-label">Комментарий / статус</div>
-          <textarea class="comment-input" placeholder="Напиши статус, контакт, дату, что угодно..."
-            oninput="saveComment('${item.id}', this.value)">${comment}</textarea>
-        </div>
-      `;
-      app.appendChild(card);
+        </div>`;
     });
   });
 
-  updateProgress();
+  col.innerHTML = h;
 }
 
-function toggleDone(id) {
-  if (!state[id]) state[id] = {};
-  state[id].done = !state[id].done;
-  saveState(state);
-  render();
+function redrawProd(key) {
+  const prod = PRODUCTS.find(p => key.startsWith(p.id+'_'));
+  if (prod) renderColumn(prod);
 }
 
-function toggleOpen(id) {
-  if (!state[id]) state[id] = {};
-  state[id].open = !state[id].open;
-  saveState(state);
-  render();
+function toggleDone(key) {
+  if (!state[key]) state[key] = {};
+  state[key].done = !state[key].done;
+  save("hl_cert_v3", state);
+  redrawProd(key);
+  updateGlobal();
 }
 
-function saveComment(id, val) {
-  if (!state[id]) state[id] = {};
-  state[id].comment = val;
-  saveState(state);
+function toggleOpen(key) {
+  if (!state[key]) state[key] = {};
+  state[key].open = !state[key].open;
+  save("hl_cert_v3", state);
+  redrawProd(key);
 }
 
-function updateProgress() {
-  const all = DOCS.flatMap(s => s.items);
-  const done = all.filter(item => state[item.id]?.done).length;
-  const pct = all.length ? Math.round(done / all.length * 100) : 0;
-  document.getElementById("progressFill").style.width = pct + "%";
-  document.getElementById("progressLabel").textContent = `${done} / ${all.length} готово`;
+function saveComment(key, val) {
+  if (!state[key]) state[key] = {};
+  state[key].comment = val;
+  save("hl_cert_v3", state);
 }
 
-render();
+function attachFile(key, files) {
+  if (!state[key]) state[key] = {};
+  if (!state[key].files) state[key].files = [];
+  Array.from(files).forEach(f => {
+    if (!state[key].files.includes(f.name)) state[key].files.push(f.name);
+  });
+  save("hl_cert_v3", state);
+  redrawProd(key);
+}
+
+function rmFile(key, idx) {
+  state[key]?.files?.splice(idx, 1);
+  save("hl_cert_v3", state);
+  redrawProd(key);
+}
+
+function updateGlobal() {
+  const items = DOCS.flatMap(s => s.items);
+  let total = 0, done = 0;
+  PRODUCTS.forEach(prod => items.forEach(item => {
+    total++;
+    if (state[prod.id+'_'+item.id]?.done) done++;
+  }));
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('globalFill').style.width = pct+'%';
+  document.getElementById('globalLabel').textContent = done+' / '+total+' виконано';
+  const uniq = items.filter(it => PRODUCTS.every(p => state[p.id+'_'+it.id]?.done)).length;
+  document.getElementById('badge-overview').textContent = uniq+'/'+TOTAL;
+}
+
+function handleGlobalUpload(files) {
+  Array.from(files).forEach(f => {
+    if (!uploads.find(u => u.name===f.name && u.size===f.size))
+      uploads.push({ name:f.name, size:f.size, date:new Date().toLocaleDateString('uk-UA') });
+  });
+  save("hl_uploads_v1", uploads);
+  renderUploadList();
+}
+
+function removeUpload(idx) {
+  uploads.splice(idx,1);
+  save("hl_uploads_v1", uploads);
+  renderUploadList();
+}
+
+function renderUploadList() {
+  const list = document.getElementById('globalUploadList');
+  document.getElementById('badge-upload').textContent = uploads.length||'0';
+  if (!uploads.length) { list.innerHTML=''; return; }
+  const icons = {pdf:'&#128213;',doc:'&#128209;',docx:'&#128209;',xls:'&#128210;',xlsx:'&#128210;',
+                 jpg:'&#128444;',jpeg:'&#128444;',png:'&#128444;',zip:'&#128230;'};
+  list.innerHTML = uploads.map((u,i) => {
+    const ext = u.name.split('.').pop().toLowerCase();
+    const kb  = u.size ? ' &middot; '+Math.round(u.size/1024)+' КБ' : '';
+    return `<div class="upload-item">
+      <div class="upload-item-icon">${icons[ext]||'&#128196;'}</div>
+      <div class="upload-item-info">
+        <div class="upload-item-name">${u.name}</div>
+        <div class="upload-item-meta">${u.date}${kb}</div>
+      </div>
+      <div class="upload-item-del" onclick="removeUpload(${i})">&times;</div>
+    </div>`;
+  }).join('');
+}
+
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); handleGlobalUpload(e.dataTransfer.files); });
+
+renderAll();
 </script>
 </body>
 </html>
