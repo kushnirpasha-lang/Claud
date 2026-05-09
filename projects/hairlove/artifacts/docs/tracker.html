@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HAiR L♡VE — Документы сертификации</title>
+<style>
+  :root {
+    --teal: #1E5C5C;
+    --teal-light: #D6EDED;
+    --cream: #F5F2EC;
+    --ink: #1A1A1A;
+    --gray: #666;
+    --red: #C0392B;
+    --green: #1E7A4A;
+    --amber: #B7770D;
+    --border: #DDD8CF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         background: var(--cream); color: var(--ink); font-size: 15px; }
+
+  .header { background: var(--teal); color: white; padding: 24px 20px 20px; }
+  .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .header p  { font-size: 13px; opacity: 0.75; }
+  .deadline  { display: inline-block; margin-top: 10px; background: var(--red);
+               color: white; font-size: 12px; font-weight: 600;
+               padding: 4px 10px; border-radius: 4px; }
+
+  .progress-bar { background: white; padding: 14px 20px; border-bottom: 1px solid var(--border);
+                  display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+  .progress-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-fill  { height: 100%; background: var(--green); border-radius: 4px; transition: width 0.3s; }
+  .progress-label { font-size: 13px; color: var(--gray); white-space: nowrap; }
+
+  .section { padding: 0 16px; }
+  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+                   text-transform: uppercase; color: var(--teal);
+                   padding: 20px 4px 8px; border-bottom: 2px solid var(--teal-light); }
+
+  .doc-card { background: white; border: 1px solid var(--border); border-radius: 10px;
+              margin: 10px 0; overflow: hidden; transition: box-shadow 0.2s; }
+  .doc-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .doc-card.done { opacity: 0.6; }
+
+  .doc-main { display: flex; align-items: flex-start; gap: 12px; padding: 14px 14px 12px; cursor: pointer; }
+
+  .checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+              flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+              font-size: 13px; transition: all 0.15s; margin-top: 1px; }
+  .doc-card.done .checkbox { background: var(--green); border-color: var(--green); color: white; }
+
+  .doc-info { flex: 1; min-width: 0; }
+  .doc-name  { font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .doc-card.done .doc-name { text-decoration: line-through; color: var(--gray); }
+  .doc-meta  { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .tag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+  .tag-source-mfg  { background: #E8F4FF; color: #1565C0; }
+  .tag-source-cert { background: #FFF3E0; color: #E65100; }
+  .tag-source-gov  { background: #E8F5E9; color: #2E7D32; }
+  .tag-source-own  { background: #F3E5F5; color: #6A1B9A; }
+  .tag-prod  { background: var(--teal-light); color: var(--teal); }
+  .tag-urgent{ background: #FFEBEE; color: var(--red); }
+
+  .doc-expand { padding: 0 14px 12px 48px; display: none; }
+  .doc-card.open .doc-expand { display: block; }
+  .doc-desc { font-size: 13px; color: var(--gray); line-height: 1.5; margin-bottom: 10px; }
+
+  .comment-label { font-size: 11px; font-weight: 600; color: var(--teal);
+                   text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .comment-input { width: 100%; border: 1px solid var(--border); border-radius: 8px;
+                   padding: 8px 10px; font-size: 13px; font-family: inherit;
+                   resize: vertical; min-height: 60px; color: var(--ink);
+                   background: var(--cream); outline: none; }
+  .comment-input:focus { border-color: var(--teal); }
+
+  .toggle-btn { background: none; border: none; color: var(--gray); font-size: 18px;
+                cursor: pointer; padding: 2px; flex-shrink: 0; margin-top: 1px; }
+
+  .summary { padding: 20px 20px 40px; text-align: center; color: var(--gray); font-size: 13px; }
+  .summary b { color: var(--ink); }
+
+  @media (max-width: 480px) {
+    .doc-name { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>HAiR L♡VE</h1>
+  <p>Чеклист документов для сертификации по Техрегламенту Украины</p>
+  <span class="deadline">⏰ Дедлайн: 3 августа 2026</span>
+</div>
+
+<div class="progress-bar">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 0 готово</div>
+</div>
+
+<div class="section" id="app"></div>
+
+<div class="summary">
+  Нажми на карточку чтобы открыть · Нажми на чекбокс чтобы отметить выполненным<br>
+  Комментарии и статус сохраняются автоматически
+</div>
+
+<script>
+const DOCS = [
+  {
+    section: "Запросить у производства",
+    items: [
+      { id:"d01", name:"Рецептура (формула) продукта с % каждого ингредиента",
+        source:"mfg", sourceLabel:"У завода",
+        prods:["Крем-спрей","Термо","Маска"],
+        desc:"Полная формула каждого продукта с указанием точных процентных концентраций всех ингредиентов. Это основа для CPSR. Без этого сертификационная компания не начнёт работу." },
+      { id:"d02", name:"INCI-наименования всех ингредиентов",
+        source:"mfg", sourceLabel:"У завода",
+        prods:["Все продукты"],
+        desc:"Международные наименования ингредиентов по стандарту INCI. Нужны для маркировки и для CPSR. Производитель обязан предоставить." },
+      { id:"d03", name:"Сертификаты качества / CoA на каждое сырьё",
+        source:"mfg", sourceLabel:"У завода",
+        prods:["Все продукты"],
+        desc:"Certificate of Analysis на каждый ингредиент от поставщика сырья. Подтверждают чистоту и безопасность компонентов. Часть может быть закрытой — зафиксируй что дали." },
+      { id:"d04", name:"Технические условия / спецификация (ТУ) на готовый продукт",
+        source:"mfg", sourceLabel:"У завода",
+        prods:["Все продукты"],
+        desc:"Нормативный документ на готовый продукт. Содержит физико-химические параметры, методы контроля качества, срок годности. Часть PIF." },
+      { id:"d05", name:"Результаты микробиологических испытаний",
+        source:"mfg", sourceLabel:"У завода или лаборатория",
+        prods:["Все продукты"],
+        desc:"Подтверждение что продукт безопасен с точки зрения микробиологии. Если завод не делал — нужно заказать в аккредитованной лаборатории." },
+      { id:"d06", name:"Результаты испытаний на стабильность",
+        source:"mfg", sourceLabel:"У завода или лаборатория",
+        prods:["Все продукты"],
+        desc:"Стресс-тесты: продукт выдерживает температурные перепады, UV, время. Подтверждают заявленный срок годности. Если нет — можно заказать или описать в CPSR по косвенным данным." },
+      { id:"d07", name:"Описание производственного процесса",
+        source:"mfg", sourceLabel:"У завода",
+        prods:["Все продукты"],
+        desc:"Краткое описание как производится продукт. Входит в PIF. Производитель может предоставить в упрощённом виде — для конфиденциальности." },
+      { id:"d08", name:"Сертификат GMP или ISO производства",
+        source:"mfg", sourceLabel:"У завода",
+        prods:["Все продукты"],
+        desc:"Если завод имеет GMP (Good Manufacturing Practice) или ISO 22716 — это большой плюс. Если нет — не блокирует сертификацию, но нужно отразить в PIF." },
+    ]
+  },
+  {
+    section: "Заказать у сертификационной компании",
+    items: [
+      { id:"d09", name:"CPSR — Отчёт безопасности продукта",
+        source:"cert", sourceLabel:"Сертиф. компания",
+        prods:["На каждый продукт"],
+        urgent: true,
+        desc:"Cosmetic Product Safety Report. Составляется квалифицированным токсикологом. Оценивает каждый ингредиент и даёт заключение о безопасности. Стоимость: от 200€ за продукт. Рекомендуем: biolab.com.ua, vsg-consult.com.ua, inveran.com.ua" },
+      { id:"d10", name:"PIF — Досье продукта (Product Information File)",
+        source:"cert", sourceLabel:"Сертиф. компания",
+        prods:["На каждый продукт"],
+        urgent: true,
+        desc:"Главный сводный документ. Включает CPSR, рецептуру, испытания, описание производства, маркировку. Обычно составляется вместе с CPSR одной компанией. Хранится у Ответственного лица." },
+    ]
+  },
+  {
+    section: "Организационные документы",
+    items: [
+      { id:"d11", name:"Назначение Ответственного лица",
+        source:"own", sourceLabel:"Оформить самим",
+        prods:["Все продукты"],
+        urgent: true,
+        desc:"Обязательное требование нового регламента. Ответственное лицо = производитель (если резидент Украины) или уполномоченный дистрибьютор (Dominanta). Оформить письменное уполномочие." },
+      { id:"d12", name:"Проверка и обновление маркировки этикеток",
+        source:"own", sourceLabel:"Бренд + консультант",
+        prods:["Все продукты"],
+        desc:"Этикетка должна содержать: название, данные ответственного лица, срок годности, условия хранения, предупреждения, INCI-список, страну происхождения. Текст — на украинском языке. Проверить все три продукта." },
+    ]
+  },
+  {
+    section: "Государственная регистрация",
+    items: [
+      { id:"d13", name:"Нотификация в системе e-Cosmetics (МОЗ Украины)",
+        source:"gov", sourceLabel:"Портал МОЗ",
+        prods:["Каждый продукт"],
+        urgent: true,
+        desc:"Электронное уведомление на портале Министерства здравоохранения Украины. Подаётся Ответственным лицом после готовности PIF и CPSR. Срок рассмотрения — 5 рабочих дней. Без нотификации продукт не может легально продаваться после 3 августа 2026." },
+    ]
+  }
+];
+
+const sourceClass = { mfg:"tag-source-mfg", cert:"tag-source-cert", gov:"tag-source-gov", own:"tag-source-own" };
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem("hairlove_docs") || "{}"); } catch { return {}; }
+}
+function saveState(state) {
+  localStorage.setItem("hairlove_docs", JSON.stringify(state));
+}
+
+let state = loadState();
+
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  DOCS.forEach(section => {
+    const st = document.createElement("p");
+    st.className = "section-title";
+    st.textContent = section.section;
+    app.appendChild(st);
+
+    section.items.forEach(item => {
+      const done = state[item.id]?.done || false;
+      const comment = state[item.id]?.comment || "";
+      const open = state[item.id]?.open || false;
+
+      const card = document.createElement("div");
+      card.className = "doc-card" + (done ? " done" : "") + (open ? " open" : "");
+      card.id = "card_" + item.id;
+
+      const prodsHtml = item.prods.map(p => `<span class="tag tag-prod">${p}</span>`).join("");
+      const urgentHtml = item.urgent ? `<span class="tag tag-urgent">Срочно</span>` : "";
+
+      card.innerHTML = `
+        <div class="doc-main" onclick="toggleOpen('${item.id}')">
+          <div class="checkbox" onclick="event.stopPropagation(); toggleDone('${item.id}')">${done ? "✓" : ""}</div>
+          <div class="doc-info">
+            <div class="doc-name">${item.name}</div>
+            <div class="doc-meta">
+              <span class="tag ${sourceClass[item.source]}">${item.sourceLabel}</span>
+              ${prodsHtml}
+              ${urgentHtml}
+            </div>
+          </div>
+          <button class="toggle-btn">${open ? "▲" : "▼"}</button>
+        </div>
+        <div class="doc-expand">
+          <div class="doc-desc">${item.desc}</div>
+          <div class="comment-label">Комментарий / статус</div>
+          <textarea class="comment-input" placeholder="Напиши статус, контакт, дату, что угодно..."
+            oninput="saveComment('${item.id}', this.value)">${comment}</textarea>
+        </div>
+      `;
+      app.appendChild(card);
+    });
+  });
+
+  updateProgress();
+}
+
+function toggleDone(id) {
+  if (!state[id]) state[id] = {};
+  state[id].done = !state[id].done;
+  saveState(state);
+  render();
+}
+
+function toggleOpen(id) {
+  if (!state[id]) state[id] = {};
+  state[id].open = !state[id].open;
+  saveState(state);
+  render();
+}
+
+function saveComment(id, val) {
+  if (!state[id]) state[id] = {};
+  state[id].comment = val;
+  saveState(state);
+}
+
+function updateProgress() {
+  const all = DOCS.flatMap(s => s.items);
+  const done = all.filter(item => state[item.id]?.done).length;
+  const pct = all.length ? Math.round(done / all.length * 100) : 0;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressLabel").textContent = `${done} / ${all.length} готово`;
+}
+
+render();
+</script>
+</body>
+</html>
