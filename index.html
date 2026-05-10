@@ -1740,6 +1740,54 @@ footer {
   .foot-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
   .foot-bottom { flex-direction: column; gap: 16px; text-align: center; }
 }
+
+/* ─── HAMBURGER + MOBILE DRAWER ────────────────────────────────── */
+.nav-burger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 200;
+}
+.nav-burger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: all .3s var(--ease-out);
+}
+.nav-burger.open span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+.nav-burger.open span:nth-child(2) { opacity: 0; }
+.nav-burger.open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+.mobile-drawer {
+  display: none;
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  background: var(--cream);
+  border-bottom: 1px solid var(--cream-2);
+  z-index: 150;
+  padding: 24px;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform .35s var(--ease-out), opacity .35s var(--ease-out);
+}
+.mobile-drawer.open { transform: translateY(0); opacity: 1; }
+.mobile-drawer ul { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+.mobile-drawer ul a { font-size: 18px; font-weight: 500; color: var(--ink); text-decoration: none; letter-spacing: 0.04em; }
+
+@media (max-width: 980px) {
+  .nav-burger { display: flex; }
+  .mobile-drawer { display: block; }
+}
 </style>
 <body>
 
@@ -1786,7 +1834,19 @@ footer {
     </div>
     <button class="nav-cta" data-i18n="nav_cta">Стати партнером</button>
   </div>
+  <button class="nav-burger" id="navBurger" aria-label="Меню" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+  <ul>
+    <li><a href="#products" data-i18n="nav_products" onclick="closeMobileMenu()">Лінійка</a></li>
+    <li><a href="#why" data-i18n="nav_why" onclick="closeMobileMenu()">Якість</a></li>
+    <li><a href="#reviews" data-i18n="nav_reviews" onclick="closeMobileMenu()">Відгуки</a></li>
+    <li><a href="#partners" data-i18n="nav_partners" onclick="closeMobileMenu()">Партнерам</a></li>
+    <li><a href="#insta" data-i18n="nav_insta" onclick="closeMobileMenu()">Instagram</a></li>
+  </ul>
+</div>
 
 <!-- Hero -->
 <section class="hero" id="hero">
@@ -2935,12 +2995,57 @@ applyLang = function(lang) {
 };
 
 // ─── PARTNERS FORM ───────────────────────────────────────────────
-function submitPartnersForm(e) {
+async function submitPartnersForm(e) {
   e.preventDefault();
-  document.getElementById('partnersForm').style.display = 'none';
-  document.getElementById('formSuccess').classList.add('shown');
+  const form = document.getElementById('partnersForm');
+  const btn = form.querySelector('.form-submit');
+  btn.disabled = true;
+  const data = {
+    name: document.getElementById('pf-name').value,
+    phone: document.getElementById('ccDial').textContent + document.getElementById('pf-phone').value,
+    city: document.getElementById('pf-city').value,
+    type: document.getElementById('pf-type').value,
+    comment: document.getElementById('pf-comment').value
+  };
+  try {
+    const res = await fetch('https://formspree.io/f/xpwrklbo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (res.ok) {
+      form.style.display = 'none';
+      document.getElementById('formSuccess').classList.add('shown');
+    } else {
+      btn.disabled = false;
+      alert('Помилка відправки. Напишіть нам: @hair_love_company');
+    }
+  } catch {
+    btn.disabled = false;
+    alert('Помилка мережі. Напишіть нам: @hair_love_company');
+  }
   return false;
 }
+
+function closeMobileMenu() {
+  document.getElementById('navBurger').classList.remove('open');
+  document.getElementById('mobileDrawer').classList.remove('open');
+  document.getElementById('navBurger').setAttribute('aria-expanded', 'false');
+  document.getElementById('mobileDrawer').setAttribute('aria-hidden', 'true');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const burger = document.getElementById('navBurger');
+  const drawer = document.getElementById('mobileDrawer');
+  if (burger && drawer) {
+    burger.addEventListener('click', function() {
+      const isOpen = burger.classList.toggle('open');
+      drawer.classList.toggle('open', isOpen);
+      burger.setAttribute('aria-expanded', isOpen);
+      drawer.setAttribute('aria-hidden', !isOpen);
+    });
+  }
+});
 
 // ─── PHONE COUNTRY CODE SELECTOR ─────────────────────────────────
 const COUNTRIES = [
