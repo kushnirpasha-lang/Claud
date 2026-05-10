@@ -167,5 +167,8 @@ jobs:
             send '{"project":"hairlove","agent":"copy","type":"start","message":"пишу тексты бренда для лендинга"}'
             send '{"project":"hairlove","agent":"instagram","type":"start","message":"планирую контент-план на месяц"}'
             send '{"project":"hairlove","agent":"ads","type":"start","message":"настраиваю Meta Ads на B2B аудиторию"}'
+            send '{"project":"hairlove","agent":"docs","type":"start","message":"запускаю трекер сертификации · дедлайн 03.08.2026"}'
+            send '{"project":"hairlove","agent":"docs","type":"step","message":"запрос на завод: рецептура + INCI + CoA для CPSR"}'
+            send '{"project":"hairlove","agent":"docs","type":"step","message":"нотификация e-Cosmetics МОЗ Украины — в процессе"}'
             send '{"project":"hairlove","agent":"coordinator","type":"complete","message":"маршрут завершён. Итог: HairLove запущен ✅"}'
             echo "✅ HairLove события отправлены"

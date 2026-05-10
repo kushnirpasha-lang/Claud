@@ -394,18 +394,18 @@ header {
 const PRJ = 'hairlove';
 
 const AG = [
-  { k:'coordinator', n:'Координатор', cmd:'/hairlove',            ico:'🎯', d:'Маршрутизация задач.',        px:22, py:50, def:'working' },
-  { k:'strategy',    n:'Стратегия',   cmd:'/hairlove-strategy',   ico:'🧭', d:'Стратегические решения.',     px:22, py:16, def:'working' },
-  { k:'copy',        n:'Тексты',      cmd:'/hairlove-texts',       ico:'✍️', d:'Контент для всех каналов.',  px: 5, py:33, def:'active'  },
-  { k:'site',        n:'Сайт',        cmd:'/hairlove-site',        ico:'🌐', d:'B2B-витрина.',                px:38, py:22, def:'next'    },
-  { k:'competitors', n:'Конкуренты',  cmd:'/hairlove-competitors', ico:'🔍', d:'Анализ рынка.',               px: 5, py:67, def:'wait'    },
-  { k:'ads',         n:'Реклама',     cmd:'/hairlove-ads',         ico:'📢', d:'Meta Ads, таргетинг.',       px:38, py:78, def:'stage'   },
-  { k:'instagram',   n:'Instagram',   cmd:'/hairlove-insta',       ico:'📱', d:'Публикация постов.',          px:22, py:84, def:'active'  },
-  { k:'planning',    n:'Планирование',cmd:'/hairlove-planning',    ico:'📋', d:'Задачи и приоритеты.',        px:55, py:16, def:'wait'    },
-  { k:'growth',      n:'Рост',        cmd:'/hairlove-growth',      ico:'🚀', d:'Дистрибуторы, органика.',    px:55, py:84, def:'wait'    },
-  { k:'brandbook',   n:'Брендбук',    cmd:'/hairlove-brand',       ico:'🎨', d:'Визуал и голос бренда.',     px: 5, py:50, def:'done'    },
-  { k:'text-editor', n:'Редактор',    cmd:'/hairlove-editor',      ico:'📝', d:'Финальная вычитка.',         px:38, py:50, def:'wait'    },
-  { k:'documents',   n:'Документы',   cmd:'/hairlove-docs',        ico:'📄', d:'КП, договоры, сертифик.',    px:55, py:50, def:'wait'    },
+  { k:'coordinator', n:'Координатор', cmd:'/hairlove',            ico:'🎯', d:'Маршрутизация задач.',               px:22, py:50, def:'working' },
+  { k:'strategy',    n:'Стратегия',   cmd:'/hairlove-strategy',   ico:'🧭', d:'Стратегические решения.',            px:22, py:16, def:'working' },
+  { k:'copy',        n:'Тексты',      cmd:'/hairlove-texts',       ico:'✍️', d:'Контент для всех каналов.',         px: 5, py:33, def:'active'  },
+  { k:'site',        n:'Сайт',        cmd:'/hairlove-site',        ico:'🌐', d:'B2B-витрина.',                       px:38, py:22, def:'next'    },
+  { k:'competitors', n:'Конкуренты',  cmd:'/hairlove-competitors', ico:'🔍', d:'Анализ рынка.',                      px: 5, py:67, def:'wait'    },
+  { k:'ads',         n:'Реклама',     cmd:'/hairlove-ads',         ico:'📢', d:'Meta Ads, таргетинг.',              px:38, py:78, def:'stage'   },
+  { k:'instagram',   n:'Instagram',   cmd:'/hairlove-insta',       ico:'📱', d:'Публикация постов.',                 px:22, py:84, def:'active'  },
+  { k:'planning',    n:'Планирование',cmd:'/hairlove-planning',    ico:'📋', d:'Задачи и приоритеты.',               px:55, py:16, def:'wait'    },
+  { k:'growth',      n:'Рост',        cmd:'/hairlove-growth',      ico:'🚀', d:'Дистрибуторы, органика.',           px:55, py:84, def:'wait'    },
+  { k:'brandbook',   n:'Брендбук',    cmd:'/hairlove-brand',       ico:'🎨', d:'Визуал и голос бренда.',            px: 5, py:50, def:'done'    },
+  { k:'text-editor', n:'Редактор',    cmd:'/hairlove-editor',      ico:'📝', d:'Финальная вычитка.',                px:38, py:50, def:'wait'    },
+  { k:'docs',        n:'Документы',   cmd:'/hairlove-docs',        ico:'📋', d:'Сертификация · дедлайн 03.08.2026', px:55, py:50, def:'active'  },
 ];
 const HUB  = { px:22, py:50 };
 const OWN  = { px:64, py:50 };
@@ -422,6 +422,7 @@ const WFLOWS = [
   { f:'text-editor',  t:'instagram',   c:'var(--lb)' },
   { f:'ads',          t:'growth',      c:'var(--lr)' },
   { f:'instagram',    t:'growth',      c:'var(--lr)' },
+  { f:'docs',         t:'strategy',    c:'var(--lg)' },
 ];
 const BMAP = {
   active:  ['b-active',  'Активен'],
