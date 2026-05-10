@@ -330,6 +330,18 @@
 
   .reg-sources { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
   .reg-sources h3 { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 10px; }
+  .procare-sources { background: #F1F8F5; border: 1.5px solid #A8D5BF; border-radius: 10px; padding: 16px 18px; margin-top: 14px; }
+  .procare-sources h3 { font-size: 13px; font-weight: 700; color: #1E7A4A; margin-bottom: 4px; }
+  .procare-sources .ps-sub { font-size: 11px; color: var(--gray); margin-bottom: 12px; }
+  .procare-item { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid #C8E6D7; }
+  .procare-item:last-child { border-bottom: none; }
+  .procare-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .procare-item-body { flex: 1; }
+  .procare-item-body b { font-size: 12px; font-weight: 700; color: #1A1A1A; }
+  .procare-item-body a { color: #1E7A4A; text-decoration: none; font-size: 11px; display: inline-block; margin-top: 2px; }
+  .procare-item-body a:hover { text-decoration: underline; }
+  .procare-item-body span { font-size: 11px; color: var(--gray); display: block; margin-top: 2px; line-height: 1.4; }
+  .procare-tag { display: inline-block; font-size: 10px; font-weight: 700; background: #D4EDDA; color: #155724; border-radius: 4px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
   .source-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0;
                 border-bottom: 1px solid var(--border); font-size: 12px; }
   .source-row:last-child { border-bottom: none; }
@@ -557,10 +569,10 @@ alter publication supabase_realtime add table tracker_state;</div>
 
   <div class="reg-parties">
     <div class="party-card">
-      <div class="reg-card-icon">&#127471;&#127481;</div>
-      <h4>Виробник</h4>
-      <div class="party-name">Завод (Україна)</div>
-      <div class="party-role">Надає: рецептуру, INCI, CoA, ТУ, опис виробництва, мікробіологію, стабільність, GMP. Несе відповідальність за якість.</div>
+      <div class="reg-card-icon">&#127477;&#127479;</div>
+      <h4>Виробник (частина продукції)</h4>
+      <div class="party-name">ProCare — Київ, Україна</div>
+      <div class="party-role">Надає: рецептуру, INCI, CoA, ТУ, мікробіологію, стабільність, GMP. Має <b>GMP ISO 22716:2009</b> (2022 р.), COSMOS, ECOCERT. vtm@procare.com.ua</div>
     </div>
     <div class="party-card">
       <div class="reg-card-icon">&#128105;&#8205;&#128187;</div>
@@ -597,6 +609,65 @@ alter publication supabase_realtime add table tracker_state;</div>
     <div class="source-row">
       <div class="source-num">5</div>
       <div class="source-text"><b>Портал e-Cosmetics МОЗ України</b> <span>&#8212; система електронних нотифікацій (аналог EU CPNP). Ще тестується станом на травень 2026. Слідкуй за новинами на сайті moz.gov.ua.</span></div>
+    </div>
+  </div>
+
+  <div class="procare-sources">
+    <h3>&#127963; ProCare &#8212; завод-виробник (Україна)</h3>
+    <div class="ps-sub">Контрактне виробництво косметики. Робить частину продукції HAiR L&#9825;VE. Київ, вул. Івана Виговського, 13. <b>vtm@procare.com.ua</b> · +38 (097) 386 50 64</div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#127968;</div>
+      <div class="procare-item-body">
+        <b>Офіційний сайт контрактного виробництва</b><span class="procare-tag">Головний</span>
+        <a href="https://vtm.procare.com.ua/" target="_blank">vtm.procare.com.ua &#8599;</a>
+        <span>Контактна форма, портфоліо, опис послуг. Звідси надсилати запит на документи.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#127981;</div>
+      <div class="procare-item-body">
+        <b>Контрактне виробництво — опис послуги</b>
+        <a href="https://www.procare.com.ua/page/kontraktnoe-proizvodstvo?lang=ru" target="_blank">procare.com.ua/kontraktnoe-proizvodstvo &#8599;</a>
+        <span>Що входить у послугу: від рецептури до документів. Підтверджує, що надання d01–d08 є частиною їхнього стандартного пакету.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#10003;&#65039;</div>
+      <div class="procare-item-body">
+        <b>GMP сертифікація виробництва</b><span class="procare-tag">GMP є</span>
+        <a href="https://vtm.procare.com.ua/blog-eng/partner-for-contract-manufacturing-of-cosmetics-with-gmp-certification-why-is-it-important-for-your-business" target="_blank">Стаття: чому GMP важливий &#8599;</a>
+        <span>ProCare має GMP ISO 22716:2009 з 2022 р. Для d08 потрібно лише попросити копію. Це ключовий аргумент для токсиколога при підписанні CPSR.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#127807;</div>
+      <div class="procare-item-body">
+        <b>COSMOS та ECOCERT сертифікація компонентів</b>
+        <a href="https://www.procare.com.ua/page/sertifikatsiya-produktsii" target="_blank">procare.com.ua/sertifikatsiya &#8599;</a>
+        <span>Сировина постачальників сертифікована. Спрощує підготовку CoA (d03) і підвищує якість CPSR.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#128196;</div>
+      <div class="procare-item-body">
+        <b>Переваги контрактного виробництва від ProCare</b>
+        <a href="https://vtm.procare.com.ua/blog/perevagi-kontraktnogo-virobnictva-kosmetiki-dlya-brendiv-abo-yak-procare-dopomozhe-vivesti-vash-brend-na-noviy-riven" target="_blank">Читати статтю &#8599;</a>
+        <span>Повний цикл від формули до готового продукту. Підтверджує, що документація — частина їхніх обов'язків перед клієнтом.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#9993;&#65039;</div>
+      <div class="procare-item-body">
+        <b>Контакт для запиту документів</b>
+        <a href="mailto:vtm@procare.com.ua">vtm@procare.com.ua</a>
+        <span>Надіслати запит на d01–d08 (рецептура, INCI, CoA, ТУ, мікробіологія, стабільність, опис виробництва, GMP). Шаблон листа — у вкладці «Комунікації».</span>
+      </div>
     </div>
   </div>
 
