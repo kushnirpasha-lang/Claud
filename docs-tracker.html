@@ -103,6 +103,7 @@
   .tag-own    { background: #F3E5F5; color: #6A1B9A; }
   .tag-urgent { background: #FFEBEE; color: var(--red); font-weight: 700; }
   .tag-files  { background: #E8F5E9; color: #2E7D32; }
+  .tag-procare { background: #E8F5E9; color: #1E7A4A; font-weight: 700; }
   .toggle-arrow { color: var(--gray-light); font-size: 10px; margin-top: 2px; flex-shrink: 0; }
 
   .doc-item-expand { display: none; padding: 0 14px 10px 44px; }
@@ -653,22 +654,22 @@ const PRODUCTS = [
 
 const DOCS = [
   { section:"Від виробника", items:[
-    { id:"d01", name:"Рецептура (формула) з % кожного інгредієнту", source:"mfg", sl:"Завод", urgent:true,
+    { id:"d01", name:"Рецептура (формула) з % кожного інгредієнту", source:"mfg", sl:"Завод", urgent:true, procare:"yes",
       desc:"Повна формула з точними % всіх інгредієнтів — основа для CPSR. Без неї токсиколог не почне роботу. Запитувати офіційно у відділі якості заводу." },
-    { id:"d02", name:"INCI-назви всіх інгредієнтів", source:"mfg", sl:"Завод",
+    { id:"d02", name:"INCI-назви всіх інгредієнтів", source:"mfg", sl:"Завод", procare:"yes",
       desc:"Міжнародні найменування за стандартом INCI. Потрібні для маркування та CPSR. Виробник зобов'язаний надати — це частина договору поставки." },
-    { id:"d03", name:"CoA — сертифікати якості на кожну сировину", source:"mfg", sl:"Завод",
+    { id:"d03", name:"CoA — сертифікати якості на кожну сировину", source:"mfg", sl:"Завод", procare:"yes",
       desc:"Certificate of Analysis від постачальника сировини на кожен інгредієнт. Підтверджують чистоту та безпеку. Частина може бути закритою." },
-    { id:"d04", name:"Технічні умови (ТУ) / специфікація на готовий продукт", source:"mfg", sl:"Завод",
+    { id:"d04", name:"Технічні умови (ТУ) / специфікація на готовий продукт", source:"mfg", sl:"Завод", procare:"yes",
       desc:"Фізико-хімічні параметри, методи контролю якості, термін придатності. Є частиною PIF." },
-    { id:"d05", name:"Мікробіологічні випробування", source:"mfg", sl:"Завод або лабораторія",
+    { id:"d05", name:"Мікробіологічні випробування", source:"mfg", sl:"Завод або лабораторія", procare:"yes",
       desc:"Підтвердження мікробіологічної безпеки. Якщо завод не робив — замовити в акредитованій лабораторії (biolab.com.ua). Без цього CPSR не підпишуть." },
-    { id:"d06", name:"Тести на стабільність (stability testing)", source:"mfg", sl:"Завод або лабораторія",
+    { id:"d06", name:"Тести на стабільність (stability testing)", source:"mfg", sl:"Завод або лабораторія", procare:"yes",
       desc:"Стрес-тести: температурні перепади, UV, час. Підтверджують заявлений термін придатності." },
-    { id:"d07", name:"Опис виробничого процесу", source:"mfg", sl:"Завод",
+    { id:"d07", name:"Опис виробничого процесу", source:"mfg", sl:"Завод", procare:"yes",
       desc:"Коротке описання як виробляється продукт. Входить до PIF. Завод може надати в спрощеному вигляді для конфіденційності." },
-    { id:"d08", name:"Сертифікат GMP / ISO 22716 виробництва", source:"mfg", sl:"Завод",
-      desc:"Якщо завод має GMP або ISO 22716 — великий плюс. Якщо ні — не блокує сертифікацію, але відображається в PIF." },
+    { id:"d08", name:"Сертифікат GMP / ISO 22716 виробництва", source:"mfg", sl:"Завод", procare:"has",
+      desc:"ProCare вже має GMP (ISO 22716:2009, отримано у 2022 р.) — потрібно лише запросити копію сертифікату." },
   ]},
   { section:"Замовити у сертифікаційної компанії", items:[
     { id:"d09", name:"CPSR — Звіт безпеки продукту (токсиколог)", source:"cert", sl:"Токсиколог", urgent:true,
@@ -1171,6 +1172,11 @@ function renderColumn(prod) {
       const files  = (s.files || []).map(f => typeof f==='string' ? {name:f,url:null} : f);
       const urgTag = item.urgent ? `<span class="tag tag-urgent">&#9888; Терміново</span>` : '';
       const fTag   = files.length ? `<span class="tag tag-files">&#128204; ${files.length}</span>` : '';
+      const procareTag = item.procare === 'has'
+        ? `<span class="tag tag-procare">&#10003; ProCare · GMP є</span>`
+        : item.procare === 'yes'
+          ? `<span class="tag tag-procare">&#177; ProCare може надати</span>`
+          : '';
       const fChips = files.map((f,fi) => fileHtml(f, key, fi)).join('');
 
       h += `<div class="doc-item${isDone?' done':''}${isOpen?' open':''}" id="i_${key}">
@@ -1178,7 +1184,7 @@ function renderColumn(prod) {
           <div class="checkbox" onclick="event.stopPropagation();toggleDone('${key}')">${isDone?'&#10003;':''}</div>
           <div class="doc-item-body">
             <div class="doc-item-name">${item.name}</div>
-            <div class="doc-item-tags"><span class="tag ${SRC[item.source]}">${item.sl}</span>${urgTag}${fTag}</div>
+            <div class="doc-item-tags"><span class="tag ${SRC[item.source]}">${item.sl}</span>${urgTag}${procareTag}${fTag}</div>
           </div>
           <div class="toggle-arrow">${isOpen?'&#9650;':'&#9660;'}</div>
         </div>
@@ -1254,3 +1260,4 @@ init();
 </script>
 </body>
 </html>
+
