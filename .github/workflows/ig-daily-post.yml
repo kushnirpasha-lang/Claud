@@ -109,6 +109,13 @@ jobs:
               -H "Content-Type: application/json" \
               "https://api.github.com/repos/kushnirpasha-lang/Claud/issues/1/comments" \
               -d "{\"body\": \"✅ HAiR LOVE пост #${NEW_INDEX} опублікований!\nPost ID: ${POST_ID}\nФото: ${PHOTO}\"}" || true
+
+            # Telegram уведомление Павлу
+            CHAT_ID=$(curl -s "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/getUpdates?limit=1" | python3 -c "import sys,json; updates=json.load(sys.stdin).get('result',[]); print(updates[-1]['message']['chat']['id'] if updates else '')" 2>/dev/null || echo "")
+            if [ -n "$CHAT_ID" ]; then
+              TG_TEXT="✅ HAiR LOVE — пост опубліковано!%0A%0AФото: ${PHOTO}%0AПост #${NEW_INDEX} з 27%0A%0AInstagram: @hair_love_company"
+              curl -s "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage?chat_id=${CHAT_ID}&text=${TG_TEXT}" > /dev/null || true
+            fi
           else
             ERROR=$(echo "$RESULT" | python3 -c "import sys,json; e=json.load(sys.stdin).get('error',{}); print(e.get('message','unknown'))" 2>/dev/null)
             echo "Publish failed: $ERROR"
