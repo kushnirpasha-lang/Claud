@@ -1,0 +1,116 @@
+name: HAiR LOVE — Daily Instagram Post
+
+on:
+  schedule:
+    - cron: '0 16 * * *'  # 19:00 Kyiv time (UTC+3) — пик beauty engagement
+  workflow_dispatch:       # можно запустить вручную
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.MY_PAT }}
+          ref: claude/obshak
+
+      - name: Read queue and post
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        run: |
+          INDEX=$(cat projects/hairlove/artifacts/instagram/posting-index.txt | tr -d '[:space:]')
+          QUEUE_LEN=$(python3 -c "import json; print(len(json.load(open('projects/hairlove/artifacts/instagram/posting-queue.json'))))")
+
+          echo "Current index: $INDEX / $QUEUE_LEN"
+
+          if [ "$INDEX" -ge "$QUEUE_LEN" ]; then
+            echo "Queue finished — all photos posted!"
+            exit 0
+          fi
+
+          PHOTO=$(python3 -c "import json; q=json.load(open('projects/hairlove/artifacts/instagram/posting-queue.json')); print(q[$INDEX]['photo'])")
+          CAPTION_ID=$(python3 -c "import json; q=json.load(open('projects/hairlove/artifacts/instagram/posting-queue.json')); print(q[$INDEX]['caption_id'])")
+
+          echo "Photo: $PHOTO"
+          echo "Caption ID: $CAPTION_ID"
+
+          # Captions map
+          python3 << 'PYEOF'
+          import os
+          captions = {
+            "1": "Ти вже пробувала засіб, після якого локони просто слухаються? Кератин, сфінголіпіди, шовкові амінокислоти, олія аргани. Наноси на вологе волосся — не змивай. Все.\n\nРозроблено в Італії | HAiR LOVE",
+            "2": "Без силіконів. Без сульфатів. Без компромісів.\n\nКератин + сфінголіпіди + шовкові амінокислоти + олія аргани + олія макадамії.\n\nРозроблено в Італії | HAiR LOVE",
+            "3": "Фен, праска, плойка — щодня. Thermo Protector Spray захищає до 220°C, розгладжує та додає блиск. Кератин + 9 амінокислот + екстракт виноградної кісточки. Не склеює.\n\nРозроблено в Італії | HAiR LOVE",
+            "4": "Масажуй до появи крем-піни — це значить що засіб працює. Гідролізований кератин, колаген, алое, пантенол запечатують кожну лусочку. 15 секунд — бальзам. До 30 хвилин — маска-філер.\n\nРозроблено в Італії | HAiR LOVE",
+          }
+          caption_id = os.environ.get('CAPTION_ID', '1')
+          caption = captions.get(caption_id, captions['1'])
+          with open('/tmp/caption.txt', 'w') as f:
+            f.write(caption)
+          print(f"Caption selected: ID={caption_id}, length={len(caption)}")
+          PYEOF
+
+          CAPTION=$(cat /tmp/caption.txt)
+
+          ENCODED=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote('$PHOTO'))")
+          IMAGE_URL="https://raw.githubusercontent.com/kushnirpasha-lang/Claud/claude/obshak/projects/hairlove/artifacts/instagram/photos/${ENCODED}"
+          echo "Image URL: $IMAGE_URL"
+
+          # Step 1: create container
+          CONTAINER=$(curl -s -X POST \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media" \
+            -d "image_url=${IMAGE_URL}" \
+            --data-urlencode "caption=${CAPTION}" \
+            -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Container: $CONTAINER"
+
+          CONTAINER_ID=$(echo "$CONTAINER" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
+
+          if [ -z "$CONTAINER_ID" ]; then
+            ERROR=$(echo "$CONTAINER" | python3 -c "import sys,json; e=json.load(sys.stdin).get('error',{}); print(e.get('message','unknown'))" 2>/dev/null)
+            echo "FAILED: $ERROR"
+            curl -s -X POST \
+              -H "Authorization: token $GH_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.github.com/repos/kushnirpasha-lang/Claud/issues/1/comments" \
+              -d "{\"body\": \"❌ HAiR LOVE автопост НЕ опублікований\nФото: ${PHOTO}\nПомилка: ${ERROR}\"}" || true
+            exit 1
+          fi
+
+          sleep 5
+
+          # Step 2: publish
+          RESULT=$(curl -s -X POST \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media_publish" \
+            -d "creation_id=${CONTAINER_ID}" \
+            -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Publish: $RESULT"
+
+          POST_ID=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
+
+          if [ -n "$POST_ID" ]; then
+            echo "✅ Published! Post ID: $POST_ID"
+
+            # Advance index
+            NEW_INDEX=$((INDEX + 1))
+            echo "$NEW_INDEX" > projects/hairlove/artifacts/instagram/posting-index.txt
+
+            git config user.email "bot@hairlove.studio"
+            git config user.name "HAiR LOVE Bot"
+            git add projects/hairlove/artifacts/instagram/posting-index.txt
+            git commit -m "instagram: опубліковано пост #${NEW_INDEX} — ${PHOTO}"
+            git push "https://${GH_TOKEN}@github.com/kushnirpasha-lang/Claud.git" claude/obshak
+
+            curl -s -X POST \
+              -H "Authorization: token $GH_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.github.com/repos/kushnirpasha-lang/Claud/issues/1/comments" \
+              -d "{\"body\": \"✅ HAiR LOVE пост #${NEW_INDEX} опублікований!\nPost ID: ${POST_ID}\nФото: ${PHOTO}\"}" || true
+          else
+            ERROR=$(echo "$RESULT" | python3 -c "import sys,json; e=json.load(sys.stdin).get('error',{}); print(e.get('message','unknown'))" 2>/dev/null)
+            echo "Publish failed: $ERROR"
+            exit 1
+          fi
