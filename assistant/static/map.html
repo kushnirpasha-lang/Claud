@@ -19,7 +19,6 @@
   --green: #3dd68c;
   --amber: #f5a623;
   --red: #f05c5c;
-  --blue: #4da6ff;
 }
 
 body {
@@ -34,7 +33,7 @@ body {
 header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   padding: 14px 24px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -51,143 +50,123 @@ header .subtitle { font-size: 11px; color: var(--muted); }
   flex-shrink: 0;
   animation: pulse 2s infinite;
 }
-@keyframes pulse {
-  0%,100% { opacity:1 } 50% { opacity:.3 }
-}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-.nav-links {
-  margin-left: auto;
-  display: flex;
-  gap: 8px;
-}
+.nav-links { margin-left: auto; display: flex; gap: 8px; }
 .nav-links a {
-  font-size: 12px;
-  color: var(--muted);
-  text-decoration: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  font-size: 12px; color: var(--muted); text-decoration: none;
+  padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border);
   transition: all .2s;
 }
 .nav-links a:hover { color: var(--text); border-color: var(--accent); }
 
-.map-container {
+/* Agent grid */
+.grid-container {
   flex: 1;
   overflow: auto;
-  padding: 32px;
+  padding: 28px 32px;
+}
+
+.project-section { margin-bottom: 40px; }
+.project-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.project-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
-.map-canvas {
-  position: relative;
-  width: 900px;
-  min-height: 700px;
+.agents-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-/* SVG arrows layer */
-.arrows-svg {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  overflow: visible;
-}
-
-/* Agent nodes */
-.agent-node {
-  position: absolute;
-  width: 130px;
+.agent-card {
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 14px 16px;
+  width: 180px;
   cursor: default;
-  transition: border-color .25s, box-shadow .25s, transform .15s;
-  z-index: 2;
+  transition: border-color .2s, box-shadow .2s, transform .15s;
+  position: relative;
 }
 
-.agent-node:hover {
+.agent-card:hover {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(124,106,247,.15);
+  box-shadow: 0 0 0 3px rgba(124,106,247,.12);
   transform: translateY(-1px);
 }
 
-.agent-node.active {
+.agent-card.state-active {
   border-color: var(--green);
-  box-shadow: 0 0 12px rgba(61,214,140,.25);
+  box-shadow: 0 0 14px rgba(61,214,140,.25);
   animation: glow 2s infinite;
 }
-@keyframes glow {
-  0%,100% { box-shadow: 0 0 8px rgba(61,214,140,.25) }
-  50% { box-shadow: 0 0 20px rgba(61,214,140,.45) }
-}
+@keyframes glow { 0%,100%{box-shadow:0 0 8px rgba(61,214,140,.2)} 50%{box-shadow:0 0 20px rgba(61,214,140,.4)} }
 
-.agent-node.idle { border-color: var(--border); }
-.agent-node.error { border-color: var(--red); box-shadow: 0 0 8px rgba(240,92,92,.2); }
-.agent-node.complete { border-color: var(--accent2); }
+.agent-card.state-complete { border-color: var(--accent2); }
+.agent-card.state-error { border-color: var(--red); }
 
-.agent-icon { font-size: 18px; margin-bottom: 4px; }
-.agent-name { font-size: 12px; font-weight: 600; color: var(--text); }
-.agent-role { font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+.agent-icon { font-size: 20px; margin-bottom: 6px; }
+.agent-name { font-size: 13px; font-weight: 600; }
+.agent-desc { font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
 
-.agent-status {
+.agent-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 10px;
-  margin-top: 6px;
-  padding: 2px 6px;
+  margin-top: 8px;
+  padding: 2px 7px;
   border-radius: 4px;
   background: rgba(255,255,255,.04);
+  color: var(--muted);
 }
-
-.status-dot {
+.badge-dot {
   width: 5px; height: 5px;
   border-radius: 50%;
-  flex-shrink: 0;
+  background: var(--muted);
 }
-.status-dot.active { background: var(--green); animation: pulse 1.5s infinite; }
-.status-dot.idle { background: var(--muted); }
-.status-dot.error { background: var(--red); }
-.status-dot.complete { background: var(--accent2); }
+.state-active .badge-dot { background: var(--green); animation: pulse 1.5s infinite; }
+.state-complete .badge-dot { background: var(--accent2); }
+.state-error .badge-dot { background: var(--red); }
 
-/* Phase labels */
-.phase-label {
-  position: absolute;
+/* Last event strip */
+.last-event {
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .6px;
-  text-transform: uppercase;
   color: var(--muted);
-  background: var(--bg);
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* Legend */
 .legend {
   display: flex;
   gap: 16px;
-  padding: 12px 24px;
+  padding: 10px 24px;
   background: var(--surface);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
   flex-wrap: wrap;
 }
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--muted);
-}
-.legend-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-}
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+.ts-info { margin-left: auto; font-size: 11px; color: var(--muted); }
 
 /* Tooltip */
 .tooltip {
@@ -199,29 +178,14 @@ header .subtitle { font-size: 11px; color: var(--muted); }
   font-size: 11px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity .2s;
-  max-width: 220px;
+  transition: opacity .15s;
+  max-width: 260px;
   z-index: 100;
   line-height: 1.5;
 }
 .tooltip.visible { opacity: 1; }
-.tooltip strong { color: var(--text); }
-.tooltip small { color: var(--muted); display: block; margin-top: 2px; }
-
-/* Last event ticker */
-.ticker {
-  position: absolute;
-  bottom: -1px;
-  left: 0; right: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  padding: 8px 24px;
-  font-size: 11px;
-  color: var(--muted);
-  overflow: hidden;
-  white-space: nowrap;
-}
-.ticker .event-msg { color: var(--accent2); }
+.tooltip strong { color: var(--text); display: block; margin-bottom: 2px; }
+.tooltip small { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -230,7 +194,7 @@ header .subtitle { font-size: 11px; color: var(--muted); }
   <div class="live-dot" id="liveDot"></div>
   <div>
     <h1>Карта агентов</h1>
-    <div class="subtitle">Поток задач и состояние агентов в реальном времени</div>
+    <div class="subtitle" id="subtitle">Загрузка...</div>
   </div>
   <div class="nav-links">
     <a href="/dashboard">Дашборд</a>
@@ -238,323 +202,175 @@ header .subtitle { font-size: 11px; color: var(--muted); }
   </div>
 </header>
 
-<div class="map-container">
-  <div class="map-canvas" id="canvas">
-
-    <!-- SVG arrows -->
-    <svg class="arrows-svg" id="arrowsSvg"></svg>
-
-    <!-- Phase 0 label -->
-    <div class="phase-label" style="left:330px; top:10px">Фаза 0 — Основа</div>
-
-    <!-- Row 0: coordinator -->
-    <div class="agent-node" id="node-coordinator" style="left:385px; top:40px"
-         data-agent="coordinator" data-tip="Единственная точка входа/выхода. Читает routes.md и маршрутизирует задачи.">
-      <div class="agent-icon">🎯</div>
-      <div class="agent-name">coordinator</div>
-      <div class="agent-role">маршрутизация и контроль</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-coordinator"></span><span id="label-coordinator">idle</span></div>
-    </div>
-
-    <!-- Row 1: planning, competitors, strategy -->
-    <div class="phase-label" style="left:10px; top:175px">Параллельно</div>
-
-    <div class="agent-node" id="node-planning" style="left:90px; top:195px"
-         data-agent="planning" data-tip="Дорожная карта, приоритеты, сроки. Получает задачи от координатора.">
-      <div class="agent-icon">📋</div>
-      <div class="agent-name">planning</div>
-      <div class="agent-role">задачи и планирование</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-planning"></span><span id="label-planning">idle</span></div>
-    </div>
-
-    <div class="agent-node" id="node-competitors" style="left:385px; top:195px"
-         data-agent="competitors" data-tip="Анализ рынка: позиционирование, каналы, цены конкурентов.">
-      <div class="agent-icon">🔍</div>
-      <div class="agent-name">competitors</div>
-      <div class="agent-role">анализ рынка</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-competitors"></span><span id="label-competitors">idle</span></div>
-    </div>
-
-    <div class="agent-node" id="node-strategy" style="left:680px; top:195px"
-         data-agent="strategy" data-tip="Позиционирование HairLove, B2B/B2C фокус, ключевые решения.">
-      <div class="agent-icon">🧭</div>
-      <div class="agent-name">strategy</div>
-      <div class="agent-role">стратегические решения</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-strategy"></span><span id="label-strategy">idle</span></div>
-    </div>
-
-    <!-- Phase 1 label -->
-    <div class="phase-label" style="left:330px; top:340px">Фаза 1 — Идентичность</div>
-
-    <!-- Row 2: brandbook, copy -->
-    <div class="agent-node" id="node-brandbook" style="left:220px; top:370px"
-         data-agent="brandbook" data-tip="Визуал, цвета, типографика, голос бренда. На основе strategy.">
-      <div class="agent-icon">🎨</div>
-      <div class="agent-name">brandbook</div>
-      <div class="agent-role">визуальная идентичность</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-brandbook"></span><span id="label-brandbook">idle</span></div>
-    </div>
-
-    <div class="agent-node" id="node-copy" style="left:550px; top:370px"
-         data-agent="copy" data-tip="Базовые тексты для всех каналов. На основе strategy + brandbook.">
-      <div class="agent-icon">✍️</div>
-      <div class="agent-name">copy</div>
-      <div class="agent-role">тексты и копирайтинг</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-copy"></span><span id="label-copy">idle</span></div>
-    </div>
-
-    <!-- Row 2.5: text-editor -->
-    <div class="agent-node" id="node-text-editor" style="left:385px; top:480px"
-         data-agent="text-editor" data-tip="Вычитка и контроль качества всех текстов.">
-      <div class="agent-icon">📝</div>
-      <div class="agent-name">text-editor</div>
-      <div class="agent-role">финальная вычитка</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-text-editor"></span><span id="label-text-editor">idle</span></div>
-    </div>
-
-    <!-- Phase 2 label -->
-    <div class="phase-label" style="left:330px; top:575px">Фаза 2 — Каналы</div>
-
-    <!-- Row 3: site, instagram, growth -->
-    <div class="agent-node" id="node-site" style="left:90px; top:600px"
-         data-agent="site" data-tip="B2B витрина на Tilda: структура + контент. Получает от strategy, brandbook, copy.">
-      <div class="agent-icon">🌐</div>
-      <div class="agent-name">site</div>
-      <div class="agent-role">сайт и B2B витрина</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-site"></span><span id="label-site">idle</span></div>
-    </div>
-
-    <div class="agent-node" id="node-instagram" style="left:385px; top:600px"
-         data-agent="instagram" data-tip="Контент-план, первые публикации, визуал. Получает от strategy, brandbook, copy.">
-      <div class="agent-icon">📱</div>
-      <div class="agent-name">instagram</div>
-      <div class="agent-role">контент и соцсети</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-instagram"></span><span id="label-instagram">idle</span></div>
-    </div>
-
-    <div class="agent-node" id="node-growth" style="left:680px; top:600px"
-         data-agent="growth" data-tip="Онбординг дистрибуторов, старт Одесса (салоны), тестеры.">
-      <div class="agent-icon">🚀</div>
-      <div class="agent-name">growth</div>
-      <div class="agent-role">рост и органика</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-growth"></span><span id="label-growth">idle</span></div>
-    </div>
-
-    <!-- Phase 3 label -->
-    <div class="phase-label" style="left:330px; top:720px">Фаза 3 — Трафик</div>
-
-    <!-- Row 4: ads -->
-    <div class="agent-node" id="node-ads" style="left:385px; top:745px"
-         data-agent="ads" data-tip="Запуск Meta/Google рекламы — таргетинг на B2B и B2C. Работает после site + competitors + strategy.">
-      <div class="agent-icon">📢</div>
-      <div class="agent-name">ads</div>
-      <div class="agent-role">Meta/Google реклама</div>
-      <div class="agent-status"><span class="status-dot idle" id="dot-ads"></span><span id="label-ads">idle</span></div>
-    </div>
-
-  </div><!-- /canvas -->
+<div class="grid-container" id="gridContainer">
+  <div style="color:var(--muted);padding:40px 0;text-align:center">Загрузка агентов...</div>
 </div>
 
 <div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>активен сейчас</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>активен</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--accent2)"></div>завершил</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>ожидает</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>ошибка</div>
-  <span style="color:var(--muted);font-size:11px;margin-left:auto" id="lastUpdate">Обновляется каждые 2 сек</span>
+  <span class="ts-info" id="tsInfo">Обновляется каждые 2 сек</span>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-// ── Node positions (center points) ──────────────────────────────────────────
-const NODES = {
-  'coordinator': { x: 385+65, y: 40+52 },
-  'planning':    { x: 90+65,  y: 195+52 },
-  'competitors': { x: 385+65, y: 195+52 },
-  'strategy':    { x: 680+65, y: 195+52 },
-  'brandbook':   { x: 220+65, y: 370+52 },
-  'copy':        { x: 550+65, y: 370+52 },
-  'text-editor': { x: 385+65, y: 480+52 },
-  'site':        { x: 90+65,  y: 600+52 },
-  'instagram':   { x: 385+65, y: 600+52 },
-  'growth':      { x: 680+65, y: 600+52 },
-  'ads':         { x: 385+65, y: 745+52 },
+// ── Icons per agent name ────────────────────────────────────────────────────
+const ICONS = {
+  coordinator: '🎯', planning: '📋', competitors: '🔍', strategy: '🧭',
+  brandbook: '🎨', copy: '✍️', 'text-editor': '📝', site: '🌐',
+  instagram: '📱', growth: '🚀', ads: '📢', documents: '📄',
+  research: '🔬', finance: '💰', hr: '👥', default: '🤖'
 };
 
-// Edges: [from, to, label?]
-const EDGES = [
-  ['coordinator', 'planning'],
-  ['coordinator', 'competitors'],
-  ['coordinator', 'strategy'],
-  ['planning', 'strategy'],
-  ['competitors', 'strategy'],
-  ['strategy', 'brandbook'],
-  ['strategy', 'copy'],
-  ['brandbook', 'copy'],
-  ['copy', 'text-editor'],
-  ['brandbook', 'text-editor'],
-  ['text-editor', 'site'],
-  ['text-editor', 'instagram'],
-  ['strategy', 'site'],
-  ['strategy', 'instagram'],
-  ['strategy', 'growth'],
-  ['site', 'ads'],
-  ['competitors', 'ads'],
-  ['instagram', 'growth'],
-  ['ads', 'growth'],
-  ['growth', 'coordinator'],
-];
+function icon(name) { return ICONS[name] || ICONS.default; }
 
-// ── Draw arrows ──────────────────────────────────────────────────────────────
-function drawArrows(activeAgent) {
-  const svg = document.getElementById('arrowsSvg');
-  svg.innerHTML = `<defs>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,255,255,.18)"/>
-    </marker>
-    <marker id="arrow-active" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L8,3 z" fill="#3dd68c"/>
-    </marker>
-  </defs>`;
-
-  EDGES.forEach(([from, to]) => {
-    const a = NODES[from], b = NODES[to];
-    if (!a || !b) return;
-
-    // Simple straight line with offset to avoid node overlap
-    const dx = b.x - a.x, dy = b.y - a.y;
-    const len = Math.sqrt(dx*dx + dy*dy);
-    const nx = dx/len, ny = dy/len;
-    const nodeR = 52; // approx half-height of node
-
-    const x1 = a.x + nx * nodeR;
-    const y1 = a.y + ny * nodeR;
-    const x2 = b.x - nx * (nodeR + 2);
-    const y2 = b.y - ny * (nodeR + 2);
-
-    const isActive = (from === activeAgent || to === activeAgent);
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-    line.setAttribute('stroke', isActive ? '#3dd68c' : 'rgba(255,255,255,.12)');
-    line.setAttribute('stroke-width', isActive ? '1.8' : '1.2');
-    line.setAttribute('marker-end', isActive ? 'url(#arrow-active)' : 'url(#arrow)');
-    if (!isActive) line.setAttribute('stroke-dasharray', '4 4');
-    svg.appendChild(line);
-  });
-}
-
-// ── State ────────────────────────────────────────────────────────────────────
-const agentStates = {};
+// ── State ───────────────────────────────────────────────────────────────────
+const agentStates = {};   // agent → {state, lastMsg, lastTs}
+const knownAgents = {};   // project → [{name, description}]
 let lastEventTs = '';
-let activeAgent = null;
 
-function setNodeState(agent, state, lastMsg) {
-  const node = document.getElementById('node-' + agent);
-  const dot  = document.getElementById('dot-' + agent);
-  const lbl  = document.getElementById('label-' + agent);
-  if (!node) return;
+// ── Render ──────────────────────────────────────────────────────────────────
+function render() {
+  const container = document.getElementById('gridContainer');
+  const projects = Object.keys(knownAgents);
+  if (!projects.length) return;
 
-  node.className = 'agent-node ' + state;
-  if (dot) {
-    dot.className = 'status-dot ' + state;
-  }
-  if (lbl) {
-    if (state === 'active') lbl.textContent = 'активен';
-    else if (state === 'complete') lbl.textContent = 'готово';
-    else if (state === 'error') lbl.textContent = 'ошибка';
-    else lbl.textContent = 'idle';
-  }
+  let html = '';
+  projects.forEach(proj => {
+    const agents = knownAgents[proj];
+    html += `<div class="project-section">
+      <div class="project-title">${proj}</div>
+      <div class="agents-grid" id="grid-${proj}">`;
+
+    agents.forEach(a => {
+      const st = agentStates[a.name] || {};
+      const stateClass = st.state ? `state-${st.state}` : '';
+      const stateLabel = st.state === 'active' ? 'активен' :
+                         st.state === 'complete' ? 'готово' :
+                         st.state === 'error' ? 'ошибка' : 'ожидает';
+      const shortDesc = (a.description || '').split('.')[0].slice(0, 60);
+      const lastMsg = st.lastMsg ? st.lastMsg.slice(0, 50) : '';
+
+      html += `<div class="agent-card ${stateClass}"
+        data-name="${a.name}" data-desc="${a.description || ''}">
+        <div class="agent-icon">${icon(a.name)}</div>
+        <div class="agent-name">${a.name}</div>
+        <div class="agent-desc">${shortDesc}</div>
+        ${lastMsg ? `<div class="last-event">${lastMsg}</div>` : ''}
+        <div class="agent-badge">
+          <span class="badge-dot"></span>${stateLabel}
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+
+  // Tooltip
+  container.querySelectorAll('.agent-card').forEach(card => {
+    card.addEventListener('mouseenter', e => {
+      const name = card.dataset.name;
+      const desc = card.dataset.desc;
+      const st = agentStates[name] || {};
+      tooltip.innerHTML = `<strong>${icon(name)} ${name}</strong>
+        <small>${desc || 'нет описания'}</small>
+        ${st.lastMsg ? `<small style="margin-top:4px;color:var(--accent2)">↳ ${st.lastMsg}</small>` : ''}`;
+      tooltip.classList.add('visible');
+    });
+    card.addEventListener('mousemove', e => {
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top  = (e.clientY - 10) + 'px';
+    });
+    card.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+  });
+
+  const total = projects.reduce((s, p) => s + knownAgents[p].length, 0);
+  document.getElementById('subtitle').textContent =
+    `${projects.length} проект(а) · ${total} агентов`;
 }
 
+// ── Load agents list ────────────────────────────────────────────────────────
+async function loadAgents(project) {
+  try {
+    const res = await fetch(`/api/agents/list?project=${project}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.agents && data.agents.length) {
+      knownAgents[project] = data.agents;
+      render();
+    }
+  } catch {}
+}
+
+// ── Apply events ─────────────────────────────────────────────────────────────
 function applyEvents(events) {
   events.forEach(e => {
     const agent = e.agent;
-    const type  = e.type;
     if (!agent) return;
+    const type = e.type;
+    let state = agentStates[agent]?.state || 'idle';
 
-    if (type === 'start' || type === 'step') {
-      agentStates[agent] = 'active';
-      activeAgent = agent;
-    } else if (type === 'complete') {
-      agentStates[agent] = 'complete';
-      if (activeAgent === agent) activeAgent = null;
-    } else if (type === 'error') {
-      agentStates[agent] = 'error';
-      if (activeAgent === agent) activeAgent = null;
-    }
+    if (type === 'start' || type === 'step') state = 'active';
+    else if (type === 'complete') state = 'complete';
+    else if (type === 'error') state = 'error';
+
+    agentStates[agent] = { state, lastMsg: e.message || '', lastTs: e.ts };
 
     if (e.ts > lastEventTs) {
       lastEventTs = e.ts;
-      document.getElementById('lastUpdate').textContent =
-        'Последнее событие: ' + new Date(e.ts).toLocaleTimeString('ru-RU');
+      document.getElementById('tsInfo').textContent =
+        'Последнее: ' + new Date(e.ts).toLocaleTimeString('ru-RU');
+    }
+
+    // Auto-add unknown agents from events
+    const proj = e.project || 'hairlove';
+    if (!knownAgents[proj]) knownAgents[proj] = [];
+    if (!knownAgents[proj].find(a => a.name === agent)) {
+      knownAgents[proj].push({ name: agent, description: '' });
     }
   });
-
-  // Render all node states
-  Object.entries(agentStates).forEach(([agent, state]) => {
-    setNodeState(agent, state);
-  });
-
-  drawArrows(activeAgent);
+  render();
 }
 
 // ── SSE ──────────────────────────────────────────────────────────────────────
 function connectStream() {
-  const url = `/api/agents/stream?project=hairlove&since=${lastEventTs}`;
-  const es = new EventSource(url);
-
+  const es = new EventSource(`/api/agents/stream?since=${lastEventTs}`);
   es.onmessage = e => {
-    try {
-      const data = JSON.parse(e.data);
-      applyEvents([data]);
-    } catch {}
+    try { applyEvents([JSON.parse(e.data)]); } catch {}
   };
-
   es.onerror = () => {
     es.close();
-    document.getElementById('liveDot').style.background = 'var(--red)';
+    document.getElementById('liveDot').style.background = 'var(--amber)';
     setTimeout(connectStream, 3000);
   };
-
   es.onopen = () => {
     document.getElementById('liveDot').style.background = 'var(--green)';
   };
 }
 
-// ── Load initial history ─────────────────────────────────────────────────────
-async function loadHistory() {
+// ── Init ─────────────────────────────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+
+async function init() {
+  // Load known projects' agents from filesystem
+  await Promise.all(['hairlove', 'mikhtavai'].map(loadAgents));
+
+  // Load event history
   try {
-    const res = await fetch('/api/agents/events?project=hairlove&limit=200');
+    const res = await fetch('/api/agents/events?limit=300');
     const events = await res.json();
     applyEvents(events);
   } catch {}
+
+  connectStream();
 }
 
-// ── Tooltips ─────────────────────────────────────────────────────────────────
-const tooltip = document.getElementById('tooltip');
-document.querySelectorAll('.agent-node').forEach(node => {
-  node.addEventListener('mouseenter', e => {
-    const tip = node.dataset.tip;
-    const agent = node.dataset.agent;
-    const state = agentStates[agent] || 'idle';
-    tooltip.innerHTML = `<strong>${node.querySelector('.agent-name').textContent}</strong>
-      <small>${tip}</small>
-      <small style="margin-top:4px;color:var(--accent2)">Состояние: ${state}</small>`;
-    tooltip.classList.add('visible');
-  });
-  node.addEventListener('mousemove', e => {
-    tooltip.style.left = (e.clientX + 14) + 'px';
-    tooltip.style.top  = (e.clientY - 10) + 'px';
-  });
-  node.addEventListener('mouseleave', () => {
-    tooltip.classList.remove('visible');
-  });
-});
-
-// ── Init ─────────────────────────────────────────────────────────────────────
-drawArrows(null);
-loadHistory().then(() => connectStream());
+init();
 </script>
 </body>
 </html>

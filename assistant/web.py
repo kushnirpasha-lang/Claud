@@ -97,6 +97,32 @@ def agent_map():
     return send_from_directory("static", "map.html")
 
 
+@app.route("/api/agents/list")
+def api_agents_list():
+    """Читает агентов из файловой системы проекта"""
+    import re
+    project = request.args.get("project", "hairlove")
+    projects_root = Path("/root/projects")
+    agents_dir = projects_root / project / ".claude" / "agents"
+
+    agents = []
+    if agents_dir.exists():
+        for f in sorted(agents_dir.glob("*.md")):
+            name = f.stem
+            description = ""
+            # Читаем description из frontmatter
+            try:
+                content = f.read_text(encoding="utf-8")
+                m = re.search(r'^description:\s*(.+)$', content, re.MULTILINE)
+                if m:
+                    description = m.group(1).strip()
+            except Exception:
+                pass
+            agents.append({"name": name, "description": description})
+
+    return jsonify({"project": project, "agents": agents})
+
+
 @app.route("/api/agents/stream")
 def api_stream():
     project = request.args.get("project")
