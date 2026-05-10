@@ -31,6 +31,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 - `artifacts/instagram/2026-05-10-approved-captions.md` — одобренный эталон
 - `CLAUDE.md` — полный контекст проекта (продукты, цены, бренд)
 - `knowledge/бренд.md` — tone of voice, табу, запрещённые слова
+- `knowledge/гуманизация.md` — **правила деИИ-зации**: прочитай перед написанием любого текста
 - `knowledge/аудитория.md` — для кого пишем
 - файл передачи с конкретным брифом
 
