@@ -1,0 +1,48 @@
+name: Pika API Check
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Pika API connection
+        run: |
+          echo "## Pika API Check" >> $GITHUB_STEP_SUMMARY
+
+          # Test with PIKA_API_KEY secret
+          KEY="${{ secrets.PIKA_API_KEY }}"
+
+          if [ -z "$KEY" ]; then
+            echo "❌ Secret PIKA_API_KEY не найден" >> $GITHUB_STEP_SUMMARY
+            echo "❌ Secret PIKA_API_KEY не найден"
+            exit 1
+          fi
+
+          echo "✅ Secret PIKA_API_KEY найден (длина: ${#KEY})" >> $GITHUB_STEP_SUMMARY
+
+          # Ping Pika API
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $KEY" \
+            -H "Content-Type: application/json" \
+            "https://api.pika.art/v1/videos" 2>&1 || echo "ERROR")
+
+          echo "HTTP статус: $RESPONSE" >> $GITHUB_STEP_SUMMARY
+          echo "HTTP статус: $RESPONSE"
+
+          if [ "$RESPONSE" = "200" ] || [ "$RESPONSE" = "401" ] || [ "$RESPONSE" = "403" ] || [ "$RESPONSE" = "404" ]; then
+            echo "✅ Pika API отвечает (сервер доступен)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Неожиданный статус: $RESPONSE" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Show full response body for diagnostics
+          BODY=$(curl -s \
+            -H "Authorization: Bearer $KEY" \
+            -H "Content-Type: application/json" \
+            "https://api.pika.art/v1/videos" 2>&1 | head -c 500)
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Ответ API:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "$BODY" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
