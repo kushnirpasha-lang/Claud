@@ -1,0 +1,99 @@
+name: HAiR LOVE — Post to Instagram
+
+on:
+  workflow_dispatch:
+    inputs:
+      photo:
+        description: 'Фото (имя файла из instagram/photos/)'
+        required: true
+        type: choice
+        options:
+          - 'Cream Spray 200 ml |1.png'
+          - 'Cream Spray 200 ml |2.png'
+          - 'Cream Spray 200 ml |3.png'
+          - 'Cream Spray 200 ml |4.png'
+          - 'Cream Spray 200 ml |5.jpg'
+          - 'Cream Spray 200 ml |6.png'
+          - 'Cream Spray 200 ml |7.png'
+          - 'Cream Spray 200 ml |8.png'
+          - 'Cream Spray 200 ml |9.png'
+          - 'Cream Spray 200 ml |10.png'
+          - 'Cream Spray 200 ml |11.png'
+          - 'Cream Spray 200 ml |12.png'
+          - 'Cream Spray 200 ml |13.png'
+          - 'Cream Spray 200 ml |14.png'
+          - 'Lamellar Water 200 ml | 1.png'
+          - 'Lamellar Water 200 ml | 2.png'
+          - 'Lamellar Water 200 ml | 3.png'
+          - 'Lamellar Water 200 ml | 4.png'
+          - 'Lamellar Water 200 ml | 5.png'
+          - 'Lamellar Water 200 ml | 6.png'
+          - 'Lamellar Water 200 ml | 7.png'
+          - 'Thermo Protector Spray 200 ml | 1.png'
+          - 'Thermo Protector Spray 200 ml | 2.png'
+          - 'Thermo Protector Spray 200 ml | 3.png'
+          - 'Thermo Protector Spray 200 ml | 4.png'
+          - 'Thermo Protector Spray 200 ml | 5.png'
+          - 'Thermo Protector Spray 200 ml | 6.png'
+      caption:
+        description: 'Текст поста'
+        required: true
+        type: choice
+        options:
+          - 'Ти вже пробувала засіб, після якого локони просто слухаються? Кератин, сфінголіпіди, шовкові амінокислоти, олія аргани. Наноси на вологе волосся — не змивай. Все.\n\nРозроблено в Італії | HAiR LOVE'
+          - 'Без силіконів. Без сульфатів. Без компромісів.\n\nКератин + сфінголіпіди + шовкові амінокислоти + олія аргани + олія макадамії.\n\nРозроблено в Італії | HAiR LOVE'
+          - 'Фен, праска, плойка — щодня. Thermo Protector Spray захищає до 220°C, розгладжує та додає блиск. Кератин + 9 амінокислот + екстракт виноградної кісточки. Не склеює.\n\nРозроблено в Італії | HAiR LOVE'
+          - 'Масажуй до появи крем-піни — це значить що засіб працює. Гідролізований кератин, колаген, алое, пантенол запечатують кожну лусочку. 15 секунд — бальзам. До 30 хвилин — маска-філер.\n\nРозроблено в Італії | HAiR LOVE'
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to Instagram
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+          PHOTO: ${{ github.event.inputs.photo }}
+          CAPTION: ${{ github.event.inputs.caption }}
+        run: |
+          ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${PHOTO}'))")
+          IMAGE_URL="https://raw.githubusercontent.com/kushnirpasha-lang/Claud/claude/obshak/projects/hairlove/artifacts/instagram/photos/${ENCODED}"
+          echo "Photo: $PHOTO"
+          echo "URL: $IMAGE_URL"
+
+          CONTAINER=$(curl -s -X POST \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media" \
+            -d "image_url=${IMAGE_URL}" \
+            --data-urlencode "caption=${CAPTION}" \
+            -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Container: $CONTAINER"
+
+          CONTAINER_ID=$(echo "$CONTAINER" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
+
+          if [ -z "$CONTAINER_ID" ]; then
+            echo "FAILED to create container"
+            exit 1
+          fi
+
+          sleep 3
+
+          RESULT=$(curl -s -X POST \
+            "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media_publish" \
+            -d "creation_id=${CONTAINER_ID}" \
+            -d "access_token=${INSTAGRAM_ACCESS_TOKEN}")
+          echo "Publish: $RESULT"
+
+          POST_ID=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
+
+          if [ -n "$POST_ID" ]; then
+            echo "✅ Published! Post ID: $POST_ID"
+            curl -s -X POST \
+              -H "Authorization: token $GH_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.github.com/repos/kushnirpasha-lang/Claud/issues/1/comments" \
+              -d "{\"body\": \"✅ HAiR LOVE пост опубліковано!\nPost ID: ${POST_ID}\nФото: ${PHOTO}\"}" || true
+          else
+            echo "FAILED to publish"
+            exit 1
+          fi
