@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport json, os\nstate_file = '/home/user/Claud/projects/hairlove/team-state.md'\nlog_file = '/home/user/Claud/projects/hairlove/progress.log'\ntry:\n    with open(state_file) as f:\n        state = f.read()\nexcept:\n    state = 'team-state.md не найден'\ntry:\n    with open(log_file) as f:\n        lines = f.readlines()\n    log = ''.join(lines[-10:])  # последние 10 записей\nexcept:\n    log = 'progress.log не найден'\ncontext = '=== ПАМЯТЬ ПРОЕКТА (загружена автоматически) ===\\n\\n## team-state.md\\n' + state + '\\n\\n## Последние записи progress.log:\\n' + log + '\\n=== КОНЕЦ ПАМЯТИ ==='\nprint(json.dumps({'hookSpecificOutput': {'hookEventName': 'SessionStart', 'additionalContext': context}}))\n\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nfrom datetime import datetime\nlog_file = '/home/user/Claud/projects/hairlove/progress.log'\ntimestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M')\nentry = timestamp + ' ⚠️ [coordinator] Сессия завершена/прервана\\n'\ntry:\n    with open(log_file, 'a') as f:\n        f.write(entry)\nexcept Exception as e:\n    pass\n\" 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
