@@ -348,6 +348,8 @@ header {
   <div class="brand"><span class="brand-dot"></span>Система агентов — Pavel</div>
   <div class="h-mid">Галактика HairLove · Агенты · Связи</div>
   <div class="h-right">
+    <a href="/dashboard" style="font-size:12px;color:var(--muted);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:6px;">Дашборд</a>
+    <a href="/map" style="font-size:12px;color:var(--muted);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:6px;">Карта</a>
     <div class="tsw" id="tsw">
       <button class="tbtn" data-m="light">☀️ Светлая</button>
       <button class="tbtn" data-m="dark">🌙 Тёмная</button>
@@ -392,20 +394,34 @@ header {
 const PRJ = 'hairlove';
 
 const AG = [
-  { k:'strategy',    n:'Стратегия',  cmd:'/hairlove-strategy',   ico:'🎯', d:'Дорожная карта.',           px:22, py:16, def:'working' },
-  { k:'copy',        n:'Тексты',     cmd:'/hairlove-texts',       ico:'✍️', d:'Контент для всех каналов.', px: 7, py:37, def:'active'  },
-  { k:'site',        n:'Сайт',       cmd:'/hairlove-site',        ico:'🌐', d:'B2B-витрина.',               px:38, py:29, def:'next'    },
-  { k:'competitors', n:'Конкуренты', cmd:'/hairlove-competitors', ico:'🔍', d:'Анализ рынка.',              px: 7, py:63, def:'wait'    },
-  { k:'ads',         n:'Реклама',    cmd:'/hairlove-ads',         ico:'📣', d:'Meta Ads, таргетинг.',      px:38, py:71, def:'stage'   },
-  { k:'instagram',   n:'Instagram',  cmd:'/hairlove-insta',       ico:'📸', d:'Публикация постов.',         px:22, py:84, def:'active'  },
+  { k:'coordinator', n:'Координатор', cmd:'/hairlove',            ico:'🎯', d:'Маршрутизация задач.',        px:22, py:50, def:'working' },
+  { k:'strategy',    n:'Стратегия',   cmd:'/hairlove-strategy',   ico:'🧭', d:'Стратегические решения.',     px:22, py:16, def:'working' },
+  { k:'copy',        n:'Тексты',      cmd:'/hairlove-texts',       ico:'✍️', d:'Контент для всех каналов.',  px: 5, py:33, def:'active'  },
+  { k:'site',        n:'Сайт',        cmd:'/hairlove-site',        ico:'🌐', d:'B2B-витрина.',                px:38, py:22, def:'next'    },
+  { k:'competitors', n:'Конкуренты',  cmd:'/hairlove-competitors', ico:'🔍', d:'Анализ рынка.',               px: 5, py:67, def:'wait'    },
+  { k:'ads',         n:'Реклама',     cmd:'/hairlove-ads',         ico:'📢', d:'Meta Ads, таргетинг.',       px:38, py:78, def:'stage'   },
+  { k:'instagram',   n:'Instagram',   cmd:'/hairlove-insta',       ico:'📱', d:'Публикация постов.',          px:22, py:84, def:'active'  },
+  { k:'planning',    n:'Планирование',cmd:'/hairlove-planning',    ico:'📋', d:'Задачи и приоритеты.',        px:55, py:16, def:'wait'    },
+  { k:'growth',      n:'Рост',        cmd:'/hairlove-growth',      ico:'🚀', d:'Дистрибуторы, органика.',    px:55, py:84, def:'wait'    },
+  { k:'brandbook',   n:'Брендбук',    cmd:'/hairlove-brand',       ico:'🎨', d:'Визуал и голос бренда.',     px: 5, py:50, def:'done'    },
+  { k:'text-editor', n:'Редактор',    cmd:'/hairlove-editor',      ico:'📝', d:'Финальная вычитка.',         px:38, py:50, def:'wait'    },
+  { k:'documents',   n:'Документы',   cmd:'/hairlove-docs',        ico:'📄', d:'КП, договоры, сертифик.',    px:55, py:50, def:'wait'    },
 ];
 const HUB  = { px:22, py:50 };
 const OWN  = { px:64, py:50 };
 const PH   = [{ px:81, py:32 }, { px:81, py:68 }];
 const WFLOWS = [
-  { f:'copy', t:'instagram', c:'var(--lb)' }, { f:'copy', t:'site', c:'var(--lb)' },
-  { f:'competitors', t:'strategy', c:'var(--lo)' },
-  { f:'ads', t:'instagram', c:'var(--lr)' }, { f:'ads', t:'site', c:'var(--lr)' },
+  { f:'coordinator',  t:'strategy',    c:'var(--lb)' },
+  { f:'coordinator',  t:'planning',    c:'var(--lb)' },
+  { f:'coordinator',  t:'competitors', c:'var(--lb)' },
+  { f:'competitors',  t:'strategy',    c:'var(--lo)' },
+  { f:'strategy',     t:'brandbook',   c:'var(--lo)' },
+  { f:'brandbook',    t:'copy',        c:'var(--lo)' },
+  { f:'copy',         t:'text-editor', c:'var(--lb)' },
+  { f:'text-editor',  t:'site',        c:'var(--lb)' },
+  { f:'text-editor',  t:'instagram',   c:'var(--lb)' },
+  { f:'ads',          t:'growth',      c:'var(--lr)' },
+  { f:'instagram',    t:'growth',      c:'var(--lr)' },
 ];
 const BMAP = {
   active:  ['b-active',  'Активен'],
