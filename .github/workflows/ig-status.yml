@@ -1,0 +1,57 @@
+name: Instagram Post Status Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: claude/obshak
+
+      - name: Check status and post to Issue
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        run: |
+          INDEX=$(cat projects/hairlove/artifacts/instagram/posting-index.txt | tr -d '[:space:]')
+          TOTAL=$(python3 -c "import json; print(len(json.load(open('projects/hairlove/artifacts/instagram/posting-queue.json'))))")
+          echo "Queue: $INDEX / $TOTAL"
+
+          if [ -z "$INSTAGRAM_ACCESS_TOKEN" ] || [ "$INSTAGRAM_ACCESS_TOKEN" = "" ]; then
+            STATUS="❌ INSTAGRAM_ACCESS_TOKEN не задан в GitHub Secrets"
+          elif [ -z "$INSTAGRAM_USER_ID" ] || [ "$INSTAGRAM_USER_ID" = "" ]; then
+            STATUS="❌ INSTAGRAM_USER_ID не задан в GitHub Secrets"
+          else
+            MEDIA=$(curl -s "https://graph.instagram.com/v21.0/${INSTAGRAM_USER_ID}/media?fields=id,timestamp,caption&limit=3&access_token=${INSTAGRAM_ACCESS_TOKEN}")
+            STATUS=$(echo "$MEDIA" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+if 'error' in data:
+    print('❌ API ошибка: ' + data['error']['message'])
+else:
+    posts = data.get('data', [])
+    if posts:
+        print(f'✅ Постов в Instagram: {len(posts)} (последние 3)')
+        for p in posts:
+            ts = p.get('timestamp','')[:10]
+            cap = p.get('caption','')[:60]
+            print(f'  - {ts}: {cap}...')
+    else:
+        print('ℹ️ Постов ещё нет')
+" 2>/dev/null || echo "❌ Ошибка парсинга ответа API")
+          fi
+
+          BODY="**Instagram статус:**
+- Очередь: пост #${INDEX} из ${TOTAL}
+- ${STATUS}"
+
+          curl -s -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/kushnirpasha-lang/Claud/issues/1/comments" \
+            -d "{\"body\": $(echo "$BODY" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')}"
