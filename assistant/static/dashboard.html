@@ -3,651 +3,351 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Центр управления</title>
+<title>Agent Dashboard</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-/* ── Тёмная тема (default) ── */
-:root, [data-theme="dark"] {
-  --bg: #0d0d14;
-  --surface: #13131e;
-  --surface2: #1a1a28;
-  --border: rgba(255,255,255,.06);
-  --text: #e8e8f0;
-  --muted: #6b6b88;
-  --accent: #7c6af7;
-  --accent2: #5fd8c4;
-  --green: #3dd68c;
-  --amber: #f5a623;
-  --red: #f05c5c;
-  --radius: 14px;
-  --shadow: 0 4px 24px rgba(0,0,0,.35);
+:root{
+  --bg:#0a0a0f;--sidebar:#0f0f17;--card:#151520;--card-hover:#1c1c2a;
+  --border:#ffffff0d;--border2:#ffffff18;--text:#e2e2ec;--text2:#8b8ba8;--text3:#55556a;
+  --accent:#7c6af7;--accent-glow:rgba(124,106,247,.15);
+  --green:#3ecf8e;--green-bg:rgba(62,207,142,.1);
+  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.1);
+  --red:#f05c5c;--red-bg:rgba(240,92,92,.1);
+  --blue:#60a5fa;--blue-bg:rgba(96,165,250,.1);
+  --r:10px;--transition:.15s ease;
+}
+[data-theme="light"]{
+  --bg:#f6f6fa;--sidebar:#ededf5;--card:#fff;--card-hover:#f0f0f8;
+  --border:#0000000d;--border2:#00000018;--text:#1a1a2e;--text2:#5a5a78;--text3:#9a9ab8;
+  --accent:#5b4de0;--accent-glow:rgba(91,77,224,.08);
+  --green:#059669;--green-bg:rgba(5,150,105,.08);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,.08);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.08);
+  --blue:#2563eb;--blue-bg:rgba(37,99,235,.08);
 }
 
-/* ── Светлая тема ── */
-[data-theme="light"] {
-  --bg: #f4f4f8;
-  --surface: #ffffff;
-  --surface2: #f0f0f5;
-  --border: rgba(0,0,0,.08);
-  --text: #1a1a2e;
-  --muted: #8888a8;
-  --accent: #6355d8;
-  --accent2: #0fa89a;
-  --green: #1aad6a;
-  --amber: #d4881f;
-  --red: #d94040;
-  --shadow: 0 4px 24px rgba(0,0,0,.10);
-}
+body{background:var(--bg);color:var(--text);font:13.5px/1.5 -apple-system,'Inter','Segoe UI',sans-serif;display:flex;height:100vh;overflow:hidden}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font: 14px/1.5 -apple-system, 'Segoe UI', sans-serif;
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-  transition: background .25s, color .25s;
-}
+.sidebar{width:220px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-logo{padding:18px 16px 12px;border-bottom:1px solid var(--border)}
+.sidebar-logo h1{font-size:14px;font-weight:600;letter-spacing:-.3px;color:var(--text)}
+.sidebar-logo span{font-size:11px;color:var(--text3);display:block;margin-top:1px}
+.sidebar-section{padding:10px 8px 4px}
+.sidebar-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:4px}
+.proj-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background var(--transition)}
+.proj-item:hover{background:var(--card-hover)}
+.proj-item.active{background:var(--accent-glow)}
+.proj-item.active .proj-name{color:var(--accent)}
+.proj-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.proj-dot.has-active{background:var(--green)}
+.proj-name{font-size:13px;font-weight:500;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-count{font-size:10px;color:var(--text3);background:var(--border2);border-radius:4px;padding:1px 5px}
+.sidebar-nav{padding:10px 8px;border-top:1px solid var(--border);margin-top:auto}
+.nav-link{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;color:var(--text2);text-decoration:none;font-size:12.5px;transition:all var(--transition)}
+.nav-link:hover{background:var(--card-hover);color:var(--text)}
+.nav-link svg{width:14px;height:14px;opacity:.6}
 
-/* ── Sidebar ── */
-.sidebar {
-  width: 260px;
-  min-width: 260px;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: background .25s, border-color .25s;
-}
+.stat-bar{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0}
+.stat{flex:1;padding:12px 16px;background:var(--bg)}
+.stat-val{font-size:20px;font-weight:700;letter-spacing:-.5px;color:var(--text);line-height:1}
+.stat-label{font-size:10.5px;color:var(--text3);margin-top:2px;font-weight:500;letter-spacing:.03em}
 
-.sidebar-header {
-  padding: 16px 18px 12px;
-  border-bottom: 1px solid var(--border);
-}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.main-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px}
+.main-title{font-size:14px;font-weight:600;color:var(--text)}
+.main-subtitle{font-size:11.5px;color:var(--text3);margin-top:1px}
+.header-actions{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:var(--card);color:var(--text2);cursor:pointer;transition:all var(--transition)}
+.btn:hover{background:var(--card-hover);color:var(--text)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-.sidebar-header h1 {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -.3px;
-}
+.body-split{flex:1;display:flex;overflow:hidden}
+.agent-area{flex:1;overflow-y:auto;padding:16px 20px}
+.agent-area::-webkit-scrollbar{width:5px}
+.agent-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
 
-.sidebar-header .subtitle {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 2px;
-}
+.agent-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:all var(--transition)}
+.agent-card:hover{border-color:var(--border2);background:var(--card-hover)}
+.agent-card.active{border-color:rgba(62,207,142,.3)}
+.agent-card.error{border-color:rgba(240,92,92,.3)}
+.agent-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.agent-icon{width:32px;height:32px;border-radius:8px;background:var(--border2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.status-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;letter-spacing:.03em;white-space:nowrap}
+.status-badge.active{background:var(--green-bg);color:var(--green)}
+.status-badge.wait{background:var(--amber-bg);color:var(--amber)}
+.status-badge.done{background:var(--blue-bg);color:var(--blue)}
+.status-badge.error{background:var(--red-bg);color:var(--red)}
+.status-badge.idle{background:var(--border);color:var(--text3)}
+.agent-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.agent-desc{font-size:11.5px;color:var(--text3);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.agent-meta{margin-top:10px;display:flex;align-items:center;justify-content:space-between}
+.agent-last{font-size:10.5px;color:var(--text3)}
+.agent-task{font-size:10.5px;color:var(--text2);max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--text3);gap:8px}
+.empty-state p{font-size:13px}
 
-.live-dot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  background: var(--green);
-  border-radius: 50%;
-  margin-right: 5px;
-  animation: pulse 2s infinite;
-}
+.event-panel{width:300px;flex-shrink:0;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.event-panel-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.event-panel-header h3{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px}
+.event-count{font-size:10px;color:var(--text3);background:var(--border2);border-radius:4px;padding:1px 6px}
+.event-list{flex:1;overflow-y:auto;padding:8px}
+.event-list::-webkit-scrollbar{width:4px}
+.event-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.event-item{display:flex;gap:10px;padding:8px 10px;border-radius:8px;margin-bottom:2px;transition:background var(--transition);align-items:flex-start}
+.event-item:hover{background:var(--card-hover)}
+.event-item.new{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.event-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px}
+.event-icon.start{background:var(--blue-bg);color:var(--blue)}
+.event-icon.step{background:var(--amber-bg);color:var(--amber)}
+.event-icon.complete{background:var(--green-bg);color:var(--green)}
+.event-icon.error{background:var(--red-bg);color:var(--red)}
+.event-icon.info{background:var(--border2);color:var(--text3)}
+.event-body{flex:1;min-width:0}
+.event-agent{font-size:11px;font-weight:600;color:var(--text2)}
+.event-msg{font-size:11.5px;color:var(--text);margin-top:1px;line-height:1.4;word-break:break-word}
+.event-time{font-size:10px;color:var(--text3);margin-top:3px}
 
-@keyframes pulse {
-  0%, 100% { opacity: 1 }
-  50% { opacity: .3 }
-}
+.theme-toggle{width:30px;height:30px;border-radius:8px;border:1px solid var(--border2);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all var(--transition)}
+.theme-toggle:hover{background:var(--card-hover)}
 
-.projects-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 0;
-}
-
-.projects-list::-webkit-scrollbar { width: 4px }
-.projects-list::-webkit-scrollbar-track { background: transparent }
-.projects-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px }
-
-.project-item {
-  padding: 10px 18px;
-  cursor: pointer;
-  border-left: 3px solid transparent;
-  transition: all .16s ease;
-}
-
-.project-item:hover { background: var(--surface2) }
-.project-item.active { background: var(--surface2); border-left-color: var(--accent) }
-
-.project-item-top { display: flex; align-items: center; gap: 8px }
-
-.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0 }
-.status-dot.active { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite }
-.status-dot.idle { background: var(--muted) }
-.status-dot.error { background: var(--red) }
-
-.project-name { font-weight: 600; font-size: 13px; flex: 1 }
-.project-last { font-size: 11px; color: var(--muted); margin-top: 2px; padding-left: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
-
-.sidebar-footer {
-  padding: 12px 18px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.sidebar-footer a {
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 11px;
-}
-
-/* ── Переключатель темы ── */
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 3px;
-}
-
-.theme-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 13px;
-  padding: 2px 6px;
-  border-radius: 14px;
-  transition: all .15s;
-  line-height: 1;
-  color: var(--muted);
-}
-
-.theme-btn.active {
-  background: var(--accent);
-  color: #fff;
-}
-
-/* ── Main ── */
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden }
-
-.topbar {
-  padding: 14px 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  background: var(--surface);
-  transition: background .25s;
-}
-
-.topbar-title { font-size: 18px; font-weight: 700; letter-spacing: -.4px }
-.topbar-meta { font-size: 12px; color: var(--muted); margin-top: 1px }
-
-.topbar-right { display: flex; align-items: center; gap: 14px }
-
-/* ── Часы ── */
-.clock-block { text-align: right }
-.clock-time { font-size: 20px; font-weight: 700; letter-spacing: -.5px; font-variant-numeric: tabular-nums }
-.clock-date { font-size: 11px; color: var(--muted); margin-top: 1px }
-
-.topbar-actions a {
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 12px;
-  padding: 5px 12px;
-  border: 1px solid rgba(124,106,247,.3);
-  border-radius: 6px;
-  transition: all .16s;
-}
-
-.topbar-actions a:hover { background: rgba(124,106,247,.1) }
-
-.content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 22px;
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 18px;
-  align-content: start;
-}
-
-.content::-webkit-scrollbar { width: 5px }
-.content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px }
-
-/* ── Cards ── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: background .25s, border-color .25s, box-shadow .25s;
-}
-
-.card-header {
-  padding: 13px 18px 11px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.card-header h2 { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px }
-.card-body { padding: 16px 18px }
-
-/* ── Agents grid ── */
-.agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px }
-
-.agent-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 13px;
-  cursor: pointer;
-  transition: all .18s;
-}
-
-.agent-card:hover { border-color: rgba(124,106,247,.4); transform: translateY(-1px) }
-.agent-card.active-agent { border-color: var(--green); background: rgba(61,214,140,.06) }
-
-.agent-icon { font-size: 20px; margin-bottom: 5px }
-.agent-name { font-size: 12px; font-weight: 600 }
-.agent-status { font-size: 10px; color: var(--muted); margin-top: 2px }
-
-/* ── Events feed ── */
-.event-item { padding: 9px 0; border-bottom: 1px solid var(--border); animation: fadeIn .3s ease }
-.event-item:last-child { border-bottom: none }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-3px) } to { opacity: 1; transform: none } }
-
-.event-top { display: flex; align-items: center; gap: 7px; margin-bottom: 2px }
-
-.event-type {
-  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
-  text-transform: uppercase; letter-spacing: .4px;
-}
-.event-type.start    { background: rgba(124,106,247,.15); color: var(--accent) }
-.event-type.complete { background: rgba(61,214,140,.12);  color: var(--green) }
-.event-type.step     { background: rgba(128,128,128,.1);  color: var(--muted) }
-.event-type.handoff  { background: rgba(245,166,35,.12);  color: var(--amber) }
-.event-type.error    { background: rgba(240,92,92,.12);   color: var(--red) }
-.event-type.wait     { background: rgba(128,128,128,.1);  color: var(--muted) }
-
-.event-agent { font-size: 11px; font-weight: 600; color: var(--accent2) }
-.event-time  { font-size: 10px; color: var(--muted); margin-left: auto }
-.event-msg   { font-size: 12px; line-height: 1.4 }
-
-/* ── Stats bar ── */
-.stats-bar {
-  display: flex; gap: 0;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.stat { flex: 1; padding: 12px 16px; text-align: center; border-right: 1px solid var(--border) }
-.stat:last-child { border-right: none }
-.stat-val { font-size: 22px; font-weight: 700 }
-.stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-top: 1px }
-
-.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 600 }
-.badge.active { background: rgba(61,214,140,.12); color: var(--green) }
-.badge.idle   { background: rgba(128,128,128,.1);  color: var(--muted) }
-
-.span-full { grid-column: 1 / -1 }
-
-.feed-scroll { max-height: 480px; overflow-y: auto; padding: 4px 18px 14px }
-.feed-scroll::-webkit-scrollbar { width: 3px }
-.feed-scroll::-webkit-scrollbar-thumb { background: var(--border) }
-
-.no-project {
-  grid-column: 1/-1;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;
-  color: var(--muted);
-}
-
-.empty { text-align: center; padding: 36px 20px; color: var(--muted) }
-.empty-title { font-size: 14px; font-weight: 600; margin-bottom: 4px }
-.empty-sub { font-size: 12px }
+@media(max-width:900px){.event-panel{display:none}.sidebar{width:180px}}
+@media(max-width:640px){.sidebar{display:none}.stat-bar{display:none}}
 </style>
 </head>
 <body>
 
-<aside class="sidebar">
-  <div class="sidebar-header">
-    <h1><span class="live-dot"></span>Центр управления</h1>
-    <div class="subtitle">Проекты и агенты — в реальном времени</div>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>Agent Monitor</h1>
+    <span id="sidebar-status">загрузка...</span>
   </div>
-  <div class="projects-list" id="projectsList">
-    <div class="empty" style="padding:30px 18px">
-      <div style="font-size:24px;margin-bottom:8px">⏳</div>
-      <div class="empty-title">Загрузка...</div>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Проекты</div>
+    <div id="proj-list"></div>
   </div>
-  <div class="sidebar-footer">
-    <a href="/agents">Галактика</a>
-    <a href="/map">Карта</a>
-    <div class="theme-toggle">
-      <button class="theme-btn" id="btnDark"  onclick="setTheme('dark')"  title="Тёмная">🌙</button>
-      <button class="theme-btn" id="btnLight" onclick="setTheme('light')" title="Светлая">☀️</button>
-    </div>
+  <div class="sidebar-nav">
+    <a class="nav-link" href="/agents">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="6.5"/></svg>
+      Галактика
+    </a>
+    <a class="nav-link" href="/map">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+      Карта
+    </a>
   </div>
-</aside>
+</nav>
 
-<main class="main">
-  <div class="topbar" id="topbar">
+<div class="main">
+  <div class="stat-bar">
+    <div class="stat"><div class="stat-val" id="s-events">—</div><div class="stat-label">СОБЫТИЯ</div></div>
+    <div class="stat"><div class="stat-val" id="s-agents">—</div><div class="stat-label">АГЕНТОВ</div></div>
+    <div class="stat"><div class="stat-val" id="s-active">—</div><div class="stat-label">АКТИВЕН</div></div>
+    <div class="stat"><div class="stat-val" id="s-last">—</div><div class="stat-label">ПОСЛЕДНЕЕ</div></div>
+  </div>
+
+  <div class="main-header">
     <div>
-      <div class="topbar-title">Выбери проект</div>
-      <div class="topbar-meta">← нажми на проект слева</div>
+      <div class="main-title" id="project-title">Выбери проект</div>
+      <div class="main-subtitle" id="project-sub">—</div>
     </div>
-    <div class="topbar-right">
-      <div class="clock-block">
-        <div class="clock-time" id="clockTime">--:--:--</div>
-        <div class="clock-date" id="clockDate">--</div>
-      </div>
-      <div class="topbar-actions"><a href="/agents">Галактика</a><a href="/map" style="margin-left:8px">Карта</a></div>
+    <div class="header-actions">
+      <div class="live-dot" title="Live"></div>
+      <button class="btn" onclick="refresh()">↻ Обновить</button>
+      <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
     </div>
   </div>
 
-  <div class="content" id="content">
-    <div class="no-project">
-      <div style="font-size:48px">🗺️</div>
-      <div style="font-size:16px;font-weight:700;margin-top:12px">Выбери проект</div>
-      <div style="font-size:12px;margin-top:6px">← нажми на проект в левой панели</div>
+  <div class="body-split">
+    <div class="agent-area">
+      <div class="agent-grid" id="agent-grid">
+        <div class="empty-state"><p>Выбери проект из списка слева</p></div>
+      </div>
+    </div>
+    <div class="event-panel">
+      <div class="event-panel-header">
+        <h3><span class="live-dot"></span> Live события</h3>
+        <span class="event-count" id="event-count">0</span>
+      </div>
+      <div class="event-list" id="event-list">
+        <div class="empty-state" style="height:100px"><p>Нет событий</p></div>
+      </div>
     </div>
   </div>
-</main>
+</div>
 
 <script>
-const AGENTS_META = {
-  coordinator:   { icon: '🎯', label: 'Координатор' },
-  planning:      { icon: '📋', label: 'Планирование' },
-  competitors:   { icon: '🔍', label: 'Конкуренты' },
-  strategy:      { icon: '🧭', label: 'Стратегия' },
-  site:          { icon: '🌐', label: 'Сайт' },
-  docs:          { icon: '📋', label: 'Документы' },
-  ads:           { icon: '📢', label: 'Реклама' },
-  growth:        { icon: '📈', label: 'Рост' },
-  instagram:     { icon: '📱', label: 'Instagram' },
-  copy:          { icon: '✍️', label: 'Тексты' },
-  'text-editor': { icon: '🖋️', label: 'Корректор' },
-};
+let currentProject=null,agentStatuses={},eventSource=null,eventBuffer=[],eventTotal=0;
+const ICONS={coordinator:'🎯',planning:'📋',competitors:'🔍',strategy:'🧭',instagram:'📱',copy:'✍️','text-editor':'📝',ads:'📢',site:'🌐',growth:'🚀',brandbook:'🎨',documents:'📄'};
+const TYPE_ICON={start:'▶',step:'⚡',complete:'✓',error:'✕',info:'·'};
 
-let selectedProject = null;
-let allProjects = [];
-let recentEvents = [];
-let eventSource = null;
-
-/* ── Тема ── */
-function setTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  document.getElementById('btnDark').classList.toggle('active', t === 'dark');
-  document.getElementById('btnLight').classList.toggle('active', t === 'light');
+function toggleTheme(){
+  const dark=document.documentElement.dataset.theme==='dark';
+  document.documentElement.dataset.theme=dark?'light':'dark';
+  document.getElementById('theme-btn').textContent=dark?'☀️':'🌙';
+  localStorage.setItem('theme',dark?'light':'dark');
 }
-
-(function initTheme() {
-  const saved = localStorage.getItem('theme') ||
-    (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-  setTheme(saved);
+(function(){
+  const t=localStorage.getItem('theme')||'dark';
+  document.documentElement.dataset.theme=t;
+  addEventListener('DOMContentLoaded',()=>{document.getElementById('theme-btn').textContent=t==='dark'?'🌙':'☀️'});
 })();
 
-/* ── Часы ── */
-const DAYS = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
-const MONTHS = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-
-function updateClock() {
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mm = String(now.getMinutes()).padStart(2,'0');
-  const ss = String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('clockTime').textContent = `${hh}:${mm}:${ss}`;
-  document.getElementById('clockDate').textContent =
-    `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+function timeAgo(ts){
+  if(!ts)return'—';
+  const s=Math.floor((Date.now()-new Date(ts))/1000);
+  if(s<5)return'только что';if(s<60)return s+'с назад';
+  if(s<3600)return Math.floor(s/60)+'м назад';if(s<86400)return Math.floor(s/3600)+'ч назад';
+  return Math.floor(s/86400)+'д назад';
 }
-updateClock();
-setInterval(updateClock, 1000);
+function shortTime(ts){if(!ts)return'';const d=new Date(ts);return[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':')}
 
-/* ── Helpers ── */
-function fmtTime(ts) {
-  try {
-    const d = new Date(ts), now = new Date(), diff = (now - d) / 1000;
-    if (diff < 60) return 'только что';
-    if (diff < 3600) return Math.floor(diff/60) + ' мин назад';
-    if (diff < 86400) return d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
-    return d.toLocaleDateString('ru', {day:'numeric',month:'short'});
-  } catch { return '' }
+async function loadProjects(){
+  try{
+    const[pr,sr]=await Promise.all([fetch('/api/agents/projects').then(r=>r.json()),fetch('/api/agents/stats').then(r=>r.json())]);
+    document.getElementById('s-events').textContent=sr.total_events||0;
+    document.getElementById('s-last').textContent=timeAgo(sr.last_event_ts);
+    document.getElementById('sidebar-status').textContent=sr.total_projects+' проектов';
+    renderSidebar(pr);
+    if(!currentProject&&pr.length)selectProject(pr[0].name);
+  }catch(e){console.error(e)}
 }
 
-function fmtTimeShort(ts) {
-  try {
-    const d = new Date(ts);
-    const date = d.toLocaleDateString('ru', {day:'numeric',month:'short'});
-    const time = d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    return `${date}, ${time}`;
-  } catch { return '' }
+function renderSidebar(list){
+  const el=document.getElementById('proj-list');
+  if(!list.length){el.innerHTML='<div style="padding:8px;font-size:11.5px;color:var(--text3)">Нет данных</div>';return}
+  el.innerHTML=list.map(p=>`<div class="proj-item ${p.name===currentProject?'active':''}" onclick="selectProject('${p.name}')">
+    <div class="proj-dot ${p.active_agent?'has-active':''}"></div>
+    <span class="proj-name">${p.name}</span>
+    <span class="proj-count">${p.recent_events.length}</span>
+  </div>`).join('');
 }
 
-function getAgentMeta(name) { return AGENTS_META[name] || { icon: '🤖', label: name }; }
+async function selectProject(name){
+  currentProject=name;
+  document.querySelectorAll('.proj-item').forEach(el=>el.classList.toggle('active',el.querySelector('.proj-name').textContent===name));
+  document.getElementById('project-title').textContent=name;
+  document.getElementById('project-sub').textContent='загрузка...';
+  await Promise.all([loadAgents(name),loadEvents(name)]);
+  startSSE(name);
+}
 
-/* ── Sidebar ── */
-function renderSidebar() {
-  const el = document.getElementById('projectsList');
-  if (!allProjects.length) {
-    el.innerHTML = `<div class="empty" style="padding:30px 18px">
-      <div style="font-size:24px;margin-bottom:8px">💤</div>
-      <div class="empty-title">Нет проектов</div>
-      <div class="empty-sub">Агенты ещё не присылали события</div>
-    </div>`;
-    return;
-  }
-  el.innerHTML = allProjects.map(p => {
-    const isActive = p.active_agent != null;
-    const isSelected = selectedProject === p.name;
-    const last = p.last_event;
-    return `<div class="project-item${isSelected?' active':''}" onclick="selectProject('${p.name}')">
-      <div class="project-item-top">
-        <div class="status-dot ${isActive?'active':'idle'}"></div>
-        <div class="project-name">${p.name}</div>
+async function loadAgents(project){
+  try{
+    const[agR,evR]=await Promise.all([
+      fetch('/api/agents/list?project='+project).then(r=>r.json()),
+      fetch('/api/agents/events?project='+project+'&limit=200').then(r=>r.json()),
+    ]);
+    agentStatuses={};
+    for(const e of evR){
+      const ag=e.agent;if(!ag)continue;
+      if(!agentStatuses[ag])agentStatuses[ag]={status:'idle',lastSeen:null,task:''};
+      const s=agentStatuses[ag];s.lastSeen=e.ts;
+      if(e.type==='start'){s.status='active';s.task=e.message||''}
+      if(e.type==='step'){s.status='active';s.task=e.message||''}
+      if(e.type==='complete'){s.status='done';s.task=e.message||''}
+      if(e.type==='error'){s.status='error';s.task=e.message||''}
+    }
+    const agents=agR.agents||[];
+    const active=Object.values(agentStatuses).filter(a=>a.status==='active').length;
+    document.getElementById('s-agents').textContent=agents.length;
+    document.getElementById('s-active').textContent=active||'0';
+    document.getElementById('project-sub').textContent=agents.length+' агентов · '+(active?active+' активно':'в ожидании');
+    renderAgents(agents);
+  }catch(e){console.error(e);document.getElementById('project-sub').textContent='ошибка загрузки'}
+}
+
+function renderAgents(agents){
+  const grid=document.getElementById('agent-grid');
+  if(!agents.length){grid.innerHTML='<div class="empty-state"><p>Нет агентов в проекте</p></div>';return}
+  const L={active:'Активен',wait:'Ожидает',done:'Завершил',error:'Ошибка',idle:'Готов'};
+  grid.innerHTML=agents.map(ag=>{
+    const st=agentStatuses[ag.name]||{status:'idle',lastSeen:null,task:''};
+    const icon=ICONS[ag.name]||'🤖';
+    const desc=(ag.description||'').slice(0,90);
+    return`<div class="agent-card ${st.status==='active'?'active':st.status==='error'?'error':''}">
+      <div class="agent-card-top"><div class="agent-icon">${icon}</div><span class="status-badge ${st.status}">${L[st.status]||'Готов'}</span></div>
+      <div class="agent-name">${ag.name}</div>
+      <div class="agent-desc">${desc||'Агент проекта'}</div>
+      <div class="agent-meta">
+        <span class="agent-last">${st.lastSeen?timeAgo(st.lastSeen):'не запускался'}</span>
+        ${st.task?`<span class="agent-task" title="${st.task}">${st.task.slice(0,28)}…</span>`:''}
       </div>
-      ${last ? `<div class="project-last">${last.message||''}</div>` : ''}
     </div>`;
   }).join('');
 }
 
-/* ── Event item ── */
-function renderEventItem(e) {
-  const meta = getAgentMeta(e.agent);
-  const type = e.type || 'step';
-  return `<div class="event-item">
-    <div class="event-top">
-      <span class="event-type ${type}">${type}</span>
-      <span class="event-agent">${meta.icon} ${meta.label}</span>
-      <span class="event-time">${fmtTimeShort(e.ts)}</span>
+async function loadEvents(project){
+  try{
+    const events=await fetch('/api/agents/events?project='+project+'&limit=60').then(r=>r.json());
+    eventBuffer=[...events].reverse();eventTotal=events.length;renderEvents();
+  }catch(e){console.error(e)}
+}
+
+function renderEvents(){
+  const list=document.getElementById('event-list');
+  document.getElementById('event-count').textContent=eventTotal;
+  if(!eventBuffer.length){list.innerHTML='<div class="empty-state" style="height:100px"><p>Нет событий</p></div>';return}
+  list.innerHTML=eventBuffer.slice(0,80).map(e=>renderEventItem(e,false)).join('');
+}
+
+function renderEventItem(e,isNew){
+  const type=e.type||'info';const msg=(e.message||e.task||'').slice(0,120);
+  return`<div class="event-item ${isNew?'new':''}">
+    <div class="event-icon ${type}">${TYPE_ICON[type]||'·'}</div>
+    <div class="event-body">
+      <div class="event-agent">${e.agent||'—'}</div>
+      ${msg?`<div class="event-msg">${msg}</div>`:''}
+      <div class="event-time">${shortTime(e.ts)}</div>
     </div>
-    <div class="event-msg">${e.message||''}</div>
-    ${e.artifact ? `<div style="font-size:10px;color:var(--accent);margin-top:2px">📎 ${e.artifact}</div>` : ''}
   </div>`;
 }
 
-/* ── Project view ── */
-function renderProjectView(p) {
-  const activeAgent = p.active_agent;
-  const projectEvents = recentEvents.filter(e => e.project === p.name).slice(-60).reverse();
-  const agents = [...new Set([
-    ...recentEvents.filter(e=>e.project===p.name).map(e=>e.agent).filter(Boolean),
-    ...Object.keys(AGENTS_META)
-  ])];
-  const eventCount = recentEvents.filter(e => e.project === p.name).length;
-  const doneCount  = recentEvents.filter(e => e.project === p.name && e.type === 'complete').length;
-
-  document.getElementById('topbar').innerHTML = `
-    <div>
-      <div class="topbar-title">${p.name}</div>
-      <div class="topbar-meta">${activeAgent
-        ? '🟢 Активен: ' + getAgentMeta(activeAgent).label
-        : '⚪ В ожидании задачи'}</div>
-    </div>
-    <div class="topbar-right">
-      <div class="clock-block">
-        <div class="clock-time" id="clockTime">--:--:--</div>
-        <div class="clock-date" id="clockDate">--</div>
-      </div>
-      <div class="topbar-actions"><a href="/agents">Галактика</a><a href="/map" style="margin-left:8px">Карта</a></div>
-    </div>`;
-
-  document.getElementById('content').innerHTML = `
-    <div class="span-full">
-      <div class="stats-bar">
-        <div class="stat"><div class="stat-val">${agents.length}</div><div class="stat-lbl">агентов</div></div>
-        <div class="stat"><div class="stat-val">${eventCount}</div><div class="stat-lbl">событий</div></div>
-        <div class="stat"><div class="stat-val">${doneCount}</div><div class="stat-lbl">завершено</div></div>
-        <div class="stat"><div class="stat-val" style="color:${activeAgent?'var(--green)':'var(--muted)'}">${activeAgent?'●':'○'}</div><div class="stat-lbl">статус</div></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <h2>Агенты команды</h2>
-        ${activeAgent
-          ? `<span class="badge active">● Активен</span>`
-          : `<span class="badge idle">Свободны</span>`}
-      </div>
-      <div class="card-body">
-        <div class="agents-grid">
-          ${agents.map(name => {
-            const meta = getAgentMeta(name);
-            const isActive = name === activeAgent;
-            const agentEvts = recentEvents.filter(e => e.project===p.name && e.agent===name);
-            const lastAct = agentEvts.length ? agentEvts[agentEvts.length-1] : null;
-            return `<div class="agent-card${isActive?' active-agent':''}" onclick="selectAgent('${p.name}','${name}')">
-              <div class="agent-icon">${meta.icon}</div>
-              <div class="agent-name">${meta.label}</div>
-              <div class="agent-status">${isActive ? '🟢 активен' : lastAct ? fmtTime(lastAct.ts) : 'нет активности'}</div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><h2>Лента событий</h2></div>
-      <div class="feed-scroll" id="eventFeed">
-        ${projectEvents.length
-          ? projectEvents.map(renderEventItem).join('')
-          : '<div class="empty"><div class="empty-title">Событий нет</div><div class="empty-sub">Запусти агента через слеш-команду</div></div>'}
-      </div>
-    </div>`;
+function prependEvent(e){
+  eventBuffer.unshift(e);if(eventBuffer.length>100)eventBuffer.pop();
+  eventTotal++;
+  document.getElementById('event-count').textContent=eventTotal;
+  document.getElementById('s-last').textContent=timeAgo(e.ts);
+  const list=document.getElementById('event-list');
+  const empty=list.querySelector('.empty-state');if(empty)empty.remove();
+  const div=document.createElement('div');div.innerHTML=renderEventItem(e,true);
+  list.prepend(div.firstChild);
+  while(list.children.length>80)list.removeChild(list.lastChild);
 }
 
-/* ── Agent view ── */
-function selectAgent(project, agent) {
-  const agentEvents = recentEvents.filter(e => e.project===project && e.agent===agent).reverse();
-  const meta = getAgentMeta(agent);
-  const artifacts = [...new Set(agentEvents.filter(e=>e.artifact).map(e=>e.artifact))];
-
-  document.getElementById('topbar').innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px">
-      <button onclick="selectProject('${project}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--muted);cursor:pointer;font-size:12px">← ${project}</button>
-      <div>
-        <div class="topbar-title">${meta.icon} ${meta.label}</div>
-        <div class="topbar-meta">Агент проекта ${project}</div>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <div class="clock-block">
-        <div class="clock-time" id="clockTime">--:--:--</div>
-        <div class="clock-date" id="clockDate">--</div>
-      </div>
-      <div class="topbar-actions"><a href="/agents">Галактика</a><a href="/map" style="margin-left:8px">Карта</a></div>
-    </div>`;
-
-  document.getElementById('content').innerHTML = `
-    <div class="card span-full">
-      <div class="card-header"><h2>История — ${meta.icon} ${meta.label}</h2></div>
-      <div class="feed-scroll" style="max-height:600px">
-        ${agentEvents.length
-          ? agentEvents.map(renderEventItem).join('')
-          : '<div class="empty"><div class="empty-title">Событий нет</div><div class="empty-sub">Этот агент ещё не работал</div></div>'}
-      </div>
-    </div>
-    ${artifacts.length ? `
-    <div class="card span-full">
-      <div class="card-header"><h2>Артефакты</h2></div>
-      <div class="card-body">
-        ${artifacts.map(a=>`<div style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:var(--accent)">📎 ${a}</div>`).join('')}
-      </div>
-    </div>` : ''}`;
-}
-
-/* ── Select project ── */
-function selectProject(name) {
-  selectedProject = name;
-  renderSidebar();
-  startStream(name);
-  const p = allProjects.find(x => x.name === name);
-  if (p) renderProjectView(p);
-}
-
-/* ── SSE stream ── */
-function startStream(project) {
-  if (eventSource) eventSource.close();
-  const since = recentEvents.length ? (recentEvents[recentEvents.length-1]?.ts||'') : '';
-  eventSource = new EventSource(`/api/agents/stream?project=${encodeURIComponent(project)}&since=${encodeURIComponent(since)}`);
-  eventSource.onmessage = (e) => {
-    try {
-      const event = JSON.parse(e.data);
-      recentEvents.push(event);
-      if (recentEvents.length > 1000) recentEvents = recentEvents.slice(-1000);
-      updateWithEvent(event);
-    } catch {}
+function startSSE(project){
+  if(eventSource){eventSource.close();eventSource=null}
+  const lastTs=eventBuffer.length?eventBuffer[0].ts:'';
+  eventSource=new EventSource('/api/agents/stream?project='+project+'&since='+encodeURIComponent(lastTs));
+  eventSource.onmessage=ev=>{
+    try{
+      const e=JSON.parse(ev.data);prependEvent(e);
+      const ag=e.agent;
+      if(ag){
+        if(!agentStatuses[ag])agentStatuses[ag]={status:'idle',lastSeen:null,task:''};
+        const s=agentStatuses[ag];s.lastSeen=e.ts;
+        if(e.type==='start'){s.status='active';s.task=e.message||''}
+        if(e.type==='step'){s.status='active';s.task=e.message||''}
+        if(e.type==='complete'){s.status='done';s.task=e.message||''}
+        if(e.type==='error'){s.status='error';s.task=e.message||''}
+        loadAgents(currentProject);
+      }
+    }catch(_){}
   };
+  eventSource.onerror=()=>setTimeout(()=>{if(currentProject)startSSE(currentProject)},5000);
 }
 
-function updateWithEvent(event) {
-  const proj = allProjects.find(p => p.name === event.project);
-  if (proj) {
-    proj.last_event = event;
-    if (event.type==='start'||event.type==='step') proj.active_agent = event.agent;
-    else if (event.type==='complete'||event.type==='error') proj.active_agent = null;
-    proj.recent_events = [...(proj.recent_events||[]), event].slice(-5);
-  } else {
-    allProjects.unshift({ name: event.project, active_agent: null, last_event: event, recent_events: [event] });
-  }
-  renderSidebar();
-  if (selectedProject === event.project) {
-    const p = allProjects.find(x => x.name === event.project);
-    if (p) { renderProjectView(p); const f=document.getElementById('eventFeed'); if(f) f.scrollTop=0; }
-  }
+async function refresh(){
+  await loadProjects();
+  if(currentProject)await Promise.all([loadAgents(currentProject),loadEvents(currentProject)]);
 }
 
-/* ── Initial load ── */
-async function loadAll() {
-  try {
-    const [projRes, evRes] = await Promise.all([
-      fetch('/api/agents/projects'),
-      fetch('/api/agents/events?limit=500')
-    ]);
-    allProjects = await projRes.json();
-    recentEvents = await evRes.json();
-    renderSidebar();
-  } catch {}
-}
-
-loadAll();
-
-setInterval(async () => {
-  try {
-    allProjects = await (await fetch('/api/agents/projects')).json();
-    renderSidebar();
-    if (selectedProject) {
-      const p = allProjects.find(x => x.name === selectedProject);
-      if (p) renderProjectView(p);
-    }
-  } catch {}
-}, 10000);
+loadProjects();
+setInterval(()=>{if(eventBuffer.length)document.getElementById('s-last').textContent=timeAgo(eventBuffer[0].ts)},30000);
+setInterval(loadProjects,60000);
 </script>
 </body>
 </html>
