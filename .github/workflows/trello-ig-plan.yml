@@ -1,0 +1,235 @@
+name: Trello Instagram Plan Detailed
+
+on:
+  workflow_dispatch:
+
+jobs:
+  populate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install requests
+        run: pip install requests -q
+
+      - name: Populate detailed Instagram plan
+        env:
+          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python3 << 'PYEOF'
+          import os, requests, json
+
+          key      = os.environ['TRELLO_API_KEY']
+          token    = os.environ['TRELLO_TOKEN']
+          gh_token = os.environ['GH_TOKEN']
+          gh_repo  = os.environ['GH_REPO']
+          board_id = '69f5ee59565cd64f2e9da2ff'
+
+          BASE = 'https://api.trello.com/1'
+          AUTH = {'key': key, 'token': token}
+
+          # Get Instagram план list
+          r = requests.get(f'{BASE}/boards/{board_id}/lists', params={**AUTH, 'filter': 'open'})
+          lists = {l['name']: l['id'] for l in r.json()}
+
+          ig_list_name = '🗓 Instagram план'
+          ig_id = lists.get(ig_list_name)
+          if not ig_id:
+              rc = requests.post(f'{BASE}/lists', params=AUTH,
+                  json={'name': ig_list_name, 'idBoard': board_id, 'pos': 'top'})
+              ig_id = rc.json()['id']
+
+          # Clear existing cards
+          existing = requests.get(f'{BASE}/lists/{ig_id}/cards', params={**AUTH, 'fields': 'id'}).json()
+          for c in existing:
+              requests.delete(f'{BASE}/cards/{c["id"]}', params=AUTH)
+
+          # Daily plan: one card per day with all content for that day
+          # Format: (date, day_name, items)
+          # Each item: (time, format, theme, action, photo)
+          plan = [
+              ('12.05', 'Вт', [
+                  ('19:00', 'АВТО фото', 'Liquid Lamellar Filler-Mask #3', 'Ничего не делать — выйдет сам', 'Lamellar Water 200 ml | 3.png'),
+                  ('20:30', '🎬 РУЧ Reels #1', 'Хто ми — Viterbo (15 сек)', 'Снять/смонтировать и опубликовать вручную', 'Италия + флакон'),
+              ]),
+              ('13.05', 'Ср', [
+                  ('12:30', '📑 РУЧ Карусель #1', 'Що таке Liquid Lamellar — 7 слайдів', 'Сделать карусель в Canva + опубликовать', 'Слайды'),
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #4', 'Ничего не делать — выйдет сам', 'Cream Spray 200 ml |4.png'),
+              ]),
+              ('14.05', 'Чт', [
+                  ('19:00', '🆕 НОВЕ фото-brand', 'Маніфест на cream-плашці', 'Снять/сделать в Canva + добавить в очередь', 'manifesto-cream-1.png'),
+                  ('20:30', '🎬 РУЧ Reels #2', '3 ознаки що термозахист не працює (18 сек)', 'Снять/смонтировать + опубликовать вручную', 'Текстовый Reels'),
+              ]),
+              ('15.05', 'Пт', [
+                  ('19:00', 'АВТО фото', 'Thermo Protector #5', 'Ничего не делать', 'Thermo Protector Spray 200 ml | 5.png'),
+              ]),
+              ('16.05', 'Сб', [
+                  ('12:30', '📑 РУЧ Карусель #2', 'Що таке pH 4.5 і чому це важливо', 'Сделать карусель + опубликовать', 'Слайды'),
+                  ('19:00', 'АВТО фото', 'Liquid Lamellar Filler-Mask #5', 'Ничего не делать', 'Lamellar Water 200 ml | 5.png'),
+              ]),
+              ('17.05', 'Нд', [
+                  ('20:00', '🎬 РУЧ Reels #3', 'Один день майстра в Одесі (20 сек)', 'Снять lifestyle-Reels + опубликовать', 'Майстер + Liquid Lamellar'),
+              ]),
+              ('18.05', 'Пн', [
+                  ('13:00', '📑 РУЧ Карусель #3', 'Склад 20 IN 1 Crème-Spray — 10 слайдів', 'Сделать карусель + опубликовать', 'Слайды'),
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #5', 'Ничего не делать', 'Cream Spray 200 ml |5.jpg'),
+              ]),
+              ('19.05', 'Вт', [
+                  ('19:00', 'АВТО фото', 'Thermo Protector #6', 'Ничего не делать', 'Thermo Protector Spray 200 ml | 6.png'),
+                  ('20:30', '🎬 РУЧ Reels #4', 'Крем-піна Liquid Lamellar (макро, 12 сек)', 'ASMR-съёмка + опубликовать', 'Макро вода+маска'),
+              ]),
+              ('20.05', 'Ср', [
+                  ('19:00', 'АВТО фото', 'Liquid Lamellar Filler-Mask #6', 'Ничего не делать', 'Lamellar Water 200 ml | 6.png'),
+              ]),
+              ('21.05', 'Чт', [
+                  ('12:30', '📑 РУЧ Карусель #4', '5 помилок щоденного догляду', 'Сделать + опубликовать', 'Слайды'),
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #6', 'Ничего не делать', 'Cream Spray 200 ml |6.png'),
+              ]),
+              ('22.05', 'Пт', [
+                  ('20:30', '🎬 РУЧ Reels #5', 'Що відбувається з волоссям при 220°C (18 сек)', 'Анімований Reels (Canva/AE) + опубликовать', 'Schema-edu'),
+              ]),
+              ('23.05', 'Сб', [
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #7', 'Ничего не делать', 'Cream Spray 200 ml |7.png'),
+              ]),
+              ('24.05', 'Нд', [
+                  ('13:00', '🆕 НОВЕ фото-lifestyle', 'Сонячна неділя + Liquid Lamellar', 'Снять lifestyle + добавить в очередь', 'lifestyle-lamellar-sunday.png'),
+                  ('20:00', '🎬 РУЧ Reels #6 КОЛАБ #1', 'Мікро-інфлюенсер з Liquid Lamellar (25-30 сек)', '⚠️ ВАЖНО: договориться с инфлюенсером (бартер: флакон → Reels+сторіс)', 'Контент от инфлюенсера'),
+              ]),
+              ('25.05', 'Пн', [
+                  ('19:00', 'АВТО фото', 'Liquid Lamellar Filler-Mask #7', 'Ничего не делать', 'Lamellar Water 200 ml | 7.png'),
+              ]),
+              ('26.05', 'Вт', [
+                  ('12:30', '📑 РУЧ Карусель #5 B2B', 'Як майстер заробляє +220 грн з take-home (6 слайдів)', 'B2B-карусель для майстрів — опубликовать', 'Слайды'),
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #8', 'Ничего не делать', 'Cream Spray 200 ml |8.png'),
+              ]),
+              ('27.05', 'Ср', [
+                  ('20:30', '🎬 РУЧ Reels #7', 'Behind-the-scenes Viterbo (20 сек)', 'Стокові кадри + этикетка → опубликовать', 'Italy + label'),
+              ]),
+              ('28.05', 'Чт', [
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #9', 'Ничего не делать', 'Cream Spray 200 ml |9.png'),
+              ]),
+              ('29.05', 'Пт', [
+                  ('12:30', '📑 РУЧ Карусель #6', 'Терміни в етикетках: сфінголіпіди, фосфоліпіди, ламелярний (8 слайдів)', 'Глосарій для майстрів + опубликовать', 'Слайды'),
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #10', 'Ничего не делать', 'Cream Spray 200 ml |10.png'),
+              ]),
+              ('30.05', 'Сб', [
+                  ('20:30', '🎬 РУЧ Reels #8', 'Маска чи бальзам? 15 сек vs 30 хв (split-screen, 18 сек)', 'Снять + опубликовать', 'Split-screen'),
+              ]),
+              ('31.05', 'Нд', [
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #11', 'Ничего не делать', 'Cream Spray 200 ml |11.png'),
+              ]),
+              ('01.06', 'Пн', [
+                  ('13:00', '📑 РУЧ Карусель #7', 'Термозахист vs кондиціонер (7 слайдів)', 'Сделать + опубликовать', 'Слайды'),
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #12', 'Ничего не делать', 'Cream Spray 200 ml |12.png'),
+              ]),
+              ('02.06', 'Вт', [
+                  ('20:30', '🎬 РУЧ Reels #9 КОЛАБ #2', 'Мікро-інфлюенсер з 20 IN 1 (транзишн до/после)', '⚠️ Договориться с инфлюенсером', 'Контент от инфлюенсера'),
+              ]),
+              ('03.06', 'Ср', [
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #13', 'Ничего не делать', 'Cream Spray 200 ml |13.png'),
+              ]),
+              ('04.06', 'Чт', [
+                  ('12:30', '📑 РУЧ Карусель #8 UGC #1', 'Перші відгуки майстрів-партнерів (5 слайдів)', 'Собрать UGC + опубликовать (нужны реальные отзывы)', 'Слайды'),
+                  ('19:00', 'АВТО фото', '20 IN 1 Crème-Spray #14', '⚠️ ПОСЛЕДНИЙ из текущей очереди!', 'Cream Spray 200 ml |14.png'),
+              ]),
+              ('05.06', 'Пт', [
+                  ('19:00', '🆕 НОВЕ фото', 'Trio HairLove — flat-lay 3 продуктов', '⚠️ Снять до 04.06 + добавить в очередь!', 'trio-flatlay-1.png'),
+                  ('20:30', '🎬 РУЧ Reels #10', 'Як обирали етикетку — Constellation Jade Raster (22 сек)', 'Снять текстуру бумаги + опубликовать', 'Текстура'),
+              ]),
+              ('06.06', 'Сб', [
+                  ('13:00', '📑 РУЧ Карусель #9', 'Що питають клієнти у майстра (8 слайдів)', 'Сделать + опубликовать', 'Слайды'),
+                  ('19:00', '🆕 НОВЕ фото', 'Lifestyle: рука + Thermo Protector', '⚠️ Снять до 05.06', 'lifestyle-thermo-hand.png'),
+              ]),
+              ('07.06', 'Нд', [
+                  ('20:00', '🎬 РУЧ Reels #11', 'Live з майстром Одеси cut-down (30 сек)', 'Провести live → нарезать → опубликовать', 'Live'),
+              ]),
+              ('08.06', 'Пн', [
+                  ('19:00', '🆕 НОВЕ фото-brand', 'Текст на cream: "Не магія. Склад."', '⚠️ Сделать в Canva + добавить в очередь', 'manifesto-cream-2.png'),
+              ]),
+              ('09.06', 'Вт', [
+                  ('12:30', '📑 РУЧ Карусель #10', 'Перші 30 днів @hair_love_company — звіт', 'Сделать + опубликовать', 'Слайды'),
+                  ('19:00', '🆕 НОВЕ фото', 'Liquid Lamellar — крем-піна крупный план', '⚠️ Снять макро', 'lamellar-foam-macro.png'),
+              ]),
+              ('10.06', 'Ср', [
+                  ('20:30', '🎬 РУЧ Reels #12', 'Протокол майстра — три продукти разом (28 сек)', 'Снять последовательность Thermo → Lamellar → Cream', 'Послідовність'),
+              ]),
+              ('11.06', 'Чт', [
+                  ('13:00', '📑 РУЧ Карусель #11', 'Чек-лист догляду на літо (9 слайдів)', 'Сделать + опубликовать (saves-контент)', 'Слайды'),
+                  ('19:00', '🆕 НОВЕ фото', 'Trio HairLove — закрытие месяца', '⚠️ Снять второй flat-lay', 'trio-flatlay-2.png'),
+              ]),
+          ]
+
+          # Create header card with legend
+          legend_desc = (
+              '**КАК ЧИТАТЬ ПЛАН:**\n\n'
+              '✅ **АВТО фото** — публикуется автоматически в 19:00 Киев. Ничего не делать.\n'
+              '🎬 **РУЧ Reels** — нужно снять/смонтировать видео и опубликовать вручную (20:30 обычно).\n'
+              '📑 **РУЧ Карусель** — сделать в Canva (7-10 слайдов) и опубликовать вручную (12:30-13:00).\n'
+              '🆕 **НОВЕ фото** — нужно СНЯТЬ новое фото и добавить в очередь posting-queue.json.\n\n'
+              '**⚠️ КРИТИЧНО:**\n'
+              'До 04.06 нужно снять 6 новых фото — иначе автопостинг встанет 05.06:\n'
+              '• manifesto-cream-1.png (на 14.05)\n'
+              '• lifestyle-lamellar-sunday.png (на 24.05)\n'
+              '• trio-flatlay-1.png (на 05.06)\n'
+              '• lifestyle-thermo-hand.png (на 06.06)\n'
+              '• manifesto-cream-2.png (на 08.06)\n'
+              '• lamellar-foam-macro.png (на 09.06)\n'
+              '• trio-flatlay-2.png (на 11.06)\n\n'
+              '**Колаб с инфлюенсерами (Reels #6 и #9) — бартер: флакон → Reels+сторіс.**\n'
+              'Список 25 микро-инфлюенсеров: artifacts/competitors/2026-05-10-одесса-список-салоны-инфлюенсеры.md\n\n'
+              'Полный план: artifacts/instagram/2026-05-12-контент-план-30-днів.md'
+          )
+
+          requests.post(f'{BASE}/cards', params=AUTH, json={
+              'name': '📖 ЛЕГЕНДА — как читать план',
+              'desc': legend_desc,
+              'idList': ig_id,
+              'pos': 'top'
+          })
+
+          # Day cards
+          count = 1
+          for date_str, day_name, items in plan:
+              # Build description
+              desc_lines = []
+              has_manual = False
+              for time, fmt, theme, action, photo in items:
+                  desc_lines.append(f'**{time} · {fmt}**')
+                  desc_lines.append(f'Тема: {theme}')
+                  if photo and photo != '—':
+                      desc_lines.append(f'Фото/контент: `{photo}`')
+                  desc_lines.append(f'Действие: {action}')
+                  desc_lines.append('')
+                  if 'РУЧ' in fmt or 'НОВЕ' in fmt:
+                      has_manual = True
+
+              # Title indicates if manual work needed
+              flag = '⚡' if has_manual else '✅'
+              title = f'{flag} {date_str} ({day_name}) — {len(items)} {"пост" if len(items)==1 else "поста"}'
+
+              requests.post(f'{BASE}/cards', params=AUTH, json={
+                  'name': title,
+                  'desc': '\n'.join(desc_lines),
+                  'idList': ig_id,
+                  'pos': 'bottom'
+              })
+              count += 1
+
+          # Report
+          body = (
+              f'**✅ Instagram план в Trello обновлён**\n\n'
+              f'- Карточек добавлено: {count} (1 легенда + {count-1} дней)\n'
+              f'- Период: 12.05.2026 → 11.06.2026\n'
+              f'- Каждая карточка = 1 день со всеми постами\n'
+              f'- ⚡ в названии = есть ручная работа\n'
+              f'- ✅ в названии = только автопостинг\n\n'
+              f'Открой первую карточку "📖 ЛЕГЕНДА" чтобы понять обозначения.'
+          )
+          requests.post(
+              f'https://api.github.com/repos/{gh_repo}/issues/1/comments',
+              headers={'Authorization': f'Bearer {gh_token}', 'Content-Type': 'application/json'},
+              json={'body': body}
+          )
+          print(body)
+          PYEOF
