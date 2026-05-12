@@ -62,3 +62,5 @@
 2026-05-12T14:35 ⚠️ [coordinator] Сессия завершена/прервана
 2026-05-12T14:35 ⚠️ [coordinator] Сессия завершена/прервана
 2026-05-12T14:37 ⚠️ [coordinator] Сессия завершена/прервана
+2026-05-12T14:37 ⚠️ [coordinator] Сессия завершена/прервана
+2026-05-12T14:38 🔧 [coordinator] Настроен прямой push на GitHub через origin (pushurl + credential helper). Теперь git push origin работает без указания токена и обновляет tracking ref.
