@@ -2,7 +2,10 @@ name: HAiR LOVE — Daily Instagram Post
 
 on:
   schedule:
-    - cron: '0 16 * * *'  # 19:00 Kyiv time (UTC+3) — пик beauty engagement
+    # Каждые 20 минут в окне 16:00-19:40 UTC = 19:00-22:40 Киев.
+    # GitHub Actions cron может пропускать или задерживать запуски —
+    # поэтому 12 попыток. Идемпотентность ниже: если уже постили сегодня — skip.
+    - cron: '0,20,40 16-19 * * *'
   workflow_dispatch:       # можно запустить вручную
 
 jobs:
@@ -14,8 +17,24 @@ jobs:
         with:
           token: ${{ secrets.MY_PAT }}
           ref: claude/obshak
+          fetch-depth: 10
+
+      - name: Idempotency check (skip if already posted today)
+        id: check
+        run: |
+          # Получаем дату последнего коммита, который менял posting-index.txt
+          LAST=$(git log -1 --format=%cd --date=short -- projects/hairlove/artifacts/instagram/posting-index.txt || echo "")
+          TODAY_KYIV=$(TZ=Europe/Kiev date +%Y-%m-%d)
+          echo "Last index update: $LAST | Today (Kyiv): $TODAY_KYIV"
+          if [ "$LAST" = "$TODAY_KYIV" ]; then
+            echo "already_posted=true" >> $GITHUB_OUTPUT
+            echo "✅ Already posted today — skipping (idempotency guard)"
+          else
+            echo "already_posted=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Read queue and post
+        if: steps.check.outputs.already_posted != 'true'
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
