@@ -1,0 +1,156 @@
+name: Trello Rebuild Board
+
+on:
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install requests
+        run: pip install requests -q
+
+      - name: Rebuild Trello board
+        env:
+          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python3 << 'PYEOF'
+          import os, requests, json
+
+          key      = os.environ['TRELLO_API_KEY']
+          token    = os.environ['TRELLO_TOKEN']
+          gh_token = os.environ['GH_TOKEN']
+          gh_repo  = os.environ['GH_REPO']
+          board_id = '69f5ee59565cd64f2e9da2ff'
+
+          BASE = 'https://api.trello.com/1'
+          AUTH = {'key': key, 'token': token}
+
+          def post_to_issue(body):
+              requests.post(
+                  f'https://api.github.com/repos/{gh_repo}/issues/1/comments',
+                  headers={'Authorization': f'Bearer {gh_token}', 'Content-Type': 'application/json'},
+                  json={'body': body}
+              )
+
+          log = []
+
+          # 1. Get all current lists
+          r = requests.get(f'{BASE}/boards/{board_id}/lists', params={**AUTH, 'filter': 'open'})
+          current_lists = r.json()
+          log.append(f'Текущих списков: {len(current_lists)}')
+
+          # Lists to keep (our new ones)
+          keep_names = {'📋 Мне сделать', '❓ Вопрос к Клоду', '✅ Готово'}
+
+          # 2. Archive old lists
+          archived = []
+          for lst in current_lists:
+              if lst['name'] not in keep_names:
+                  requests.put(f'{BASE}/lists/{lst["id"]}/closed',
+                      params={**AUTH, 'value': 'true'})
+                  archived.append(lst['name'])
+
+          log.append(f'Архивировано: {", ".join(archived) if archived else "ничего"}')
+
+          # 3. Get remaining lists (our 3)
+          r2 = requests.get(f'{BASE}/boards/{board_id}/lists', params={**AUTH, 'filter': 'open'})
+          remaining = {l['name']: l['id'] for l in r2.json()}
+
+          # 4. Create Instagram plan list if not exists
+          ig_list_name = '🗓 Instagram план'
+          if ig_list_name not in remaining:
+              rc = requests.post(f'{BASE}/lists', params=AUTH,
+                  json={'name': ig_list_name, 'idBoard': board_id, 'pos': 'top'})
+              remaining[ig_list_name] = rc.json()['id']
+              log.append(f'Создан список: {ig_list_name}')
+
+          # Make sure order is right: Instagram план → Мне сделать → Вопрос → Готово
+          list_order = [ig_list_name, '📋 Мне сделать', '❓ Вопрос к Клоду', '✅ Готово']
+          for i, name in enumerate(list_order):
+              if name in remaining:
+                  requests.put(f'{BASE}/lists/{remaining[name]}/pos',
+                      params={**AUTH, 'value': (i+1)*1000})
+
+          # 5. Clear existing cards in our lists (fresh start)
+          for name, lid in remaining.items():
+              cards = requests.get(f'{BASE}/lists/{lid}/cards', params=AUTH).json()
+              for card in cards:
+                  requests.delete(f'{BASE}/cards/{card["id"]}', params=AUTH)
+
+          log.append('Старые карточки очищены')
+
+          # 6. Add Instagram plan cards
+          ig_list_id = remaining[ig_list_name]
+
+          # Current index = 2 (posts 0,1 done), today = 12.05
+          ig_posts = [
+              ('12.05 (сегодня) 19:00', 'Lamellar Water 200 ml | 1.png', 'Liquid Lamellar Filler-Mask — первое знакомство'),
+              ('13.05 ср 19:00',        'Cream Spray 200 ml |2.png',     '20 IN 1 Crème-Spray — второй ракурс'),
+              ('14.05 чт 19:00',        'Thermo Protector Spray 200 ml | 2.png', 'Thermo — защита до 220°C'),
+              ('15.05 пт 19:00',        'Lamellar Water 200 ml | 2.png', 'Liquid Lamellar — результат до/после'),
+              ('16.05 сб 19:00',        'Cream Spray 200 ml |3.png',     '20 IN 1 — детали упаковки'),
+              ('17.05 вс 19:00',        'Thermo Protector Spray 200 ml | 3.png', 'Thermo — lifestyle съёмка'),
+              ('18.05 пн 19:00',        'Lamellar Water 200 ml | 3.png', 'Liquid Lamellar — текстура продукта'),
+          ]
+
+          for date_str, photo, caption_hint in ig_posts:
+              requests.post(f'{BASE}/cards', params=AUTH, json={
+                  'name': f'📸 {date_str}',
+                  'desc': f'Фото: {photo}\nТема: {caption_hint}\n\nАвтопостинг в 19:00 Киев',
+                  'idList': ig_list_id,
+                  'pos': 'bottom'
+              })
+
+          log.append(f'Instagram план: {len(ig_posts)} постов добавлено')
+
+          # 7. Add tasks for Pavel
+          tasks_list_id = remaining['📋 Мне сделать']
+
+          tasks = [
+              (
+                  '🗑 Удалить дубль в Instagram',
+                  'Cream Spray 200 ml |1.png был опубликован ДВАЖДЫ (10.05 и 11.05).\n\nЗайди в @hair_love_company → найди два одинаковых поста с кремом-спреем → удали тот который выглядит хуже.\n\nPost IDs:\n- 18050991971724705 (10.05)\n- 17879396490437018 (11.05)'
+              ),
+              (
+                  '📧 Ответ от завода ProCare',
+                  'Ожидаем ответ от vtm@procare.com.ua на письмо с запросом документов МОЗ.\n\nДедлайн получения документов: 25.05.2026\nДедлайн сертификации МОЗ: 03.08.2026\n\nКак придёт ответ — переложи эту карточку в ✅ Готово и напиши мне что ответили.'
+              ),
+              (
+                  '🤝 Инфо от Максима (Одесса)',
+                  'Спроси у партнёра Максима:\n1. С какими салонами в Одессе уже контактировал?\n2. Какой был отклик?\n3. Есть ли действующие договорённости?\n\nТиер-1 приоритеты (если Максим ещё не трогал):\n- NKT4 Emotional Salon\n- IVA Beauty Coworking\n- Manifest Beauty Hub\n- Viart\n\nКак узнаешь — напиши мне, запустим growth агента.'
+              ),
+              (
+                  '💰 Подтвердить B2B прайсинг',
+                  'В КП стоит минимальный заказ 6 000 грн.\n\nОК для тебя или нужно изменить?\n\nКП лежит тут:\nprojects/hairlove/artifacts/copy/2026-05-10-b2b-матеріали.md\n\nПодтверди — сразу отдаю growth агенту для outreach.'
+              ),
+              (
+                  '🌐 Проверить форму на сайте',
+                  'Зайди на https://kushnirpasha-lang.github.io/Claud/\nОткрой раздел "Партнёрам"\nЗаполни форму своими данными → нажми Отправить\n\nДолжно прийти письмо на почту Formspree (meenvegv).\n\nЕсли не пришло — создай карточку в ❓ Вопрос к Клоду.'
+              ),
+          ]
+
+          for title, desc in tasks:
+              requests.post(f'{BASE}/cards', params=AUTH, json={
+                  'name': title,
+                  'desc': desc,
+                  'idList': tasks_list_id,
+                  'pos': 'bottom'
+              })
+
+          log.append(f'Задачи для Павла: {len(tasks)} карточек')
+
+          # Summary
+          body = '**✅ Trello пересобран:**\n' + '\n'.join(f'- {l}' for l in log)
+          body += '\n\n**Структура доски:**\n'
+          body += '🗓 Instagram план (7 постов)\n'
+          body += '📋 Мне сделать (5 задач для Павла)\n'
+          body += '❓ Вопрос к Клоду (пусто — сюда Павел пишет вопросы)\n'
+          body += '✅ Готово (пусто — сюда переносим выполненное)\n'
+
+          print(body)
+          post_to_issue(body)
+          PYEOF
