@@ -27,6 +27,10 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 - Sage / forest green (#5C7560 — для текста)
 - Без чёрного. Без яркого красного. Без неоновых.
 
+**Этикетка флакона — критическая деталь:**
+Бумага этикетки: **Constellation Jade Raster** — фактурная бумага с матовым отливом, тонкий растровый узор, мягкая «шероховатость» под пальцами. На фотографиях это читается как текстурированная бумага без глянца, с лёгкими бликами по фактуре. Это якорь итальянской премиальности — как папка винного caratterizzato.
+Указывать в КАЖДОМ промпте: `"label printed on Constellation Jade Raster textured matte paper with subtle raster pattern"`.
+
 **Свет:**
 - Soft natural daylight (не жёсткий)
 - Утро (09:00-11:00) или предзакат (17:00-19:00) — golden hour опционально
@@ -73,13 +77,16 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 
 Промпт пишется одним абзацем на английском (Nano Banana лучше работает на en). Длина 60-150 слов. Без слов "ультра", "масштабный", "роскошный".
 
-# Брендовые якоря (вставлять в КАЖДЫЙ промпт)
+# Брендовые якоря (вставлять в КАЖДЫЙ промпт — без исключений)
 
 - "200ml glass dropper bottle with minimalist label reading HAiR LOVE"
+- **"label printed on Constellation Jade Raster textured matte paper with subtle raster pattern, no gloss"** ← обязательно во ВСЕХ кадрах где виден флакон
 - "Italian premium editorial cosmetics photography"
 - Палитра из brandbook (минимум 2 цвета явно)
 - "Soft natural daylight"
 - "Generous white space"
+
+Если в кадре нет флакона (например, текстовый постер или макро-текстура без продукта) — якорь про Constellation Jade Raster можно опустить, но в комментарии Павлу пометить «без флакона — поэтому без бумаги».
 
 # Что ты делаешь
 

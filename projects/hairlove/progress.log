@@ -76,3 +76,5 @@
 2026-05-12T18:01 ⚠️ [coordinator] Сессия завершена/прервана
 2026-05-12T18:30 ✅ [coordinator] Создан агент visual (projects/hairlove/.claude/agents/visual.md) — единый image-prompts gatekeeper для Nano Banana, покрывает Instagram + сайт + (будущее) видео. Trello-план пересобран: убраны бессмысленные имена файлов, в НОВЕ-карточках теперь 'Промпт от visual'. Легенда переписана.
 2026-05-12T18:09 ⚠️ [coordinator] Сессия завершена/прервана
+2026-05-12T18:09 ⚠️ [coordinator] Сессия завершена/прервана
+2026-05-12T18:40 ✅ [coordinator] visual агент: добавлен обязательный brand-якорь 'Constellation Jade Raster textured matte paper' в каждый промпт где виден флакон. Из старых ТЗ Павла — критическая деталь премиальной этикетки.
