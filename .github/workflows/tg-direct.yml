@@ -10,7 +10,7 @@ jobs:
   send:
     runs-on: ubuntu-latest
     steps:
-      - name: Send via server
+      - name: Check server bot setup
         uses: appleboy/ssh-action@v1.0.3
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
@@ -23,40 +23,10 @@ jobs:
           script_stop: false
           script: |
             export $(grep -v '^#' /opt/assistant/.env | xargs) 2>/dev/null || true
-            python3 << 'PYEOF'
-            import os, json, urllib.request, urllib.parse, sys
-            sys.path.insert(0, '/opt/assistant')
-
-            token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
-            if not token:
-              print('ERROR: no TELEGRAM_BOT_TOKEN in .env')
-              exit(1)
-
-            # Get chat_id from updates (server polling resets offset so this might work)
-            upd = json.loads(urllib.request.urlopen(
-              f'https://api.telegram.org/bot{token}/getUpdates?limit=20&offset=-20',
-              timeout=10
-            ).read())
-            updates = upd.get('result', [])
-            chat_id = ''
-            if updates:
-              chat_id = str(updates[-1].get('message', {}).get('chat', {}).get('id', ''))
-
-            print(f'updates={len(updates)}, chat_id={chat_id}')
-
-            if chat_id:
-              data = urllib.parse.urlencode({
-                'chat_id': chat_id,
-                'text': 'ТЕСТ\n2026-05-15\nСистема работает!'
-              }).encode()
-              result = urllib.request.urlopen(
-                urllib.request.Request(
-                  f'https://api.telegram.org/bot{token}/sendMessage',
-                  data=data
-                ), timeout=10
-              ).read()
-              print('Sent:', result.decode()[:100])
-            else:
-              print('chat_id not found in updates')
-            PYEOF
-# trigger 8
+            echo "=== bot.py message handler ==="
+            grep -n "chat_id\|chat\.id\|from_user\|message" /opt/assistant/bot.py | head -30
+            echo "=== any stored chat_ids ==="
+            grep -r "chat_id" /opt/assistant/*.py 2>/dev/null | grep -v "def\|#" | head -20
+            echo "=== getUpdates from server ==="
+            curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?limit=5&offset=-5"
+# trigger 9
