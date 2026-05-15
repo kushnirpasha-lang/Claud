@@ -12,40 +12,51 @@ jobs:
     steps:
       - name: Send test message to Saved Messages via Telethon
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+          GH_REPO: ${{ github.repository }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: GH_TOKEN,GH_REPO
           script_stop: false
           script: |
             export $(grep -v '^#' /opt/assistant/.env | xargs) 2>/dev/null || true
-            TODAY=$(date +%Y-%m-%d)
             cd /opt/assistant
-            venv/bin/python3 - <<'PYEOF'
+            RESULT=$(venv/bin/python3 - 2>&1 <<'PYEOF'
 import asyncio, os, sys
 sys.path.insert(0, '/opt/assistant')
 from telethon import TelegramClient
+import datetime
 
 async def main():
     c = TelegramClient('/opt/assistant/user_session',
                        int(os.environ['TELEGRAM_API_ID']),
                        os.environ['TELEGRAM_API_HASH'])
     await c.connect()
+    session_exists = os.path.exists('/opt/assistant/user_session.session')
     authorized = await c.is_user_authorized()
-    print(f"is_authorized: {authorized}")
-    session_exists = __import__('os').path.exists('/opt/assistant/user_session.session')
-    print(f"session_file_exists: {session_exists}")
+    print(f"session_file: {session_exists}, authorized: {authorized}")
     if not authorized:
-        print("❌ Telethon не авторизован")
+        print("FAIL: not authorized")
         await c.disconnect()
         return
-    import datetime
+    me = await c.get_me()
+    print(f"logged in as: {me.first_name} @{me.username}")
     today = datetime.date.today().isoformat()
-    print(f"Authorized as: {await c.get_me()}")
     await c.send_message('me', f'✅ ТЕСТ Telethon\n{today}\n\nСообщение в Избранное — бесплатно!')
     await c.disconnect()
-    print("✅ Сообщение отправлено в Избранное")
+    print("OK: sent to Saved Messages")
 
 asyncio.run(main())
 PYEOF
-# trigger 4
+)
+            echo "RESULT: $RESULT"
+            PAYLOAD=$(printf 'telethon saved messages test:\n```\n%s\n```' "$RESULT" | python3 -c "import sys,json; print(json.dumps({'body': sys.stdin.read()}))")
+            curl -s -X POST \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.github.com/repos/$GH_REPO/issues/1/comments" \
+              -d "$PAYLOAD" || true
+# trigger 5
