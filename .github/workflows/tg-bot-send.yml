@@ -1,0 +1,35 @@
+name: TG Bot Send
+"on":
+  push:
+    paths:
+      - .github/workflows/tg-bot-send.yml
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    env:
+      TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    steps:
+      - name: Get chat_id and send
+        run: |
+          UPDATES=$(curl -s "https://api.telegram.org/bot${TG_TOKEN}/getUpdates?limit=20")
+          echo "Updates raw: $UPDATES"
+          CHAT_ID=$(echo "$UPDATES" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+for r in reversed(d.get('result', [])):
+    cid = r.get('message',{}).get('chat',{}).get('id')
+    if cid:
+        print(cid)
+        break
+" 2>/dev/null)
+          echo "Chat ID: $CHAT_ID"
+          if [ -z "$CHAT_ID" ]; then
+            echo "FAIL: chat_id not found"
+            exit 1
+          fi
+          curl -s "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            -d "chat_id=${CHAT_ID}" \
+            --data-urlencode "text=ТЕСТ
+2026-05-15"
+
