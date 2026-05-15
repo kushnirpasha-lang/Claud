@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HairLove — Фото ТЗ</title>
+<style>
+  :root{
+    --teal:#7BC4B8; --teal-d:#4E9E90; --pink:#E8B9C0; --cream:#F5EFE6;
+    --sage:#5C7560; --ink:#3A4540; --muted:#8A958F; --border:#E4E0D8;
+    --bg:#FBF9F5; --card:#FFFFFF; --ok:#5FA978;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.5; padding-bottom:60px}
+  header{background:linear-gradient(135deg,#E8F4F1,#F7E9EC); padding:22px 18px;
+    border-bottom:1px solid var(--border)}
+  header h1{font-size:20px; font-weight:800; letter-spacing:.3px}
+  header p{font-size:13px; color:var(--muted); margin-top:4px}
+  .wrap{max-width:920px; margin:0 auto; padding:0 16px}
+  .progress{margin:14px auto 0; max-width:920px; padding:0 16px; display:flex;
+    align-items:center; gap:12px; flex-wrap:wrap}
+  .bar{flex:1; min-width:160px; height:9px; background:#E9E4DA; border-radius:9px; overflow:hidden}
+  .bar > i{display:block; height:100%; width:0; background:var(--ok); transition:width .3s}
+  .pcount{font-size:13px; font-weight:700; color:var(--sage)}
+
+  .trend{max-width:920px; margin:18px auto 0; padding:0 16px}
+  .trend details{background:#FFF; border:1px solid var(--border); border-radius:12px; padding:0}
+  .trend summary{cursor:pointer; padding:13px 16px; font-weight:700; font-size:14px;
+    color:var(--teal-d); list-style:none}
+  .trend summary::-webkit-details-marker{display:none}
+  .trend summary::before{content:"▸ "; color:var(--teal)}
+  .trend details[open] summary::before{content:"▾ "}
+  .trend .tbody{padding:4px 18px 16px; font-size:13px; color:var(--ink)}
+  .trend .tbody h4{margin:12px 0 4px; font-size:13px; color:var(--sage)}
+  .trend .tbody li{margin-left:18px; margin-top:3px}
+
+  .filters{max-width:920px; margin:18px auto 4px; padding:0 16px; display:flex;
+    gap:8px; flex-wrap:wrap}
+  .fbtn{border:1px solid var(--border); background:#FFF; color:var(--ink);
+    padding:7px 14px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer}
+  .fbtn.active{background:var(--teal); color:#FFF; border-color:var(--teal)}
+
+  .grid{max-width:920px; margin:14px auto 0; padding:0 16px; display:grid; gap:14px}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:16px; transition:opacity .25s}
+  .card.done{opacity:.55}
+  .card.done .ctitle::after{content:" ✓"; color:var(--ok)}
+  .ctop{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap}
+  .ctitle{font-size:15px; font-weight:800}
+  .badges{display:flex; gap:6px; flex-wrap:wrap; margin-top:7px}
+  .b{font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px}
+  .b-prod{background:#E7F3F0; color:var(--teal-d)}
+  .b-vol{background:#F3ECE0; color:#9C7B3A}
+  .b-fmt{background:#F7E7EB; color:#B05A72}
+  .b-num{background:var(--sage); color:#FFF}
+  pre{margin-top:12px; background:#FAF7F1; border:1px solid var(--border);
+    border-radius:10px; padding:12px; font-size:11.5px; line-height:1.55;
+    white-space:pre-wrap; word-break:break-word; max-height:210px; overflow:auto;
+    font-family:"SF Mono",Menlo,Consolas,monospace; color:#46514B}
+  .actions{display:flex; align-items:center; gap:14px; margin-top:12px; flex-wrap:wrap}
+  .copy{background:var(--teal); color:#FFF; border:none; padding:9px 18px;
+    border-radius:9px; font-size:13px; font-weight:700; cursor:pointer}
+  .copy:active{transform:scale(.97)}
+  .copy.copied{background:var(--ok)}
+  .chk{display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600;
+    color:var(--muted); cursor:pointer; user-select:none}
+  .chk input{width:17px; height:17px; accent-color:var(--ok); cursor:pointer}
+  .chk.on{color:var(--sage)}
+  footer{text-align:center; font-size:12px; color:var(--muted); margin-top:26px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>HairLove — Фото ТЗ</h1>
+    <p>Конвейер: Instagram-агент (тренды) → Visual-агент (ТЗ) → ты (генерация в ChatGPT)</p>
+  </div>
+</header>
+
+<div class="progress">
+  <span class="pcount" id="pcount">0 / 12 сгенерировано</span>
+  <div class="bar"><i id="pbar"></i></div>
+</div>
+
+<div class="trend">
+  <details>
+    <summary>Что нашёл Instagram-агент: тренды product-photo 2025/2026</summary>
+    <div class="tbody">
+      <h4>ТОП-5 трендов</h4>
+      <ul>
+        <li><b>Texture Hero</b> — макро текстуры/распыления, видна суть продукта. ER 3.5–4.8%.</li>
+        <li><b>Wet / Dewy</b> — влага, капли, «роса». У микро-брендов ER 5%+.</li>
+        <li><b>Shelfie</b> — несколько продуктов как на полке, вид с уровня полки. Бренд-якорь.</li>
+        <li><b>Hand-in-Shot</b> — руки с nude-маникюром. +30–40% сохранений vs чистый продукт.</li>
+        <li><b>Minimalist / Clinical</b> — белый фон, тень как пропс. Лучшая конверсия в сайт (B2B).</li>
+      </ul>
+      <h4>Конкуренты</h4>
+      <ul>
+        <li><b>K18</b> — science-first, белый фон, клинический свет.</li>
+        <li><b>Olaplex</b> — клинический, флаконы-иконы, показывают результат не процесс.</li>
+        <li><b>Alfaparf Italia</b> — итальянский лоск, кремово-золотистые тона, не боится цвета.</li>
+      </ul>
+      <h4>Приоритет старта</h4>
+      <ul>
+        <li>Hero + Hands + Before/After = максимум охвата и конверсии.</li>
+        <li>Органика: природа, dewy, mirror-steam. B2B-сайт: shelf, минимализм.</li>
+      </ul>
+      <p style="margin-top:10px;color:var(--muted)">Полный анализ: artifacts/instagram/2026-05-15-trend-analysis-product-photo.md</p>
+    </div>
+  </details>
+</div>
+
+<div class="filters" id="filters"></div>
+<div class="grid" id="grid"></div>
+<footer>v1 · 12 ТЗ · обновляется когда Instagram-агент даёт новые рекомендации</footer>
+
+<script>
+const TZ = [
+  {n:1, prod:"Cream-Spray", vol:"200мл", fmt:"1:1", title:"Turquoise studio hero",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: minimalist hero — the bottle standing upright on a seamless turquoise-white backdrop, its own soft cast shadow as the only prop.
+Environment: smooth matte turquoise-white (#D9F0EC) seamless paper sweep, no objects.
+Composition: bottle on the rule-of-thirds line, camera at eye level with a slight 10° tilt, generous empty space above.
+Lighting: soft natural daylight from upper left, gentle gradient, soft shadow to lower right, no harsh shadows.
+Color palette: turquoise-white dominant, warm cream only in the light, white.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Square 1:1.
+Negative: no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows, no beige background.
+Natural color grading, no filters.`},
+
+  {n:2, prod:"Thermo", vol:"200мл", fmt:"4:5", title:"Pastel pink editorial",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: the bottle lying at a relaxed angle on a soft pastel-pink plaster surface, a single folded linen ribbon nearby.
+Environment: pastel pink (#F4D9D9) matte plaster surface and pink seamless background, one cream linen ribbon.
+Composition: 35° top-down, bottle on the lower third on a diagonal, large pink negative space at the top.
+Lighting: soft window daylight from the right, soft long shadow to the left, morning.
+Color palette: pastel pink dominant, warm cream linen, sage-green only on the label.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Vertical 4:5.
+Negative: no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:3, prod:"Thermo", vol:"200мл", fmt:"1:1", title:"Sage botanical",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: the bottle resting on a cool grey-green river stone among fresh eucalyptus and fern, light morning dew.
+Environment: sage/forest-green stone, eucalyptus sprig, fern fronds, faint water droplets, soft moss.
+Composition: near-flatlay at 60°, bottle center-left, botanicals leading in from the right.
+Lighting: overcast diffused daylight, even and soft, no harsh shadows, fresh cool tone.
+Color palette: sage green plus turquoise-white plus cream, cooler natural register.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Square 1:1.
+Negative: no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:4, prod:"Cream-Spray", vol:"200мл", fmt:"4:5", title:"Wet / dewy",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: the bottle on a wet turquoise-white tile ledge inside a bright shower niche, water droplets on the glass in the foreground.
+Environment: matte turquoise-white ceramic tile, frosted glass with condensation, water droplets, no chrome or metal fixtures.
+Composition: portrait, bottle on the lower third, soft out-of-focus steamy glass at the top, shot slightly from below at 20°.
+Lighting: soft daylight from above and behind through frosted glass, gentle rim light, dewy.
+Color palette: turquoise-white plus cool white plus a cream highlight.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Vertical 4:5.
+Negative: no faces, no text overlays, no glossy surfaces, no plastic, no chrome, no metallic fixtures, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:5, prod:"Дуэт", vol:"200мл", fmt:"4:5", title:"Linen shelf — дуэт (нужны ОБА флакона)",
+   p:`Product photography. Keep the provided product bottles exactly as-is. Do not alter the labels in any way: no changes to label design, text, logo, font, or colors. The labels are printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shapes or glass. Only add environment, background, surface, props, and lighting around the bottles.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: the two bottles standing together on a natural linen-draped ledge with a raw ceramic dish and a single eucalyptus stem, a curated shelf seen at shelf-eye level.
+Environment: warm cream linen, raw ceramic, light oak, one eucalyptus stem, soft neutral wall behind.
+Composition: shot from shelf eye level (not top-down), bottles slightly apart with depth between them.
+Lighting: soft daylight from the left, soft shadows to the right, late morning.
+Color palette: cream plus turquoise-white plus sage, the two labels provide the color contrast.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Vertical 4:5.
+Negative: no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:6, prod:"Cream-Spray", vol:"200мл", fmt:"4:5", title:"Hands lifestyle",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: a woman's hand with a bare nude manicure gently holding the bottle near a window, soft out-of-focus interior behind.
+Environment: warm domestic blur, sheer curtain light, hand and forearm only, no face.
+Composition: hand enters from the lower right holding the bottle upright, bottle in sharp focus, creamy background bokeh.
+Lighting: soft diffused window daylight from the left, warm and gentle.
+Color palette: warm cream plus neutral skin plus a turquoise-white label pop.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Vertical 4:5.
+Negative: no face, only hand and forearm, natural skin without heavy retouch, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:7, prod:"Cream-Spray", vol:"200мл", fmt:"4:5", title:"Italian morning windowsill",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: the bottle on a sunlit windowsill, softly blurred Mediterranean greenery (cypress, olive) outside, a sprig of olive and a folded linen cloth beside it.
+Environment: warm painted windowsill, sheer light, out-of-focus green and terracotta outside, olive sprig, cream linen.
+Composition: bottle left of center, soft blurred window background, generous space, portrait.
+Lighting: soft warm morning sun from behind-left through the window, gentle long shadow, golden hour optional.
+Color palette: warm cream plus soft green plus turquoise-white label.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Vertical 4:5.
+Negative: no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:8, prod:"Cream-Spray", vol:"200мл", fmt:"1:1", title:"Clinical white cornerstone",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: minimalist cornerstone hero — the bottle standing upright on a pure white background, a single soft gradient shadow as the only element.
+Environment: pure seamless white #FFFFFF, subtle gradient shadow at the base, nothing else.
+Composition: bottle on the rule-of-thirds line, camera about 12° above eye level, soft shadow to one side, abundant white space.
+Lighting: soft even daylight from the upper left, clean, soft base shadow, no harsh shadows.
+Color palette: pure white with the label's own colors as the only color in frame.
+Style: quiet luxury, minimalist, generous white space, Italian editorial, clinical clarity.
+Format: Square 1:1.
+Negative: no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:9, prod:"Cream-Spray", vol:"200мл", fmt:"1:1", title:"Spray mist macro hero",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: extreme macro texture hero — the spray bottle mid-spray, releasing an ultra-fine airborne mist of micro-droplets that drifts and catches a soft light beam.
+Environment: clean light high-key background, a single soft side light beam revealing the fine atomized mist in the air.
+Composition: bottle on the lower third, the fine mist arcs up into the upper negative space, shallow focus on the nozzle.
+Lighting: soft directional daylight from the side-back, gentle, the beam catches the airborne micro-droplets.
+Color palette: light warm cream plus turquoise-white plus faint luminous mist highlights.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Square 1:1.
+Negative: no cream blob, no thick cream dollop, no liquid drop, no viscous strand, no dark background, no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:10, prod:"Дуэт", vol:"50мл", fmt:"1:1", title:"Premium tray flatlay (нужны ОБА 50мл)",
+   p:`Product photography. Keep the provided product bottles exactly as-is. Do not alter the labels in any way: no changes to label design, text, logo, font, or colors. The labels are printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shapes or glass. Only add environment, background, surface, props, and lighting around the bottles.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: two small 50ml bottles on a matte ceramic tray with one small refined accessory (a slim mirror or a folded linen square), curated and aspirational.
+Environment: matte neutral ceramic tray, soft cloth, one small accessory, soft wall behind.
+Composition: 60° top-down, bottles slightly apart on the tray, calm spacing.
+Lighting: soft daylight from the left, soft shadows, calm.
+Color palette: neutral matte plus turquoise-white plus pastel-pink label accents.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Square 1:1.
+Negative: no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:11, prod:"Thermo", vol:"200мл", fmt:"4:5", title:"Concrete + leaf shadow",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: the bottle on a matte light-grey concrete surface with a soft dappled shadow play from out-of-frame leaves.
+Environment: matte pale concrete, soft moving leaf shadows, minimal, one bare twig optional.
+Composition: bottle centered, 25° top-down, the dappled shadow as the only prop.
+Lighting: soft daylight filtered through leaves, gentle dappled pattern, no harsh edges.
+Color palette: cool pale grey concrete plus turquoise-white plus cream, calm cool register.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Vertical 4:5.
+Negative: no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`},
+
+  {n:12, prod:"Lamellar", vol:"200мл", fmt:"4:5", title:"Lamellar dewy shower",
+   p:`Product photography. Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle.
+
+Italian premium editorial cosmetics photography. Canon 5D Mark IV, 85mm lens, f/2.8.
+Scene: the Lamellar Filler-Mask bottle on a wet pastel-pink tile ledge in a bright shower niche, fine water droplets on the surrounding glass.
+Environment: matte pastel-pink ceramic tile, frosted glass with soft condensation, water droplets, no chrome.
+Composition: bottle on the lower third, soft out-of-focus dewy glass behind, slight low angle at 20°.
+Lighting: soft daylight from above and behind through frosted glass, dewy rim light.
+Color palette: pastel pink plus cool white plus a cream highlight.
+Style: quiet luxury, minimalist, generous white space, Italian editorial.
+Format: Vertical 4:5.
+Negative: no chrome, no metallic fixtures, no faces, no text overlays, no glossy surfaces, no plastic, no other brands, no harsh shadows.
+Natural color grading, no filters.`}
+];
+
+const LS = 'hairlove_tz_state_v1';
+let state = JSON.parse(localStorage.getItem(LS) || '{}');
+let filter = 'Все';
+const PRODUCTS = ['Все','Cream-Spray','Thermo','Lamellar','Дуэт'];
+
+function save(){ localStorage.setItem(LS, JSON.stringify(state)); }
+
+function st(n){ return state[n] || {cop:false, gen:false}; }
+
+function toggle(n, key){
+  const s = st(n); s[key] = !s[key]; state[n] = s; save(); render();
+}
+
+function copyTZ(n, btn){
+  const tz = TZ.find(t=>t.n===n);
+  navigator.clipboard.writeText(tz.p).then(()=>{
+    btn.textContent='Скопировано ✓'; btn.classList.add('copied');
+    const s = st(n); if(!s.cop){ s.cop=true; state[n]=s; save(); }
+    setTimeout(()=>{ btn.textContent='Копировать промпт'; btn.classList.remove('copied'); render(); }, 1200);
+  });
+}
+
+function renderFilters(){
+  const f = document.getElementById('filters');
+  f.innerHTML = PRODUCTS.map(p =>
+    `<button class="fbtn ${p===filter?'active':''}" onclick="setFilter('${p}')">${p}</button>`).join('');
+}
+function setFilter(p){ filter=p; render(); }
+
+function render(){
+  renderFilters();
+  const grid = document.getElementById('grid');
+  const list = TZ.filter(t => filter==='Все' || t.prod===filter);
+  grid.innerHTML = list.map(t=>{
+    const s = st(t.n);
+    return `<div class="card ${s.gen?'done':''}">
+      <div class="ctop">
+        <div>
+          <div class="ctitle">${t.title}</div>
+          <div class="badges">
+            <span class="b b-num">№${t.n}</span>
+            <span class="b b-prod">${t.prod}</span>
+            <span class="b b-vol">${t.vol}</span>
+            <span class="b b-fmt">${t.fmt}</span>
+          </div>
+        </div>
+      </div>
+      <pre>${t.p.replace(/</g,'&lt;')}</pre>
+      <div class="actions">
+        <button class="copy" onclick="copyTZ(${t.n}, this)">Копировать промпт</button>
+        <label class="chk ${s.cop?'on':''}">
+          <input type="checkbox" ${s.cop?'checked':''} onchange="toggle(${t.n},'cop')">Скопировал</label>
+        <label class="chk ${s.gen?'on':''}">
+          <input type="checkbox" ${s.gen?'checked':''} onchange="toggle(${t.n},'gen')">Сгенерировал</label>
+      </div>
+    </div>`;
+  }).join('');
+
+  const done = TZ.filter(t=>st(t.n).gen).length;
+  document.getElementById('pcount').textContent = `${done} / ${TZ.length} сгенерировано`;
+  document.getElementById('pbar').style.width = (done/TZ.length*100)+'%';
+}
+
+render();
+</script>
+</body>
+</html>
