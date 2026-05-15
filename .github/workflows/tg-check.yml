@@ -3,7 +3,7 @@ name: TG Auth Check
   workflow_dispatch:
     inputs:
       step:
-        description: 'request or signin'
+        description: 'request, signin, trello, or send_bot'
         required: true
         default: request
       code:
@@ -45,6 +45,24 @@ jobs:
             elif [ "$STEP" = "trello" ]; then
               echo "$TRELLO_B64" | base64 -d > /tmp/trello_check.py
               RESULT=$(venv/bin/python3 /tmp/trello_check.py 2>&1)
+            elif [ "$STEP" = "send_bot" ]; then
+              UPDATES=$(curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?limit=5")
+              CHAT_ID=$(echo "$UPDATES" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+results = data.get('result', [])
+for r in reversed(results):
+    cid = r.get('message', {}).get('chat', {}).get('id')
+    if cid:
+        print(cid)
+        break
+" 2>/dev/null)
+              if [ -z "$CHAT_ID" ]; then
+                RESULT="chat_id не найден — напиши боту хоть одно сообщение сначала"
+              else
+                SEND=$(curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=ТЕСТ%0A2026-05-15")
+                RESULT="chat_id=$CHAT_ID | response=$SEND"
+              fi
             else
               RESULT="Unknown step"
             fi
