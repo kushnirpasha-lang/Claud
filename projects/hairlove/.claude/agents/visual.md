@@ -28,8 +28,8 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 - Без чёрного. Без яркого красного. Без неоновых.
 
 **Этикетка флакона — критическая деталь:**
-Бумага этикетки: **Constellation Jade Raster** — фактурная бумага с матовым отливом, тонкий растровый узор, мягкая «шероховатость» под пальцами. На фотографиях это читается как текстурированная бумага без глянца, с лёгкими бликами по фактуре. Это якорь итальянской премиальности — как папка винного caratterizzato.
-Указывать в КАЖДОМ промпте: `"label printed on Constellation Jade Raster textured matte paper with subtle raster pattern"`.
+Бумага этикетки: **Constellation Jade Raster (Fedrigoni)** — перламутровое покрытие с тиснёным растровым узором, мягкое сияние (не глянец). Содержит слюду — это даёт тонкий люминесцентный отлив. На фотографиях читается как дорогая перламутровая этикетка с рельефной текстурой — визуальный якорь итальянской премиальности (как этикетка винного Barolo).
+Указывать в КАЖДОМ промпте: `"label printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture, subtle luminous sheen, not glossy"`.
 
 **Свет:**
 - Soft natural daylight (не жёсткий)
@@ -90,7 +90,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 # Брендовые якоря (вставлять в КАЖДЫЙ промпт — без исключений)
 
 - "200ml glass dropper bottle with minimalist label reading HAiR LOVE"
-- **"label printed on Constellation Jade Raster textured matte paper with subtle raster pattern, no gloss"** ← обязательно во ВСЕХ кадрах где виден флакон
+- **"label printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture, subtle luminous sheen, not glossy"** ← обязательно во ВСЕХ кадрах где виден флакон
 - "Italian premium editorial cosmetics photography"
 - Палитра из brandbook (минимум 2 цвета явно)
 - "Soft natural daylight"
