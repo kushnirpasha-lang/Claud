@@ -42,6 +42,9 @@
 2026-05-15T13:40 ✅ [coordinator] Telethon Saved Messages протестирован: TEST Telethon 2026-05-15 - Saved Messages OK!
 2026-05-15T14:00 ✅ [coordinator] Безопасность Telethon зафиксирована: ТОЛЬКО send_message('me'), никаких контактов навсегда
 2026-05-15T14:30 ✅ [competitors] Анализ трендов product photography hair care 2025/2026: ТОП-5 трендов, разбор K18/Olaplex/Alfaparf, 10 сцен, структура промпта ChatGPT. Артефакт: artifacts/instagram/2026-05-15-trend-analysis-product-photo.md
+2026-05-15T15:00 ✅ [documents] Регуляторный аудит МОЗ UA + MOH IL: реестр 13 док. от завода + 8 наших, анализ риска дедлайна 03.08 (КРАСНЫЙ ФЛАГ), план эскалации ProCare, SILK. Артефакт: artifacts/documents/2026-05-15-certification-registry.md
 2026-05-15T15:00 ✅ [strategy] Стратегический аудит план vs реальность + обновлённый план на 60 дней (15.05–15.07): 3 приоритета (МОЗ / B2B Одесса / Instagram-доверие), вехи по 9 неделям, 6 рисков, правило "тишина 5 дней → дефолт". Артефакт: artifacts/strategy/2026-05-15-strategy-update-60days.md
 2026-05-15T15:00 ✅ [planning] Тактический план 15-29.05: инвентаризация, план по неделям, матрица приоритетов, список из 5 пунктов для Павла → artifacts/planning/2026-05-15-tactical-plan-may.md
 2026-05-15T15:30 ✅ [site] Аудит сайта: форма работает через mailto вместо Formspree — заявки не доходят (КРИТИЧНО). Цены верны. SILK отсутствует. Артефакт: artifacts/site/2026-05-15-site-audit.md
+2026-05-15T15:00 ✅ [brandbook] Аудит брендбука v1: найдено 7 расхождений с team-state. Создан патч (2026-05-15-brandbook-update.md) + 1-стр памятка для агентов (2026-05-15-brand-summary-agents.md). Критично: "Made in Italy"→"Розроблено в Італії" и унификация имён продуктов ещё не выполнены в copy/site/instagram.
+2026-05-15T15:00 ✅ [copy] Аудит B2B-материалов + создан Odessa outreach пакет (холодный DM/звонок, инфо-блок, follow-up 4 касания, презентация мастеру). Файл: artifacts/copy/2026-05-15-b2b-odessa-outreach.md
