@@ -1,0 +1,137 @@
+name: HairLove — Weekly Insights
+
+"on":
+  schedule:
+    - cron: '0 6 * * 2'  # Каждый вторник 09:00 Киев (UTC+3)
+  workflow_dispatch:
+
+jobs:
+  insights:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/hairlove
+          token: ${{ secrets.MY_PAT }}
+
+      - name: Generate weekly insights report
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+        run: |
+          pip install anthropic requests -q
+          python3 - <<'PYEOF'
+import anthropic, requests, os, datetime, json
+
+today = datetime.date.today().isoformat()
+week = datetime.date.today().isocalendar()[1]
+client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+# Generate report
+resp = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=3000,
+    system="""Ты аналитик для украинского beauty-бренда HairLove.
+Продукты: 20 IN 1 Creme-Spray, Thermo Protector Spray, Liquid Lamellar Filler-Mask.
+Аудитория: мастера и салоны Украины, женщины 25-45.
+Instagram: @hair_love_company""",
+    messages=[{"role": "user", "content": f"""Сегодня {today}, неделя {week}.
+Подготовь практический еженедельный отчёт по трём направлениям:
+
+## 1. ТРЕНДЫ INSTAGRAM (алгоритм и форматы)
+- Какие форматы сейчас дают охват: Reels (длина?), Feed, Carousel, Stories
+- Что работает у beauty-аккаунтов: хуки, подача, стиль
+- 3 конкретных рекомендации для @hair_love_company
+
+## 2. ВИЗУАЛЬНЫЕ ТРЕНДЫ (для product photography)
+- Топ-5 актуальных трендов в beauty-фото: композиция, свет, цвет, пропсы
+- Что собирает больше всего лайков у hair care брендов прямо сейчас
+- 3 идеи для промптов (image-to-image, product shot с флаконом)
+
+## 3. КОНКУРЕНТЫ
+- Что интересного делают beauty-бренды в Instagram
+- Какие механики/форматы/акции можно адаптировать для HairLove
+
+## 4. ПЛАН НА НЕДЕЛЮ
+5 конкретных действий для HairLove на следующие 7 дней.
+
+Пиши конкретно и кратко. Формат Markdown."""}]
+)
+report = resp.content[0].text
+
+# Save to artifacts
+os.makedirs("projects/hairlove/artifacts/insights", exist_ok=True)
+filepath = f"projects/hairlove/artifacts/insights/{today}-weekly-insight.md"
+with open(filepath, "w") as f:
+    f.write(f"# Weekly Insight — {today} (неделя {week})\n\n")
+    f.write(report)
+print(f"Saved: {filepath}")
+
+# Short summary for Trello
+summary_resp = client.messages.create(
+    model="claude-haiku-4-5-20251001",
+    max_tokens=500,
+    messages=[{"role": "user", "content": f"Сделай краткое резюме в 5 пунктах (bullet points) из этого отчёта. Только самое важное и actionable для команды:\n\n{report}"}]
+)
+summary = summary_resp.content[0].text
+
+# Create Trello card
+key = os.environ["TRELLO_API_KEY"]
+token = os.environ["TRELLO_TOKEN"]
+board_id = "69f5ee59565cd64f2e9da2ff"
+
+lists_r = requests.get(
+    f"https://api.trello.com/1/boards/{board_id}/lists",
+    params={"key": key, "token": token}
+).json()
+
+analytics_list = next(
+    (l for l in lists_r if "Аналітика" in l.get("name","") or "аналитик" in l.get("name","").lower()),
+    None
+)
+
+if not analytics_list:
+    analytics_list = requests.post(
+        "https://api.trello.com/1/lists",
+        params={"key": key, "token": token},
+        data={"name": "📊 Аналітика", "idBoard": board_id, "pos": "bottom"}
+    ).json()
+    print("Created Trello list: Аналітика")
+
+list_id = analytics_list["id"]
+card = requests.post(
+    "https://api.trello.com/1/cards",
+    params={"key": key, "token": token},
+    data={
+        "name": f"📊 Інсайт {today}",
+        "desc": f"Щотижневий звіт HairLove\n\n{summary}\n\n---\nПовний звіт: artifacts/insights/{today}-weekly-insight.md",
+        "idList": list_id,
+        "pos": "top"
+    }
+).json()
+print(f"Trello card: {card.get('shortUrl', 'error')}")
+PYEOF
+
+      - name: Notify via Telethon to Saved Messages
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          SCRIPT_B64: aW1wb3J0IGFzeW5jaW8sIG9zLCBzeXMsIGRhdGV0aW1lCnN5cy5wYXRoLmluc2VydCgwLCAnL29wdC9hc3Npc3RhbnQnKQpmcm9tIHRlbGV0aG9uIGltcG9ydCBUZWxlZ3JhbUNsaWVudAoKYXN5bmMgZGVmIG1haW4oKToKICAgIGMgPSBUZWxlZ3JhbUNsaWVudCgnL29wdC9hc3Npc3RhbnQvdXNlcl9zZXNzaW9uJywKICAgICAgICAgICAgICAgICAgICAgICBpbnQob3MuZW52aXJvblsnVEVMRUdSQU1fQVBJX0lEJ10pLAogICAgICAgICAgICAgICAgICAgICAgIG9zLmVudmlyb25bJ1RFTEVHUkFNX0FQSV9IQVNIJ10pCiAgICBhd2FpdCBjLmNvbm5lY3QoKQogICAgaWYgbm90IGF3YWl0IGMuaXNfdXNlcl9hdXRob3JpemVkKCk6CiAgICAgICAgYXdhaXQgYy5kaXNjb25uZWN0KCkKICAgICAgICByZXR1cm4KICAgIHRvZGF5ID0gZGF0ZXRpbWUuZGF0ZS50b2RheSgpLmlzb2Zvcm1hdCgpCiAgICB0ZXh0ID0gJ1tIYWlyTG92ZV0gV2Vla2x5IGluc2lnaHQgcmVhZHk6ICcgKyB0b2RheSArICcuIENoZWNrIFRyZWxsbyAtIGFuYWx5dGljcyBjYXJkIGFkZGVkLicKICAgIGF3YWl0IGMuc2VuZF9tZXNzYWdlKCdtZScsIHRleHQpCiAgICBhd2FpdCBjLmRpc2Nvbm5lY3QoKQoKYXN5bmNpby5ydW4obWFpbigpKQo=
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: SCRIPT_B64
+          script_stop: false
+          script: |
+            export $(grep -v '^#' /opt/assistant/.env | xargs) 2>/dev/null || true
+            echo "$SCRIPT_B64" | base64 -d > /tmp/tg_weekly.py
+            /opt/assistant/venv/bin/python3 /tmp/tg_weekly.py 2>&1 || true
+
+      - name: Commit insights file
+        run: |
+          git config user.name "hairlove-bot"
+          git config user.email "bot@hairlove"
+          git add projects/hairlove/artifacts/insights/
+          git diff --staged --quiet || git commit -m "insights: weekly report $(date +%Y-%m-%d)"
+          git push origin claude/hairlove || true
