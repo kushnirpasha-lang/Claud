@@ -54,3 +54,7 @@
 2026-05-15T15:30 ✅ [coordinator] Замена "Made in Italy" → "Розроблено в Італії" во всех артефактах (17 файлов .md + index.html)
 2026-05-15T15:30 ✅ [coordinator] Восстановлены из obshak: brandbook-full, b2b-матеріали, письмо-procare, approved-captions, тексты-продукты, тз-фото-генерация, контент-план-30-днів, posting-queue.json, posting-index.txt, план-90-дней
 2026-05-15T15:30 📌 [coordinator] Правило "никогда не терять": ВСЕ агенты работают только в claude/hairlove. Артефакты сохраняются в artifacts/ и коммитятся ДО завершения сессии. obshak = архив, не рабочая ветка.
+2026-05-15T15:45 ✅ [competitors] Глубокий разбор 3 угроз (deeply / VITAEL-Vitalfarco / PALITRA-360): слабости каждого, B2B-скрипты против "у меня уже есть deeply", вывод по позиционированию (не менять), нейминг-защита "20 в 1" через бренд+SEO. Артефакт: artifacts/competitors/2026-05-15-deep-threat-analysis.md
+2026-05-15T16:00 ✅ [documents] Восстановлен настоящий агент documents из obshak (193 стр: КМУ №65, список d01-d13, разбор ProCare, контакты токсикологов). Усилен: единый владелец темы документов + принцип юридической точности
+2026-05-15T16:00 ✅ [documents] Дашборд docs-tracker.html сохранён в artifacts/documents/ (1334 стр, Supabase-backend)
+2026-05-15T16:00 ✅ [competitors] Глубокий разбор deeply/VITAEL/PALITRA — позиционирование не менять, окно открыто. Артефакт: 2026-05-15-deep-threat-analysis.md

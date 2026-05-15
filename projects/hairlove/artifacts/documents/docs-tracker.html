@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HAiR L&#9825;VE &#8212; Сертифікація</title>
+<style>
+  :root {
+    --teal: #1E5C5C; --teal-light: #D6EDED;
+    --cream: #F5F2EC; --ink: #1A1A1A;
+    --gray: #666; --gray-light: #999;
+    --red: #C0392B; --green: #1E7A4A;
+    --border: #DDD8CF;
+    --col-spray: #1E5C5C; --col-thermo: #8B4513; --col-mask: #4A6741;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         background: var(--cream); color: var(--ink); font-size: 14px; }
+
+  .header { background: var(--teal); color: white; padding: 20px 20px 16px; }
+  .header h1 { font-size: 20px; font-weight: 700; margin-bottom: 3px; }
+  .header p  { font-size: 12px; opacity: 0.75; }
+  .deadline  { display: inline-block; margin-top: 8px; background: var(--red);
+               color: white; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px; }
+
+  .setup-banner { background: #FFF8E1; border-bottom: 3px solid #FFC107; padding: 16px 20px; }
+  .setup-banner h3 { font-size: 14px; font-weight: 700; color: #5D4037; margin-bottom: 10px; }
+  .setup-step { font-size: 12px; color: #5D4037; margin: 6px 0; line-height: 1.6; }
+  .setup-step b { font-weight: 700; }
+  .setup-sql { background: white; border: 1px solid #DDD; border-radius: 6px; padding: 10px 12px;
+               font-family: monospace; font-size: 11px; white-space: pre; overflow-x: auto; margin: 8px 0; }
+  .setup-inline { background: white; border: 1px solid #DDD; border-radius: 3px;
+                  padding: 1px 5px; font-family: monospace; font-size: 11px; }
+
+  .sync-bar { background: white; padding: 6px 16px; border-bottom: 1px solid var(--border);
+              display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--gray); }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .sync-dot.ok   { background: var(--green); }
+  .sync-dot.off  { background: #ccc; }
+  .sync-dot.err  { background: var(--red); }
+  .sync-dot.spin { background: #FFC107; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .tabs { background: white; border-bottom: 2px solid var(--border);
+          display: flex; overflow-x: auto; position: sticky; top: 0; z-index: 20; }
+  .tab { padding: 12px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+         border-bottom: 2px solid transparent; margin-bottom: -2px;
+         white-space: nowrap; color: var(--gray); transition: all 0.15s; }
+  .tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .tab:hover:not(.active) { color: var(--ink); }
+  .tab-badge { display: inline-block; margin-left: 5px; background: var(--teal-light);
+               color: var(--teal); font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 10px; }
+  .tab.active .tab-badge { background: var(--teal); color: white; }
+
+  .progress-row { background: white; padding: 10px 16px; border-bottom: 1px solid var(--border);
+                  display: flex; align-items: center; gap: 12px; }
+  .progress-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-fill  { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
+  .progress-label { font-size: 12px; color: var(--gray); white-space: nowrap; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── OVERVIEW ── */
+  .overview { padding: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 860px) { .overview { grid-template-columns: 1fr; } }
+
+  .product-col { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+  .product-col-header { padding: 12px 14px; color: white; font-weight: 700; font-size: 13px; }
+  .product-col-header.spray  { background: var(--col-spray); }
+  .product-col-header.thermo { background: var(--col-thermo); }
+  .product-col-header.mask   { background: var(--col-mask); }
+  .product-col-header small  { font-weight: 400; font-size: 11px; opacity: 0.8; display: block; margin-top: 2px; }
+
+  .col-progress { padding: 8px 14px; border-bottom: 1px solid var(--border); background: #fafafa;
+                  display: flex; align-items: center; gap: 8px; }
+  .col-progress-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .col-progress-fill  { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .col-progress-fill.spray  { background: var(--col-spray); }
+  .col-progress-fill.thermo { background: var(--col-thermo); }
+  .col-progress-fill.mask   { background: var(--col-mask); }
+  .col-progress-label { font-size: 11px; color: var(--gray); white-space: nowrap; }
+
+  .section-divider { padding: 7px 14px 3px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+                     text-transform: uppercase; color: var(--gray);
+                     border-bottom: 1px solid var(--border); background: #fafafa; }
+
+  .doc-item { border-bottom: 1px solid var(--border); }
+  .doc-item:last-child { border-bottom: none; }
+  .doc-item-main { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px 8px; cursor: pointer; }
+  .checkbox { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--border);
+              flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+              font-size: 11px; cursor: pointer; transition: all 0.15s; margin-top: 1px; }
+  .doc-item.done .checkbox { background: var(--green); border-color: var(--green); color: white; }
+  .doc-item-body { flex: 1; min-width: 0; }
+  .doc-item-name { font-size: 12px; font-weight: 600; line-height: 1.35; }
+  .doc-item.done .doc-item-name { text-decoration: line-through; color: var(--gray); }
+  .doc-item-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .tag { font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 10px; }
+  .tag-mfg    { background: #E8F4FF; color: #1565C0; }
+  .tag-cert   { background: #FFF3E0; color: #E65100; }
+  .tag-gov    { background: #E8F5E9; color: #2E7D32; }
+  .tag-own    { background: #F3E5F5; color: #6A1B9A; }
+  .tag-urgent { background: #FFEBEE; color: var(--red); font-weight: 700; }
+  .tag-files  { background: #E8F5E9; color: #2E7D32; }
+  .tag-procare { background: #E8F5E9; color: #1E7A4A; font-weight: 700; }
+  .toggle-arrow { color: var(--gray-light); font-size: 10px; margin-top: 2px; flex-shrink: 0; }
+
+  .doc-item-expand { display: none; padding: 0 14px 10px 44px; }
+  .doc-item.open .doc-item-expand { display: block; }
+  .doc-item-desc { font-size: 12px; color: var(--gray); line-height: 1.5; margin-bottom: 8px; }
+
+  .field-label { font-size: 10px; font-weight: 700; color: var(--teal); text-transform: uppercase;
+                 letter-spacing: 0.08em; margin-bottom: 3px; margin-top: 8px; }
+  .comment-input { width: 100%; border: 1px solid var(--border); border-radius: 6px;
+                   padding: 6px 8px; font-size: 12px; font-family: inherit;
+                   resize: vertical; min-height: 50px; color: var(--ink);
+                   background: var(--cream); outline: none; }
+  .comment-input:focus { border-color: var(--teal); }
+
+  .file-area { margin-top: 8px; }
+  .file-btn-label { display: inline-flex; align-items: center; gap: 5px; font-size: 11px;
+                    font-weight: 600; color: var(--teal); border: 1px dashed var(--teal);
+                    border-radius: 6px; padding: 5px 10px; cursor: pointer; transition: all 0.15s; }
+  .file-btn-label:hover { background: var(--teal-light); }
+  .file-btn-label.uploading { opacity: 0.6; pointer-events: none; }
+  .file-input-hidden { display: none; }
+  .file-list { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .file-chip { display: flex; align-items: center; gap: 6px; background: var(--teal-light);
+               border-radius: 5px; padding: 4px 8px; font-size: 11px; color: var(--teal); }
+  .file-chip a { color: var(--teal); text-decoration: none; font-weight: 600; flex: 1;
+                 overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-chip a:hover { text-decoration: underline; }
+  .file-chip-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-remove { cursor: pointer; font-size: 14px; opacity: 0.6; flex-shrink: 0; }
+  .file-remove:hover { opacity: 1; }
+
+  /* ── UPLOAD PANEL ── */
+  .upload-panel { padding: 20px 16px; max-width: 680px; }
+  .upload-panel h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .upload-panel > p { font-size: 13px; color: var(--gray); line-height: 1.5; margin-bottom: 16px; }
+  .upload-drop { border: 2px dashed var(--teal); border-radius: 12px; padding: 36px 20px;
+                 text-align: center; cursor: pointer; transition: all 0.2s; background: white; }
+  .upload-drop.over { background: var(--teal-light); }
+  .upload-drop-icon { font-size: 32px; margin-bottom: 8px; }
+  .upload-drop-text { font-size: 14px; font-weight: 600; color: var(--teal); margin-bottom: 3px; }
+  .upload-drop-sub  { font-size: 12px; color: var(--gray); }
+  .global-file-input { display: none; }
+  .upload-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .upload-item { background: white; border: 1px solid var(--border); border-radius: 8px;
+                 padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+  .upload-item-icon { font-size: 22px; flex-shrink: 0; }
+  .upload-item-info { flex: 1; min-width: 0; }
+  .upload-item-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .upload-item-name a { color: var(--ink); text-decoration: none; }
+  .upload-item-name a:hover { text-decoration: underline; color: var(--teal); }
+  .upload-item-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
+  .upload-item-del  { cursor: pointer; color: var(--red); font-size: 20px; opacity: 0.6; flex-shrink: 0; }
+  .upload-item-del:hover { opacity: 1; }
+  .upload-empty { text-align: center; padding: 30px; color: var(--gray-light); font-size: 13px; }
+
+  /* ── TASKS PANEL ── */
+  .tasks-panel { padding: 16px; max-width: 860px; }
+  .tasks-panel-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .tasks-panel-top h2 { font-size: 16px; font-weight: 700; }
+  .btn-add { display: inline-flex; align-items: center; gap: 5px; background: var(--teal); color: white;
+             font-size: 12px; font-weight: 600; border: none; border-radius: 8px; padding: 8px 14px;
+             cursor: pointer; transition: opacity 0.15s; }
+  .btn-add:hover { opacity: 0.85; }
+
+  .task-filters { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .task-filter-btn { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+                     border: 1px solid var(--border); background: white; cursor: pointer;
+                     color: var(--gray); transition: all 0.15s; }
+  .task-filter-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
+
+  .task-list { display: flex; flex-direction: column; gap: 8px; }
+  .task-card { background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .task-card.done-task { opacity: 0.6; }
+  .task-card-main { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; cursor: pointer; }
+  .task-cb { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+             flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+             font-size: 12px; cursor: pointer; transition: all 0.15s; margin-top: 1px; }
+  .task-card.done-task .task-cb { background: var(--green); border-color: var(--green); color: white; }
+  .task-card-body { flex: 1; min-width: 0; }
+  .task-title { font-size: 13px; font-weight: 600; line-height: 1.35; }
+  .task-card.done-task .task-title { text-decoration: line-through; color: var(--gray); }
+  .task-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; align-items: center; }
+  .task-assignee { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
+  .task-assignee.pavlo  { background: #E8F4FF; color: #1565C0; }
+  .task-assignee.maks   { background: #FFF3E0; color: #E65100; }
+  .task-assignee.both   { background: #F3E5F5; color: #6A1B9A; }
+  .task-priority { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .task-priority.critical { background: #FFEBEE; color: var(--red); }
+  .task-priority.urgent   { background: #FFF8E1; color: #E65100; }
+  .task-priority.normal   { background: #E8F5E9; color: #2E7D32; }
+  .task-toggle { color: var(--gray-light); font-size: 10px; flex-shrink: 0; margin-top: 3px; }
+
+  .task-expand { display: none; padding: 0 14px 12px 46px; }
+  .task-card.open-task .task-expand { display: block; }
+  .task-note-input { width: 100%; border: 1px solid var(--border); border-radius: 6px;
+                     padding: 6px 8px; font-size: 12px; font-family: inherit;
+                     resize: vertical; min-height: 44px; color: var(--ink);
+                     background: var(--cream); outline: none; }
+  .task-note-input:focus { border-color: var(--teal); }
+  .task-del-btn { margin-top: 8px; font-size: 11px; color: var(--red); cursor: pointer;
+                  background: none; border: none; padding: 0; opacity: 0.7; }
+  .task-del-btn:hover { opacity: 1; }
+
+  .task-form-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+                       z-index: 100; align-items: center; justify-content: center; }
+  .task-form-overlay.open { display: flex; }
+  .task-form { background: white; border-radius: 14px; padding: 24px; width: 100%; max-width: 420px;
+               margin: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+  .task-form h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+  .form-row { margin-bottom: 12px; }
+  .form-label { font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase;
+                letter-spacing: 0.08em; display: block; margin-bottom: 4px; }
+  .form-input { width: 100%; border: 1px solid var(--border); border-radius: 7px;
+                padding: 8px 10px; font-size: 13px; font-family: inherit; color: var(--ink);
+                background: var(--cream); outline: none; }
+  .form-input:focus { border-color: var(--teal); }
+  .form-select { width: 100%; border: 1px solid var(--border); border-radius: 7px;
+                 padding: 8px 10px; font-size: 13px; font-family: inherit; color: var(--ink);
+                 background: var(--cream); outline: none; cursor: pointer; }
+  .form-select:focus { border-color: var(--teal); }
+  .form-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .btn-cancel { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px;
+                border: 1px solid var(--border); background: white; cursor: pointer; color: var(--gray); }
+  .btn-save { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px;
+              border: none; background: var(--teal); color: white; cursor: pointer; }
+  .task-empty { text-align: center; padding: 40px; color: var(--gray-light); font-size: 13px; }
+
+  /* ── COMMS PANEL ── */
+  .comms-panel { padding: 16px; max-width: 860px; }
+  .comms-panel-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .comms-panel-top h2 { font-size: 16px; font-weight: 700; }
+
+  .comm-card { background: white; border: 1px solid var(--border); border-radius: 10px;
+               overflow: hidden; margin-bottom: 10px; }
+  .comm-card-header { display: flex; align-items: flex-start; gap: 10px; padding: 14px;
+                      cursor: pointer; }
+  .comm-card-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .comm-card-info { flex: 1; min-width: 0; }
+  .comm-card-title { font-size: 13px; font-weight: 700; line-height: 1.3; }
+  .comm-card-sub   { font-size: 11px; color: var(--gray); margin-top: 3px; }
+  .comm-status { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .comm-status.sent    { background: #E8F4FF; color: #1565C0; }
+  .comm-status.waiting { background: #FFF8E1; color: #E65100; }
+  .comm-status.replied { background: #E8F5E9; color: #2E7D32; }
+  .comm-toggle { color: var(--gray-light); font-size: 10px; flex-shrink: 0; margin-top: 4px; }
+
+  .comm-body { display: none; padding: 0 14px 14px; }
+  .comm-card.open-comm .comm-body { display: block; }
+
+  .comm-section-label { font-size: 10px; font-weight: 700; color: var(--teal); text-transform: uppercase;
+                         letter-spacing: 0.08em; margin-bottom: 5px; margin-top: 12px; }
+  .comm-letter { background: var(--cream); border: 1px solid var(--border); border-radius: 8px;
+                 padding: 12px 14px; font-size: 12px; line-height: 1.7; white-space: pre-wrap;
+                 color: var(--ink); max-height: 300px; overflow-y: auto; }
+  .comm-copy-btn { margin-top: 6px; font-size: 11px; font-weight: 600; color: var(--teal);
+                   background: var(--teal-light); border: none; border-radius: 6px;
+                   padding: 5px 12px; cursor: pointer; transition: opacity 0.15s; }
+  .comm-copy-btn:hover { opacity: 0.8; }
+  .comm-response-area { width: 100%; border: 1px solid var(--border); border-radius: 8px;
+                        padding: 10px 12px; font-size: 12px; font-family: inherit;
+                        resize: vertical; min-height: 80px; color: var(--ink);
+                        background: var(--cream); outline: none; margin-top: 4px; }
+  .comm-response-area:focus { border-color: var(--teal); }
+  .comm-status-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .comm-status-btn { font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px;
+                     border: 1px solid var(--border); background: white; cursor: pointer;
+                     color: var(--gray); transition: all 0.15s; }
+  .comm-status-btn.active.sent    { background: #1565C0; color: white; border-color: #1565C0; }
+  .comm-status-btn.active.waiting { background: #E65100; color: white; border-color: #E65100; }
+  .comm-status-btn.active.replied { background: var(--green); color: white; border-color: var(--green); }
+
+  .comm-del-btn { margin-top: 10px; font-size: 11px; color: var(--red); cursor: pointer;
+                  background: none; border: none; padding: 0; opacity: 0.7; }
+  .comm-del-btn:hover { opacity: 1; }
+
+  /* New comm form */
+  .new-comm-form { background: white; border: 1px dashed var(--border); border-radius: 10px;
+                   padding: 16px; margin-top: 10px; display: none; }
+  .new-comm-form.open { display: block; }
+  .new-comm-form h4 { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+
+  /* ── REGULATORY PANEL ── */
+  .reg-panel { padding: 20px 16px; max-width: 860px; }
+  .reg-hero { background: var(--teal); color: white; border-radius: 12px;
+              padding: 20px 24px; margin-bottom: 20px; }
+  .reg-hero h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .reg-hero p  { font-size: 13px; opacity: 0.85; line-height: 1.5; }
+  .reg-hero .reg-law { display: inline-block; margin-top: 10px; background: rgba(255,255,255,0.2);
+                        border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
+
+  .reg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px; }
+  @media (max-width: 640px) { .reg-grid { grid-template-columns: 1fr; } }
+
+  .reg-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .reg-card-icon { font-size: 24px; margin-bottom: 8px; }
+  .reg-card h3   { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--teal); }
+  .reg-card p    { font-size: 12px; color: var(--gray); line-height: 1.55; }
+  .reg-card ul   { font-size: 12px; color: var(--gray); line-height: 1.55; padding-left: 16px; }
+  .reg-card li   { margin: 3px 0; }
+  .reg-card .reg-highlight { background: var(--teal-light); color: var(--teal);
+                              font-size: 11px; font-weight: 700; padding: 2px 8px;
+                              border-radius: 10px; display: inline-block; margin: 2px 2px 0 0; }
+
+  .reg-timeline { background: white; border: 1px solid var(--border); border-radius: 10px;
+                  padding: 16px 18px; margin-bottom: 20px; }
+  .reg-timeline h3 { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 14px; }
+  .timeline-item { display: flex; gap: 12px; margin: 0 0 14px; }
+  .timeline-item:last-child { margin: 0; }
+  .tl-dot { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex;
+             align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+  .tl-dot.done-dot { background: var(--green); }
+  .tl-dot.now-dot  { background: var(--teal); }
+  .tl-dot.future-dot { background: #ccc; }
+  .tl-body { flex: 1; }
+  .tl-date  { font-size: 11px; font-weight: 700; color: var(--gray); }
+  .tl-text  { font-size: 12px; color: var(--ink); line-height: 1.4; margin-top: 1px; }
+
+  .reg-parties { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 640px) { .reg-parties { grid-template-columns: 1fr; } }
+  .party-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .party-card h4 { font-size: 12px; font-weight: 700; color: var(--teal); margin-bottom: 6px; }
+  .party-name    { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .party-role    { font-size: 11px; color: var(--gray); line-height: 1.4; }
+
+  .reg-sources { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .reg-sources h3 { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 10px; }
+  .procare-sources { background: #F1F8F5; border: 1.5px solid #A8D5BF; border-radius: 10px; padding: 16px 18px; margin-top: 14px; }
+  .procare-sources h3 { font-size: 13px; font-weight: 700; color: #1E7A4A; margin-bottom: 4px; }
+  .procare-sources .ps-sub { font-size: 11px; color: var(--gray); margin-bottom: 12px; }
+  .procare-item { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid #C8E6D7; }
+  .procare-item:last-child { border-bottom: none; }
+  .procare-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .procare-item-body { flex: 1; }
+  .procare-item-body b { font-size: 12px; font-weight: 700; color: #1A1A1A; }
+  .procare-item-body a { color: #1E7A4A; text-decoration: none; font-size: 11px; display: inline-block; margin-top: 2px; }
+  .procare-item-body a:hover { text-decoration: underline; }
+  .procare-item-body span { font-size: 11px; color: var(--gray); display: block; margin-top: 2px; line-height: 1.4; }
+  .procare-tag { display: inline-block; font-size: 10px; font-weight: 700; background: #D4EDDA; color: #155724; border-radius: 4px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+  .source-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0;
+                border-bottom: 1px solid var(--border); font-size: 12px; }
+  .source-row:last-child { border-bottom: none; }
+  .source-num { width: 22px; height: 22px; background: var(--teal-light); color: var(--teal);
+                border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .source-text { flex: 1; color: var(--ink); line-height: 1.45; }
+  .source-text b { font-weight: 700; }
+  .source-text span { color: var(--gray); font-size: 11px; }
+
+  .summary { padding: 16px 20px 40px; text-align: center; color: var(--gray-light); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="setup-banner" id="setupBanner" style="display:none">
+  <h3>&#9989; Налаштуй хмарне сховище (1 раз, 5 хвилин)</h3>
+  <div class="setup-step"><b>1.</b> Перейди на <b>supabase.com</b> &#8594; Sign Up &#8594; New Project (безкоштовно)</div>
+  <div class="setup-step"><b>2.</b> В <b>SQL Editor</b> виконай:</div>
+  <div class="setup-sql">create table tracker_state (
+  id text primary key,
+  data jsonb default '{}'::jsonb,
+  updated_at timestamptz default now()
+);
+insert into tracker_state (id) values ('hairlove');
+alter table tracker_state enable row level security;
+create policy "anon_all" on tracker_state for all to anon using (true) with check (true);
+alter publication supabase_realtime add table tracker_state;</div>
+  <div class="setup-step"><b>3.</b> В <b>Storage &#8594; New Bucket</b>: назва <span class="setup-inline">hairlove-docs</span>, увімкни <b>Public bucket</b></div>
+  <div class="setup-step"><b>4.</b> В <b>Settings &#8594; API</b> скопіюй <b>Project URL</b> та <b>anon key</b></div>
+  <div class="setup-step"><b>5.</b> Встав їх у цей HTML-файл замість <span class="setup-inline">https://qezcnewojlmnpputmhuf.supabase.co</span> та <span class="setup-inline">sb_publishable_d9W00fbikKYjn0Jk8FQu6w_JZ98Oixs</span></div>
+</div>
+
+<div class="header">
+  <h1>HAiR L&#9825;VE &mdash; Сертифікація</h1>
+  <p>Технічний регламент України &middot; KMU &#8470;65 (2021) &middot; гармонізований з EU 1223/2009</p>
+  <span class="deadline">&#9200; Дедлайн: 3 серпня 2026</span>
+</div>
+
+<div class="sync-bar" id="syncBar">
+  <div class="sync-dot spin" id="syncDot"></div>
+  <span id="syncLabel">Підключення...</span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overview')">
+    По продуктах <span class="tab-badge" id="badge-overview">0/13</span>
+  </div>
+  <div class="tab" onclick="switchTab('upload')">
+    &#128204; Документи <span class="tab-badge" id="badge-upload">0</span>
+  </div>
+  <div class="tab" onclick="switchTab('tasks')">
+    &#9989; Завдання <span class="tab-badge" id="badge-tasks">0</span>
+  </div>
+  <div class="tab" onclick="switchTab('comms')">
+    &#128140; Комунікації <span class="tab-badge" id="badge-comms">0</span>
+  </div>
+  <div class="tab" onclick="switchTab('regulatory')">
+    &#128218; Нормативна база
+  </div>
+</div>
+
+<div class="progress-row">
+  <div class="progress-track"><div class="progress-fill" id="globalFill"></div></div>
+  <div class="progress-label" id="globalLabel">0 / 0</div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="panel active" id="panel-overview">
+  <div class="overview">
+    <div class="product-col" id="col-spray"></div>
+    <div class="product-col" id="col-thermo"></div>
+    <div class="product-col" id="col-mask"></div>
+  </div>
+  <div class="summary">Натисни картку щоб відкрити &middot; Чекбокс &#8212; позначити виконаним &middot; Зміни синхронізуються між всіма учасниками</div>
+</div>
+
+<!-- DOCUMENTS -->
+<div class="panel" id="panel-upload">
+  <div class="upload-panel">
+    <h2>&#128196; Завантажені документи</h2>
+    <p>Файли зберігаються в хмарі та доступні всім учасникам. Завантаж отримані документи сюди.</p>
+    <div class="upload-drop" id="dropZone" onclick="document.getElementById('globalFileInput').click()">
+      <div class="upload-drop-icon">&#128196;</div>
+      <div class="upload-drop-text">Натисни або перетягни файл</div>
+      <div class="upload-drop-sub" id="dropSubText">PDF, DOCX, XLSX, JPG, PNG</div>
+    </div>
+    <input type="file" id="globalFileInput" class="global-file-input" multiple
+           accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.zip"
+           onchange="handleGlobalUpload(this.files)">
+    <div class="upload-list" id="globalUploadList">
+      <div class="upload-empty">Документів ще немає</div>
+    </div>
+  </div>
+</div>
+
+<!-- TASKS -->
+<div class="panel" id="panel-tasks">
+  <div class="tasks-panel">
+    <div class="tasks-panel-top">
+      <h2>&#9989; Завдання по сертифікації</h2>
+      <button class="btn-add" onclick="openTaskForm()">&#43; Нове завдання</button>
+    </div>
+    <div class="task-filters">
+      <button class="task-filter-btn active" onclick="setTaskFilter('all',this)">Всі</button>
+      <button class="task-filter-btn" onclick="setTaskFilter('open',this)">Відкриті</button>
+      <button class="task-filter-btn" onclick="setTaskFilter('pavlo',this)">Павло</button>
+      <button class="task-filter-btn" onclick="setTaskFilter('maks',this)">Максим</button>
+    </div>
+    <div class="task-list" id="taskList"></div>
+  </div>
+</div>
+
+<!-- COMMS -->
+<div class="panel" id="panel-comms">
+  <div class="comms-panel">
+    <div class="comms-panel-top">
+      <h2>&#128140; Комунікації</h2>
+      <button class="btn-add" onclick="openNewCommForm()">&#43; Нова комунікація</button>
+    </div>
+    <div id="commList"></div>
+    <div class="new-comm-form" id="newCommForm">
+      <h4>Нова комунікація</h4>
+      <div class="form-row">
+        <label class="form-label">Назва / тема</label>
+        <input class="form-input" id="nc-title" placeholder="Наприклад: Запит до biolab.com.ua">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Кому надсилається</label>
+        <input class="form-input" id="nc-to" placeholder="Завод / biolab.com.ua / Dominanta...">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Текст листа / запиту</label>
+        <textarea class="comm-response-area" id="nc-letter" style="min-height:120px" placeholder="Вставте або напишіть текст листа..."></textarea>
+      </div>
+      <div class="form-btns">
+        <button class="btn-cancel" onclick="closeNewCommForm()">Скасувати</button>
+        <button class="btn-save" onclick="addComm()">Зберегти</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGULATORY -->
+<div class="panel" id="panel-regulatory">
+<div class="reg-panel">
+
+  <div class="reg-hero">
+    <h2>&#128218; Нормативна база сертифікації</h2>
+    <p>Все, що тут написано, базується на офіційних нормативних актах України та ЄС, які набрали чинності або набувають чинності у 2026 році.</p>
+    <span class="reg-law">&#128196; Постанова КМУ &#8470;65 від 20.01.2021</span>
+    <span class="reg-law" style="margin-left:8px">&#127466;&#127482; Регламент ЄС 1223/2009</span>
+  </div>
+
+  <div class="reg-grid">
+    <div class="reg-card">
+      <div class="reg-card-icon">&#128204;</div>
+      <h3>Що це за документи і навіщо вони потрібні</h3>
+      <p>Список документів у цьому трекері — <b>не рекомендація</b>, а <b>обов&#8217;язкова вимога закону</b>. Постанова КМУ &#8470;65 встановила перелік документів, без яких косметика не може легально продаватись в Україні після 3 серпня 2026 року.</p>
+      <br>
+      <p>Цей же перелік відповідає Регламенту ЄС 1223/2009, на якому він побудований. Фактично Україна прийняла єврейські стандарти безпеки косметики.</p>
+    </div>
+    <div class="reg-card">
+      <div class="reg-card-icon">&#128179;</div>
+      <h3>Що буде, якщо не виконати до дедлайну</h3>
+      <p>З <b>3 серпня 2026</b> продаж косметичних засобів без нотифікації в системі e-Cosmetics МОЗ України є <b>порушенням технічного регламенту</b>. Це означає:</p>
+      <ul>
+        <li>Заборона реалізації продукту</li>
+        <li>Штрафні санкції для дистриб&#8217;ютора / ВО</li>
+        <li>Вилучення товару з ринку</li>
+        <li>Проблеми з митницею при імпорті</li>
+      </ul>
+    </div>
+    <div class="reg-card">
+      <div class="reg-card-icon">&#128203;</div>
+      <h3>Ключові документи та їхні джерела</h3>
+      <p><b>PIF (Product Information File)</b> &#8212; вимога Ст. 11 Регламенту ЄС 1223/2009, імплементована в ст. 12 Постанови КМУ &#8470;65.</p>
+      <br>
+      <p><b>CPSR (Safety Report)</b> &#8212; вимога Ст. 10 Регламенту ЄС 1223/2009. Має складатись особою з кваліфікацією у фармакології, токсикології або медицині.</p>
+      <br>
+      <p><b>Нотифікація e-Cosmetics</b> &#8212; ст. 13 Регламенту ЄС, адаптована МОЗ України. Аналог EU CPNP-порталу.</p>
+    </div>
+    <div class="reg-card">
+      <div class="reg-card-icon">&#127981;</div>
+      <h3>Хто перевіряє і контролює</h3>
+      <p><b>МОЗ України</b> &#8212; видає дозвіл через e-Cosmetics, веде реєстр нотифікованих продуктів.</p>
+      <br>
+      <p><b>Держспоживслужба</b> &#8212; здійснює ринковий нагляд, може перевірити наявність PIF та CPSR у Відповідальної особи в будь-який момент.</p>
+      <br>
+      <p><b>Митна служба</b> &#8212; при перевезенні через кордон може вимагати нотифікаційний номер.</p>
+    </div>
+  </div>
+
+  <div class="reg-timeline">
+    <h3>&#128197; Хронологія регулювання</h3>
+    <div class="timeline-item">
+      <div class="tl-dot done-dot">&#10003;</div>
+      <div class="tl-body">
+        <div class="tl-date">20 січня 2021</div>
+        <div class="tl-text">КМУ прийняв Постанову &#8470;65 «Технічний регламент на косметичну продукцію». Офіційне введення в дію нормативної бази.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-dot done-dot">&#10003;</div>
+      <div class="tl-body">
+        <div class="tl-date">2021&#8211;2024</div>
+        <div class="tl-text">Перехідний період. Стара система держреєстрації ще діє паралельно. Виробники готуються до нових вимог.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-dot now-dot">&#9679;</div>
+      <div class="tl-body">
+        <div class="tl-date">Зараз (2026)</div>
+        <div class="tl-text">МОЗ тестує портал e-Cosmetics. Виробники та імпортери зобов&#8217;язані підготувати PIF + CPSR для кожного продукту. <b>HAiR L&#9825;VE готує документи.</b></div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-dot future-dot">!</div>
+      <div class="tl-body">
+        <div class="tl-date">3 серпня 2026 &#8212; дедлайн</div>
+        <div class="tl-text">Кінець перехідного періоду. Продаж без нотифікації заборонений. Всі три продукти HAiR L&#9825;VE мають бути нотифіковані в e-Cosmetics.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reg-parties">
+    <div class="party-card">
+      <div class="reg-card-icon">&#127477;&#127479;</div>
+      <h4>Виробник (частина продукції)</h4>
+      <div class="party-name">ProCare — Київ, Україна</div>
+      <div class="party-role">Надає: рецептуру, INCI, CoA, ТУ, мікробіологію, стабільність, GMP. Має <b>GMP ISO 22716:2009</b> (2022 р.), COSMOS, ECOCERT. vtm@procare.com.ua</div>
+    </div>
+    <div class="party-card">
+      <div class="reg-card-icon">&#128105;&#8205;&#128187;</div>
+      <h4>Відповідальна особа</h4>
+      <div class="party-name">HAiR L&#9825;VE / Dominanta</div>
+      <div class="party-role">Юридично відповідає за продукт на ринку. Зберігає PIF. Подає нотифікацію. Взаємодіє з держорганами.</div>
+    </div>
+    <div class="party-card">
+      <div class="reg-card-icon">&#128300;</div>
+      <h4>Токсиколог (CPSR)</h4>
+      <div class="party-name">Сертиф. компанія</div>
+      <div class="party-role">Перевіряє кожен інгредієнт, оцінює ризики, підписує CPSR. Без цього підпису продукт не може бути нотифікований. biolab.com.ua, vsg-consult.com.ua</div>
+    </div>
+  </div>
+
+  <div class="reg-sources">
+    <h3>&#128196; Первинні нормативні джерела</h3>
+    <div class="source-row">
+      <div class="source-num">1</div>
+      <div class="source-text"><b>Постанова КМУ &#8470;65 від 20.01.2021</b> &#8212; «Технічний регламент на косметичну продукцію» <span>&#8212; основний закон України про косметику. Замінює стару систему держреєстрації.</span></div>
+    </div>
+    <div class="source-row">
+      <div class="source-num">2</div>
+      <div class="source-text"><b>Регламент ЄС &#8470;1223/2009</b> &#8212; European Cosmetics Regulation <span>&#8212; базовий документ, на якому побудована українська норма. Стаття 10 &#8212; CPSR, стаття 11 &#8212; PIF, стаття 13 &#8212; нотифікація.</span></div>
+    </div>
+    <div class="source-row">
+      <div class="source-num">3</div>
+      <div class="source-text"><b>ISO 22716:2007</b> &#8212; Good Manufacturing Practices (GMP) for Cosmetics <span>&#8212; стандарт виробництва. Не обов&#8217;язковий, але підвищує довіру регулятора та спрощує отримання CPSR.</span></div>
+    </div>
+    <div class="source-row">
+      <div class="source-num">4</div>
+      <div class="source-text"><b>SCCS Guidelines</b> &#8212; Scientific Committee on Consumer Safety (EU) <span>&#8212; методологія оцінки безпеки інгредієнтів косметики. Токсикологи використовують ці гайдлайни при складанні CPSR.</span></div>
+    </div>
+    <div class="source-row">
+      <div class="source-num">5</div>
+      <div class="source-text"><b>Портал e-Cosmetics МОЗ України</b> <span>&#8212; система електронних нотифікацій (аналог EU CPNP). Ще тестується станом на травень 2026. Слідкуй за новинами на сайті moz.gov.ua.</span></div>
+    </div>
+  </div>
+
+  <div class="procare-sources">
+    <h3>&#127963; ProCare &#8212; завод-виробник (Україна)</h3>
+    <div class="ps-sub">Контрактне виробництво косметики. Робить частину продукції HAiR L&#9825;VE. Київ, вул. Івана Виговського, 13. <b>vtm@procare.com.ua</b> · +38 (097) 386 50 64</div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#127968;</div>
+      <div class="procare-item-body">
+        <b>Офіційний сайт контрактного виробництва</b><span class="procare-tag">Головний</span>
+        <a href="https://vtm.procare.com.ua/" target="_blank">vtm.procare.com.ua &#8599;</a>
+        <span>Контактна форма, портфоліо, опис послуг. Звідси надсилати запит на документи.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#127981;</div>
+      <div class="procare-item-body">
+        <b>Контрактне виробництво — опис послуги</b>
+        <a href="https://www.procare.com.ua/page/kontraktnoe-proizvodstvo?lang=ru" target="_blank">procare.com.ua/kontraktnoe-proizvodstvo &#8599;</a>
+        <span>Що входить у послугу: від рецептури до документів. Підтверджує, що надання d01–d08 є частиною їхнього стандартного пакету.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#10003;&#65039;</div>
+      <div class="procare-item-body">
+        <b>GMP сертифікація виробництва</b><span class="procare-tag">GMP є</span>
+        <a href="https://vtm.procare.com.ua/blog-eng/partner-for-contract-manufacturing-of-cosmetics-with-gmp-certification-why-is-it-important-for-your-business" target="_blank">Стаття: чому GMP важливий &#8599;</a>
+        <span>ProCare має GMP ISO 22716:2009 з 2022 р. Для d08 потрібно лише попросити копію. Це ключовий аргумент для токсиколога при підписанні CPSR.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#127807;</div>
+      <div class="procare-item-body">
+        <b>COSMOS та ECOCERT сертифікація компонентів</b>
+        <a href="https://www.procare.com.ua/page/sertifikatsiya-produktsii" target="_blank">procare.com.ua/sertifikatsiya &#8599;</a>
+        <span>Сировина постачальників сертифікована. Спрощує підготовку CoA (d03) і підвищує якість CPSR.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#128196;</div>
+      <div class="procare-item-body">
+        <b>Переваги контрактного виробництва від ProCare</b>
+        <a href="https://vtm.procare.com.ua/blog/perevagi-kontraktnogo-virobnictva-kosmetiki-dlya-brendiv-abo-yak-procare-dopomozhe-vivesti-vash-brend-na-noviy-riven" target="_blank">Читати статтю &#8599;</a>
+        <span>Повний цикл від формули до готового продукту. Підтверджує, що документація — частина їхніх обов'язків перед клієнтом.</span>
+      </div>
+    </div>
+
+    <div class="procare-item">
+      <div class="procare-icon">&#9993;&#65039;</div>
+      <div class="procare-item-body">
+        <b>Контакт для запиту документів</b>
+        <a href="mailto:vtm@procare.com.ua">vtm@procare.com.ua</a>
+        <span>Надіслати запит на d01–d08 (рецептура, INCI, CoA, ТУ, мікробіологія, стабільність, опис виробництва, GMP). Шаблон листа — у вкладці «Комунікації».</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- TASK FORM OVERLAY -->
+<div class="task-form-overlay" id="taskFormOverlay">
+  <div class="task-form">
+    <h3>Нове завдання</h3>
+    <div class="form-row">
+      <label class="form-label">Завдання</label>
+      <input class="form-input" id="tf-title" placeholder="Що потрібно зробити?">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Виконавець</label>
+      <select class="form-select" id="tf-assignee">
+        <option value="maks">Максим</option>
+        <option value="pavlo">Павло</option>
+        <option value="both">Обидва</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Пріоритет</label>
+      <select class="form-select" id="tf-priority">
+        <option value="critical">&#128308; Критично</option>
+        <option value="urgent">&#128993; Терміново</option>
+        <option value="normal">&#128994; Звичайна</option>
+      </select>
+    </div>
+    <div class="form-btns">
+      <button class="btn-cancel" onclick="closeTaskForm()">Скасувати</button>
+      <button class="btn-save" onclick="addTask()">Додати</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ─── ★ НАЛАШТУВАННЯ ─────────────────────────────────────────────────────────
+const SUPABASE_URL      = 'https://qezcnewojlmnpputmhuf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_d9W00fbikKYjn0Jk8FQu6w_JZ98Oixs';
+const BUCKET            = 'hairlove-docs';
+// ────────────────────────────────────────────────────────────────────────────
+
+const CONFIGURED = !SUPABASE_URL.startsWith('YOUR');
+let sb = null;
+if (CONFIGURED) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const PRODUCTS = [
+  { id:"spray",  label:"Крем-спрей 20 в 1",     sub:"200 мл / 50 мл / 20 мл тестер", cls:"spray"  },
+  { id:"thermo", label:"Термо-протектор",        sub:"200 мл / 50 мл / 20 мл тестер", cls:"thermo" },
+  { id:"mask",   label:"Ламелярна маска-філлер", sub:"200 мл / 50 мл / 20 мл тестер", cls:"mask"   },
+];
+
+const DOCS = [
+  { section:"Від виробника", items:[
+    { id:"d01", name:"Рецептура (формула) з % кожного інгредієнту", source:"mfg", sl:"Завод", urgent:true, procare:"yes",
+      desc:"Повна формула з точними % всіх інгредієнтів — основа для CPSR. Без неї токсиколог не почне роботу. Запитувати офіційно у відділі якості заводу." },
+    { id:"d02", name:"INCI-назви всіх інгредієнтів", source:"mfg", sl:"Завод", procare:"yes",
+      desc:"Міжнародні найменування за стандартом INCI. Потрібні для маркування та CPSR. Виробник зобов'язаний надати — це частина договору поставки." },
+    { id:"d03", name:"CoA — сертифікати якості на кожну сировину", source:"mfg", sl:"Завод", procare:"yes",
+      desc:"Certificate of Analysis від постачальника сировини на кожен інгредієнт. Підтверджують чистоту та безпеку. Частина може бути закритою." },
+    { id:"d04", name:"Технічні умови (ТУ) / специфікація на готовий продукт", source:"mfg", sl:"Завод", procare:"yes",
+      desc:"Фізико-хімічні параметри, методи контролю якості, термін придатності. Є частиною PIF." },
+    { id:"d05", name:"Мікробіологічні випробування", source:"mfg", sl:"Завод або лабораторія", procare:"yes",
+      desc:"Підтвердження мікробіологічної безпеки. Якщо завод не робив — замовити в акредитованій лабораторії (biolab.com.ua). Без цього CPSR не підпишуть." },
+    { id:"d06", name:"Тести на стабільність (stability testing)", source:"mfg", sl:"Завод або лабораторія", procare:"yes",
+      desc:"Стрес-тести: температурні перепади, UV, час. Підтверджують заявлений термін придатності." },
+    { id:"d07", name:"Опис виробничого процесу", source:"mfg", sl:"Завод", procare:"yes",
+      desc:"Коротке описання як виробляється продукт. Входить до PIF. Завод може надати в спрощеному вигляді для конфіденційності." },
+    { id:"d08", name:"Сертифікат GMP / ISO 22716 виробництва", source:"mfg", sl:"Завод", procare:"has",
+      desc:"ProCare вже має GMP (ISO 22716:2009, отримано у 2022 р.) — потрібно лише запросити копію сертифікату." },
+  ]},
+  { section:"Замовити у сертифікаційної компанії", items:[
+    { id:"d09", name:"CPSR — Звіт безпеки продукту (токсиколог)", source:"cert", sl:"Токсиколог", urgent:true,
+      desc:"Cosmetic Product Safety Report. Складається кваліфікованим токсикологом. Від 200€ за продукт. Компанії: biolab.com.ua, vsg-consult.com.ua, inveran.com.ua, cratia.ua" },
+    { id:"d10", name:"PIF — Досьє продукту (Product Information File)", source:"cert", sl:"Сертиф. компанія", urgent:true,
+      desc:"Головний документ: CPSR, рецептура, випробування, опис виробництва, маркування. Складається разом з CPSR. Зберігається у Відповідальної особи." },
+  ]},
+  { section:"Організаційні та маркування", items:[
+    { id:"d11", name:"Призначення Відповідальної особи (ВО)", source:"own", sl:"Оформити самим", urgent:true,
+      desc:"Обов'язкова вимога нового регламенту. ВО = виробник (резидент України) або уповноважений дистриб'ютор. Потрібне письмове уповноваження. Без ВО — нотифікація неможлива." },
+    { id:"d12", name:"Перевірка маркування етикеток (українська мова)", source:"own", sl:"Бренд + консультант",
+      desc:"Обов'язково: назва, дані ВО, термін придатності, умови зберігання, попередження, повний INCI-список, країна походження. Текст — українською мовою." },
+  ]},
+  { section:"Державна нотифікація", items:[
+    { id:"d13", name:"Нотифікація в e-Cosmetics (МОЗ України)", source:"gov", sl:"Портал МОЗ", urgent:true,
+      desc:"Електронне повідомлення на порталі МОЗ. Подається ВО після готовності PIF та CPSR. Строк — 5 робочих днів. Портал e-Cosmetics ще тестується — слідкуй за оновленнями." },
+  ]},
+];
+
+const DEFAULT_TASKS = [
+  { title:"Надіслати запит на завод: документи для сертифікації", assignee:"maks", priority:"critical", note:"" },
+  { title:"Запустити прискорені тести стабільності (28 днів при 40°C)", assignee:"maks", priority:"critical", note:"Стандартне тестування 4-5 міс. — не встигаємо. Потрібна акредитована лабораторія." },
+  { title:"Знайти токсиколога для CPSR (biolab.com.ua / vsg-consult.com.ua)", assignee:"maks", priority:"critical", note:"" },
+  { title:"Призначити Відповідальну особу (ВО) — оформити документально", assignee:"maks", priority:"urgent", note:"ВО = Dominanta або юр. особа виробника. Без ВО — нотифікація неможлива." },
+  { title:"Уточнити в biolab.com.ua: готові сертифіковані формули (white label)", assignee:"maks", priority:"urgent", note:"Якщо є готова формула з документами — можна зекономити 3-4 місяці." },
+  { title:"Перевірити маркування всіх трьох продуктів (українська мова)", assignee:"pavlo", priority:"normal", note:"" },
+];
+
+const DEFAULT_COMMS = [
+  {
+    id: "comm_factory_001",
+    title: "Запит на завод: документи для сертифікації",
+    to: "Завод-виробник",
+    date: "Травень 2026",
+    status: "waiting",
+    letter: `Шановні партнери,
+
+у зв'язку з набранням чинності Технічного регламенту на косметичну продукцію (Постанова КМУ №65 від 20.01.2021) та закінченням перехідного періоду 3 серпня 2026 року, HAiR L♡VE зобов'язана пройти процедуру нотифікації продуктів у системі e-Cosmetics МОЗ України.
+
+Просимо надати наступні документи для кожного з трьох продуктів:
+— Крем-спрей 20 в 1 (200 мл / 50 мл / 20 мл)
+— Термо-протектор (200 мл / 50 мл / 20 мл)
+— Ламелярна маска-філлер (200 мл / 50 мл / 20 мл)
+
+ПЕРЕЛІК НЕОБХІДНИХ ДОКУМЕНТІВ:
+
+1. Рецептура (формула) з відсотковим вмістом кожного інгредієнту
+   Необхідна для складання Звіту безпеки продукту (CPSR) токсикологом. Без повної формули токсиколог не може розпочати роботу.
+
+2. INCI-назви всіх інгредієнтів
+   Міжнародні найменування за стандартом INCI — для маркування та CPSR.
+
+3. Сертифікати якості (CoA) на кожну сировину
+   Certificate of Analysis від постачальника кожного інгредієнту.
+
+4. Технічні умови (ТУ) або специфікація на готовий продукт
+   Фізико-хімічні показники, методи контролю якості, термін придатності.
+
+5. Протоколи мікробіологічних випробувань готового продукту
+   Якщо такі випробування не проводились — готові обговорити їх замовлення.
+
+6. Протоколи тестів на стабільність (stability testing)
+   Стрес-тести на температурні перепади, підтвердження заявленого терміну придатності.
+
+7. Опис виробничого процесу
+   В будь-якому вигляді, прийнятному для включення в Product Information File (PIF). Конфіденційні деталі можуть бути узагальнені.
+
+8. Сертифікат GMP / ISO 22716 або декларація виробника про відповідність GMP-вимогам
+   Якщо сертифікат наявний — просимо надати копію. Якщо ні — достатньо письмової декларації.
+
+ВАЖЛИВО: Щодо пункту 1 (рецептура). Якщо формула є комерційною таємницею, ми готові організувати підписання угоди про нерозголошення (NDA) між заводом та токсикологом, який складатиме CPSR. Токсиколог не передаватиме дані третім особам.
+
+ДЕДЛАЙН: нотифікація всіх трьох продуктів має бути завершена до 3 серпня 2026 року. Для дотримання строків нам потрібно отримати документи якнайшвидше.
+
+Будь ласка, підтвердіть отримання цього листа та орієнтовні строки підготовки документів.
+
+З повагою,
+Максим
+HAiR L♡VE`,
+    response: ""
+  }
+];
+
+const SRC      = { mfg:"tag-mfg", cert:"tag-cert", gov:"tag-gov", own:"tag-own" };
+const TOTAL    = DOCS.flatMap(s => s.items).length;
+const STATE_ID = 'hairlove';
+
+let state         = {};
+let localOpen     = {};
+let commentTimers = {};
+let taskFilter    = 'all';
+let localTaskOpen = {};
+let localCommOpen = {};
+let commTimers    = {};
+
+function setSyncStatus(type, text) {
+  document.getElementById('syncDot').className    = 'sync-dot ' + type;
+  document.getElementById('syncLabel').textContent = text;
+}
+
+async function init() {
+  localOpen     = JSON.parse(localStorage.getItem('hl_open')     || '{}');
+  localTaskOpen = JSON.parse(localStorage.getItem('hl_task_open')|| '{}');
+  localCommOpen = JSON.parse(localStorage.getItem('hl_comm_open')|| '{}');
+
+  if (!CONFIGURED) {
+    document.getElementById('setupBanner').style.display = 'block';
+    document.getElementById('dropSubText').textContent   = 'PDF, DOCX, XLSX (зберігається локально — налаштуй Supabase для хмарної синхронізації)';
+    state = JSON.parse(localStorage.getItem('hl_cert_v3') || '{}');
+    setSyncStatus('off', 'Локальний режим — налаштуй Supabase для синхронізації між двома партнерами');
+    ensureDefaults();
+    renderAll();
+    return;
+  }
+
+  setSyncStatus('spin', 'Підключення...');
+  try {
+    const { data, error } = await sb.from('tracker_state').select('data').eq('id', STATE_ID).single();
+    if (error) throw error;
+    state = data?.data || {};
+    ensureDefaults();
+    setSyncStatus('ok', 'Підключено');
+    renderAll();
+    subscribeRealtime();
+  } catch (e) {
+    console.error(e);
+    state = JSON.parse(localStorage.getItem('hl_cert_v3') || '{}');
+    ensureDefaults();
+    setSyncStatus('err', "Помилка з'єднання — локальний режим");
+    renderAll();
+  }
+}
+
+function ensureDefaults() {
+  if (!state._tasks || state._tasks.length === 0) {
+    state._tasks = DEFAULT_TASKS.map((t,i) => ({
+      id: 'task_' + i + '_' + Date.now(),
+      title: t.title, assignee: t.assignee, priority: t.priority,
+      note: t.note, done: false, created: new Date().toLocaleDateString('uk-UA')
+    }));
+  }
+  if (!state._comms || state._comms.length === 0) {
+    state._comms = DEFAULT_COMMS;
+  }
+}
+
+function subscribeRealtime() {
+  sb.channel('tracker_main')
+    .on('postgres_changes', {
+      event: 'UPDATE', schema: 'public', table: 'tracker_state', filter: `id=eq.${STATE_ID}`
+    }, (payload) => {
+      const remote = payload.new.data || {};
+      const focused = document.activeElement;
+      if (focused?.classList.contains('comment-input')) {
+        const k = focused.dataset.key;
+        if (k) { remote[k] = Object.assign({}, remote[k] || {}, { comment: state[k]?.comment }); }
+      }
+      state = remote;
+      renderAll();
+      const t = new Date().toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'});
+      setSyncStatus('ok', 'Оновлено ' + t);
+    })
+    .subscribe(s => {
+      if (s === 'SUBSCRIBED') setSyncStatus('ok', 'Підключено · realtime');
+      if (s === 'CLOSED')     setSyncStatus('off', 'Відключено');
+    });
+}
+
+async function saveState() {
+  localStorage.setItem('hl_cert_v3', JSON.stringify(state));
+  if (!CONFIGURED) return;
+  const { error } = await sb.from('tracker_state')
+    .upsert({ id: STATE_ID, data: state, updated_at: new Date().toISOString() });
+  if (error) { console.error(error); setSyncStatus('err', 'Помилка збереження'); }
+}
+
+function saveLocalOpen()     { localStorage.setItem('hl_open',      JSON.stringify(localOpen)); }
+function saveLocalTaskOpen() { localStorage.setItem('hl_task_open', JSON.stringify(localTaskOpen)); }
+function saveLocalCommOpen() { localStorage.setItem('hl_comm_open', JSON.stringify(localCommOpen)); }
+
+function getPublicUrl(path) { return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl; }
+async function uploadFile(path, file) {
+  const { error } = await sb.storage.from(BUCKET).upload(path, file, { upsert:true });
+  return error ? null : getPublicUrl(path);
+}
+async function deleteFile(url) {
+  if (!url) return;
+  const m = '/object/public/' + BUCKET + '/';
+  const i = url.indexOf(m);
+  if (i !== -1) await sb.storage.from(BUCKET).remove([url.slice(i + m.length)]);
+}
+
+async function attachFile(key, files, lblEl) {
+  if (!state[key]) state[key] = {};
+  if (!state[key].files) state[key].files = [];
+  if (lblEl) lblEl.classList.add('uploading');
+  for (const file of Array.from(files)) {
+    let url = CONFIGURED ? await uploadFile(`items/${key}/${Date.now()}_${file.name}`, file) : null;
+    if (!state[key].files.find(f => (f.name||f) === file.name))
+      state[key].files.push({ name: file.name, url });
+  }
+  if (lblEl) lblEl.classList.remove('uploading');
+  await saveState(); redrawProd(key);
+}
+
+async function rmFile(key, idx) {
+  const f = state[key]?.files?.[idx];
+  if (CONFIGURED && f?.url) await deleteFile(f.url);
+  state[key]?.files?.splice(idx, 1);
+  await saveState(); redrawProd(key);
+}
+
+async function handleGlobalUpload(fileList) {
+  if (!state._uploads) state._uploads = [];
+  document.getElementById('dropZone').style.opacity = '0.6';
+  for (const file of Array.from(fileList)) {
+    let url = CONFIGURED ? await uploadFile(`global/${Date.now()}_${file.name}`, file) : null;
+    if (!state._uploads.find(u => u.name === file.name))
+      state._uploads.push({ name:file.name, url, size:file.size, date:new Date().toLocaleDateString('uk-UA') });
+  }
+  document.getElementById('dropZone').style.opacity = '';
+  await saveState(); renderUploadList();
+}
+
+async function removeUpload(idx) {
+  const f = state._uploads?.[idx];
+  if (CONFIGURED && f?.url) await deleteFile(f.url);
+  state._uploads?.splice(idx, 1);
+  await saveState(); renderUploadList();
+}
+
+async function toggleDone(key) {
+  if (!state[key]) state[key] = {};
+  state[key].done = !state[key].done;
+  await saveState(); redrawProd(key); updateGlobal();
+}
+function toggleOpen(key) {
+  localOpen[key] = !localOpen[key];
+  saveLocalOpen(); redrawProd(key);
+}
+function onComment(key, val) {
+  if (!state[key]) state[key] = {};
+  state[key].comment = val;
+  localStorage.setItem('hl_cert_v3', JSON.stringify(state));
+  clearTimeout(commentTimers[key]);
+  commentTimers[key] = setTimeout(() => saveState(), 1200);
+}
+
+// ── TASKS ────────────────────────────────────────────────────────────────────
+function openTaskForm()  { document.getElementById('taskFormOverlay').classList.add('open'); document.getElementById('tf-title').focus(); }
+function closeTaskForm() { document.getElementById('taskFormOverlay').classList.remove('open'); document.getElementById('tf-title').value = ''; }
+
+async function addTask() {
+  const title = document.getElementById('tf-title').value.trim();
+  if (!title) return;
+  if (!state._tasks) state._tasks = [];
+  state._tasks.push({
+    id: 'task_' + Date.now(),
+    title,
+    assignee: document.getElementById('tf-assignee').value,
+    priority:  document.getElementById('tf-priority').value,
+    note: '', done: false,
+    created: new Date().toLocaleDateString('uk-UA')
+  });
+  closeTaskForm();
+  await saveState();
+  renderTasks();
+}
+
+async function toggleTask(id) {
+  const t = (state._tasks||[]).find(t => t.id === id);
+  if (t) { t.done = !t.done; await saveState(); renderTasks(); }
+}
+
+function toggleTaskOpen(id) {
+  localTaskOpen[id] = !localTaskOpen[id];
+  saveLocalTaskOpen(); renderTasks();
+}
+
+function onTaskNote(id, val) {
+  const t = (state._tasks||[]).find(t => t.id === id);
+  if (!t) return;
+  t.note = val;
+  localStorage.setItem('hl_cert_v3', JSON.stringify(state));
+  clearTimeout(commentTimers['task_'+id]);
+  commentTimers['task_'+id] = setTimeout(() => saveState(), 1200);
+}
+
+async function deleteTask(id) {
+  if (!confirm('Видалити завдання?')) return;
+  state._tasks = (state._tasks||[]).filter(t => t.id !== id);
+  await saveState(); renderTasks();
+}
+
+function setTaskFilter(f, btn) {
+  taskFilter = f;
+  document.querySelectorAll('.task-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
+
+const PRIORITY_LABELS = { critical:'Критично', urgent:'Терміново', normal:'Звичайна' };
+const ASSIGNEE_LABELS = { pavlo:'Павло', maks:'Максим', both:'Обидва' };
+
+function renderTasks() {
+  const list = document.getElementById('taskList');
+  let tasks = state._tasks || [];
+
+  if (taskFilter === 'open')  tasks = tasks.filter(t => !t.done);
+  if (taskFilter === 'pavlo') tasks = tasks.filter(t => t.assignee === 'pavlo' || t.assignee === 'both');
+  if (taskFilter === 'maks')  tasks = tasks.filter(t => t.assignee === 'maks'  || t.assignee === 'both');
+
+  const openCount = (state._tasks||[]).filter(t => !t.done).length;
+  document.getElementById('badge-tasks').textContent = openCount;
+
+  if (!tasks.length) {
+    list.innerHTML = '<div class="task-empty">Завдань немає</div>';
+    return;
+  }
+
+  list.innerHTML = tasks.map(t => {
+    const isOpen = localTaskOpen[t.id] || false;
+    return `<div class="task-card${t.done?' done-task':''}${isOpen?' open-task':''}" id="tc_${t.id}">
+      <div class="task-card-main" onclick="toggleTaskOpen('${t.id}')">
+        <div class="task-cb" onclick="event.stopPropagation();toggleTask('${t.id}')">${t.done?'&#10003;':''}</div>
+        <div class="task-card-body">
+          <div class="task-title">${t.title}</div>
+          <div class="task-meta">
+            <span class="task-assignee ${t.assignee}">${ASSIGNEE_LABELS[t.assignee]||t.assignee}</span>
+            <span class="task-priority ${t.priority}">${PRIORITY_LABELS[t.priority]||t.priority}</span>
+            ${t.created ? `<span style="font-size:10px;color:var(--gray-light)">${t.created}</span>` : ''}
+          </div>
+        </div>
+        <div class="task-toggle">${isOpen?'&#9650;':'&#9660;'}</div>
+      </div>
+      <div class="task-expand">
+        <div class="field-label">Нотатка</div>
+        <textarea class="task-note-input" placeholder="Деталі, контакти, результат..."
+          oninput="onTaskNote('${t.id}',this.value)">${t.note||''}</textarea>
+        <button class="task-del-btn" onclick="deleteTask('${t.id}')">&#128465; Видалити завдання</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── COMMUNICATIONS ───────────────────────────────────────────────────────────
+function openNewCommForm() {
+  const f = document.getElementById('newCommForm');
+  f.classList.toggle('open');
+  if (f.classList.contains('open')) document.getElementById('nc-title').focus();
+}
+function closeNewCommForm() { document.getElementById('newCommForm').classList.remove('open'); }
+
+async function addComm() {
+  const title = document.getElementById('nc-title').value.trim();
+  if (!title) return;
+  if (!state._comms) state._comms = [];
+  state._comms.push({
+    id: 'comm_' + Date.now(),
+    title,
+    to: document.getElementById('nc-to').value.trim() || '—',
+    date: new Date().toLocaleDateString('uk-UA'),
+    status: 'sent',
+    letter: document.getElementById('nc-letter').value.trim(),
+    response: ''
+  });
+  document.getElementById('nc-title').value = '';
+  document.getElementById('nc-to').value = '';
+  document.getElementById('nc-letter').value = '';
+  closeNewCommForm();
+  await saveState();
+  renderComms();
+}
+
+function toggleCommOpen(id) {
+  localCommOpen[id] = !localCommOpen[id];
+  saveLocalCommOpen(); renderComms();
+}
+
+async function setCommStatus(id, status) {
+  const c = (state._comms||[]).find(c => c.id === id);
+  if (c) { c.status = status; await saveState(); renderComms(); }
+}
+
+function onCommResponse(id, val) {
+  const c = (state._comms||[]).find(c => c.id === id);
+  if (!c) return;
+  c.response = val;
+  localStorage.setItem('hl_cert_v3', JSON.stringify(state));
+  clearTimeout(commTimers[id]);
+  commTimers[id] = setTimeout(() => saveState(), 1200);
+}
+
+async function deleteComm(id) {
+  if (!confirm('Видалити комунікацію?')) return;
+  state._comms = (state._comms||[]).filter(c => c.id !== id);
+  await saveState(); renderComms();
+}
+
+function copyLetter(id) {
+  const c = (state._comms||[]).find(c => c.id === id);
+  if (!c) return;
+  navigator.clipboard.writeText(c.letter).then(() => {
+    const btn = document.getElementById('copy_'+id);
+    if (btn) { btn.textContent = '✓ Скопійовано'; setTimeout(() => { btn.textContent = '📋 Копіювати текст'; }, 2000); }
+  });
+}
+
+const COMM_STATUS_LABELS = { sent:'Надіслано', waiting:'Очікуємо відповідь', replied:'Відповідь отримана' };
+
+function renderComms() {
+  const list = document.getElementById('commList');
+  const comms = state._comms || [];
+  document.getElementById('badge-comms').textContent = comms.length;
+
+  if (!comms.length) {
+    list.innerHTML = '<div class="task-empty">Комунікацій ще немає</div>';
+    return;
+  }
+
+  list.innerHTML = comms.map(c => {
+    const isOpen = localCommOpen[c.id] || false;
+    const statusClass = c.status || 'waiting';
+    return `<div class="comm-card${isOpen?' open-comm':''}" id="cc_${c.id}">
+      <div class="comm-card-header" onclick="toggleCommOpen('${c.id}')">
+        <div class="comm-card-icon">&#128140;</div>
+        <div class="comm-card-info">
+          <div class="comm-card-title">${c.title}</div>
+          <div class="comm-card-sub">Кому: ${c.to} &middot; ${c.date||''}</div>
+        </div>
+        <span class="comm-status ${statusClass}">${COMM_STATUS_LABELS[statusClass]||statusClass}</span>
+        <div class="comm-toggle">${isOpen?'&#9650;':'&#9660;'}</div>
+      </div>
+      <div class="comm-body">
+        ${c.letter ? `
+        <div class="comm-section-label">Текст листа</div>
+        <div class="comm-letter">${escHtml(c.letter)}</div>
+        <button class="comm-copy-btn" id="copy_${c.id}" onclick="copyLetter('${c.id}')">&#128203; Копіювати текст</button>
+        ` : ''}
+        <div class="comm-section-label">Відповідь</div>
+        <textarea class="comm-response-area"
+          placeholder="Вставте або напишіть відповідь, яку ви отримали..."
+          oninput="onCommResponse('${c.id}',this.value)">${escHtml(c.response||'')}</textarea>
+        <div class="comm-section-label">Статус</div>
+        <div class="comm-status-row">
+          <button class="comm-status-btn${c.status==='sent'?' active sent':''}" onclick="setCommStatus('${c.id}','sent')">Надіслано</button>
+          <button class="comm-status-btn${c.status==='waiting'?' active waiting':''}" onclick="setCommStatus('${c.id}','waiting')">Очікуємо відповідь</button>
+          <button class="comm-status-btn${c.status==='replied'?' active replied':''}" onclick="setCommStatus('${c.id}','replied')">Відповідь отримана</button>
+        </div>
+        <button class="comm-del-btn" onclick="deleteComm('${c.id}')">&#128465; Видалити</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+const TAB_NAMES = ['overview','upload','tasks','comms','regulatory'];
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) =>
+    t.classList.toggle('active', TAB_NAMES[i] === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll() { PRODUCTS.forEach(renderColumn); updateGlobal(); renderUploadList(); renderTasks(); renderComms(); }
+
+function fileHtml(f, key, fi) {
+  const name = f.name || f;
+  const url  = f.url  || null;
+  const inner = url
+    ? `<a href="${url}" target="_blank" title="Відкрити ${name}">&#128204; ${name}</a>`
+    : `<span class="file-chip-name">&#128204; ${name}</span>`;
+  return `<div class="file-chip">${inner}<span class="file-remove" onclick="rmFile('${key}',${fi});event.stopPropagation()">&times;</span></div>`;
+}
+
+function renderColumn(prod) {
+  const col   = document.getElementById('col-' + prod.id);
+  const items = DOCS.flatMap(s => s.items);
+  const done  = items.filter(it => state[prod.id+'_'+it.id]?.done).length;
+  const pct   = Math.round(done / TOTAL * 100);
+
+  let h = `<div class="product-col-header ${prod.cls}">${prod.label}<small>${prod.sub}</small></div>
+    <div class="col-progress">
+      <div class="col-progress-track"><div class="col-progress-fill ${prod.cls}" style="width:${pct}%"></div></div>
+      <div class="col-progress-label">${done}/${TOTAL}</div>
+    </div>`;
+
+  DOCS.forEach(sec => {
+    h += `<div class="section-divider">${sec.section}</div>`;
+    sec.items.forEach(item => {
+      const key    = prod.id + '_' + item.id;
+      const s      = state[key] || {};
+      const isDone = s.done || false;
+      const isOpen = localOpen[key] || false;
+      const files  = (s.files || []).map(f => typeof f==='string' ? {name:f,url:null} : f);
+      const urgTag = item.urgent ? `<span class="tag tag-urgent">&#9888; Терміново</span>` : '';
+      const fTag   = files.length ? `<span class="tag tag-files">&#128204; ${files.length}</span>` : '';
+      const procareTag = item.procare === 'has'
+        ? `<span class="tag tag-procare">&#10003; ProCare · GMP є</span>`
+        : item.procare === 'yes'
+          ? `<span class="tag tag-procare">&#177; ProCare може надати</span>`
+          : '';
+      const fChips = files.map((f,fi) => fileHtml(f, key, fi)).join('');
+
+      h += `<div class="doc-item${isDone?' done':''}${isOpen?' open':''}" id="i_${key}">
+        <div class="doc-item-main" onclick="toggleOpen('${key}')">
+          <div class="checkbox" onclick="event.stopPropagation();toggleDone('${key}')">${isDone?'&#10003;':''}</div>
+          <div class="doc-item-body">
+            <div class="doc-item-name">${item.name}</div>
+            <div class="doc-item-tags"><span class="tag ${SRC[item.source]}">${item.sl}</span>${urgTag}${procareTag}${fTag}</div>
+          </div>
+          <div class="toggle-arrow">${isOpen?'&#9650;':'&#9660;'}</div>
+        </div>
+        <div class="doc-item-expand">
+          <div class="doc-item-desc">${item.desc}</div>
+          <div class="field-label">Коментар / статус</div>
+          <textarea class="comment-input" data-key="${key}" placeholder="Статус, контакт, дата..."
+            oninput="onComment('${key}',this.value)">${s.comment||''}</textarea>
+          <div class="file-area">
+            <div class="field-label">Прикріплені файли</div>
+            <label class="file-btn-label" id="lbl_${key}">
+              &#128204; Прикріпити файл
+              <input type="file" class="file-input-hidden" multiple
+                onchange="attachFile('${key}',this.files,document.getElementById('lbl_${key}'))">
+            </label>
+            ${files.length ? `<div class="file-list">${fChips}</div>` : ''}
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+  col.innerHTML = h;
+}
+
+function redrawProd(key) {
+  const prod = PRODUCTS.find(p => key.startsWith(p.id + '_'));
+  if (prod) renderColumn(prod);
+}
+
+function updateGlobal() {
+  const items = DOCS.flatMap(s => s.items);
+  let total = 0, done = 0;
+  PRODUCTS.forEach(prod => items.forEach(it => { total++; if (state[prod.id+'_'+it.id]?.done) done++; }));
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('globalFill').style.width   = pct + '%';
+  document.getElementById('globalLabel').textContent  = done + ' / ' + total + ' виконано';
+  const uniq = items.filter(it => PRODUCTS.every(p => state[p.id+'_'+it.id]?.done)).length;
+  document.getElementById('badge-overview').textContent = uniq + '/' + TOTAL;
+}
+
+function renderUploadList() {
+  const list    = document.getElementById('globalUploadList');
+  const uploads = state._uploads || [];
+  document.getElementById('badge-upload').textContent = uploads.length || '0';
+  if (!uploads.length) { list.innerHTML = '<div class="upload-empty">Документів ще немає</div>'; return; }
+  const icons = {pdf:'&#128213;',doc:'&#128209;',docx:'&#128209;',xls:'&#128210;',xlsx:'&#128210;',
+                 jpg:'&#128444;',jpeg:'&#128444;',png:'&#128444;',zip:'&#128230;'};
+  list.innerHTML = uploads.map((u,i) => {
+    const ext  = (u.name||'').split('.').pop().toLowerCase();
+    const kb   = u.size ? ' &middot; ' + Math.round(u.size/1024) + ' КБ' : '';
+    const name = u.url ? `<a href="${u.url}" target="_blank">${u.name}</a>` : u.name;
+    return `<div class="upload-item">
+      <div class="upload-item-icon">${icons[ext]||'&#128196;'}</div>
+      <div class="upload-item-info">
+        <div class="upload-item-name">${name}</div>
+        <div class="upload-item-meta">${u.date||''}${kb}</div>
+      </div>
+      <div class="upload-item-del" onclick="removeUpload(${i})">&times;</div>
+    </div>`;
+  }).join('');
+}
+
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); handleGlobalUpload(e.dataTransfer.files); });
+
+document.getElementById('taskFormOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeTaskForm();
+});
+
+init();
+</script>
+</body>
+</html>
+
