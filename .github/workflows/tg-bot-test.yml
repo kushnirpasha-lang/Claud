@@ -1,0 +1,46 @@
+name: TG Bot Test
+"on":
+  push:
+    paths:
+      - .github/workflows/tg-bot-test.yml
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+          GH_REPO: ${{ github.repository }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: GH_TOKEN,GH_REPO
+          script_stop: false
+          script: |
+            export $(grep -v "^#" /opt/assistant/.env | xargs) 2>/dev/null || true
+            UPDATES=$(curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?limit=10")
+            CHAT_ID=$(echo "$UPDATES" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+results = data.get("result", [])
+for r in reversed(results):
+    cid = r.get("message", {}).get("chat", {}).get("id")
+    if cid:
+        print(cid)
+        break
+" 2>/dev/null)
+            if [ -z "$CHAT_ID" ]; then
+              RESULT="chat_id не найден"
+            else
+              ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('ТЕСТ\n2026-05-15'))")
+              SEND=$(curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${ENCODED}")
+              RESULT="OK: $SEND"
+            fi
+            curl -s -X POST \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.github.com/repos/$GH_REPO/issues/1/comments" \
+              -d "{"body": "Telegram test: $RESULT"}" || true
