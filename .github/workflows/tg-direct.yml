@@ -15,43 +15,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
           GH_REPO: ${{ github.repository }}
+          SCRIPT_B64: CmltcG9ydCBhc3luY2lvLCBvcywgc3lzLCBkYXRldGltZQpzeXMucGF0aC5pbnNlcnQoMCwgJy9vcHQvYXNzaXN0YW50JykKZnJvbSB0ZWxldGhvbiBpbXBvcnQgVGVsZWdyYW1DbGllbnQKCmFzeW5jIGRlZiBtYWluKCk6CiAgICBjID0gVGVsZWdyYW1DbGllbnQoJy9vcHQvYXNzaXN0YW50L3VzZXJfc2Vzc2lvbicsCiAgICAgICAgICAgICAgICAgICAgICAgaW50KG9zLmVudmlyb25bJ1RFTEVHUkFNX0FQSV9JRCddKSwKICAgICAgICAgICAgICAgICAgICAgICBvcy5lbnZpcm9uWydURUxFR1JBTV9BUElfSEFTSCddKQogICAgYXdhaXQgYy5jb25uZWN0KCkKICAgIHNlc3Npb25fZXhpc3RzID0gb3MucGF0aC5leGlzdHMoJy9vcHQvYXNzaXN0YW50L3VzZXJfc2Vzc2lvbi5zZXNzaW9uJykKICAgIGF1dGhvcml6ZWQgPSBhd2FpdCBjLmlzX3VzZXJfYXV0aG9yaXplZCgpCiAgICBwcmludChmJ3Nlc3Npb25fZmlsZToge3Nlc3Npb25fZXhpc3RzfSwgYXV0aG9yaXplZDoge2F1dGhvcml6ZWR9JykKICAgIGlmIG5vdCBhdXRob3JpemVkOgogICAgICAgIHByaW50KCdGQUlMOiBub3QgYXV0aG9yaXplZCcpCiAgICAgICAgYXdhaXQgYy5kaXNjb25uZWN0KCkKICAgICAgICByZXR1cm4KICAgIG1lID0gYXdhaXQgYy5nZXRfbWUoKQogICAgcHJpbnQoZidsb2dnZWQgaW4gYXM6IHttZS5maXJzdF9uYW1lfSBAe21lLnVzZXJuYW1lfScpCiAgICB0b2RheSA9IGRhdGV0aW1lLmRhdGUudG9kYXkoKS5pc29mb3JtYXQoKQogICAgYXdhaXQgYy5zZW5kX21lc3NhZ2UoJ21lJywgZifinIUg0KLQldCh0KIgVGVsZXRob24Ke3RvZGF5fQoK0KHQvtC+0LHRidC10L3QuNC1INCyINCY0LfQsdGA0LDQvdC90L7QtSDigJQg0LHQtdGB0L/Qu9Cw0YLQvdC+IScpCiAgICBhd2FpdCBjLmRpc2Nvbm5lY3QoKQogICAgcHJpbnQoJ09LOiBzZW50IHRvIFNhdmVkIE1lc3NhZ2VzJykKCmFzeW5jaW8ucnVuKG1haW4oKSkK
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: GH_TOKEN,GH_REPO
+          envs: GH_TOKEN,GH_REPO,SCRIPT_B64
           script_stop: false
           script: |
             export $(grep -v '^#' /opt/assistant/.env | xargs) 2>/dev/null || true
             cd /opt/assistant
-            RESULT=$(venv/bin/python3 - 2>&1 <<'PYEOF'
-import asyncio, os, sys
-sys.path.insert(0, '/opt/assistant')
-from telethon import TelegramClient
-import datetime
-
-async def main():
-    c = TelegramClient('/opt/assistant/user_session',
-                       int(os.environ['TELEGRAM_API_ID']),
-                       os.environ['TELEGRAM_API_HASH'])
-    await c.connect()
-    session_exists = os.path.exists('/opt/assistant/user_session.session')
-    authorized = await c.is_user_authorized()
-    print(f"session_file: {session_exists}, authorized: {authorized}")
-    if not authorized:
-        print("FAIL: not authorized")
-        await c.disconnect()
-        return
-    me = await c.get_me()
-    print(f"logged in as: {me.first_name} @{me.username}")
-    today = datetime.date.today().isoformat()
-    await c.send_message('me', f'✅ ТЕСТ Telethon\n{today}\n\nСообщение в Избранное — бесплатно!')
-    await c.disconnect()
-    print("OK: sent to Saved Messages")
-
-asyncio.run(main())
-PYEOF
-)
+            echo "$SCRIPT_B64" | base64 -d > /tmp/tg_saved.py
+            RESULT=$(venv/bin/python3 /tmp/tg_saved.py 2>&1)
             echo "RESULT: $RESULT"
             PAYLOAD=$(printf 'telethon saved messages test:\n```\n%s\n```' "$RESULT" | python3 -c "import sys,json; print(json.dumps({'body': sys.stdin.read()}))")
             curl -s -X POST \
@@ -59,4 +34,4 @@ PYEOF
               -H "Content-Type: application/json" \
               "https://api.github.com/repos/$GH_REPO/issues/1/comments" \
               -d "$PAYLOAD" || true
-# trigger 5
+# trigger 6
