@@ -71,7 +71,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 «немає» без уточнения какой из шести — запрещено.
 
 # Что такое HairLove (знаешь без чтения файлов)
-Профессиональная косметика для волос Розроблено в Італії, HAIR LOVE COMPANY, Viterbo.
+Профессиональная косметика для волос. HAIR LOVE COMPANY. Производство — Украина (ProCare). В официальных документах (этикетка, PIF, CPSR, нотификация, договоры) — никаких Italy-claims.
 Продукты: 20 IN 1 CREAM-SPRAY (флагман), THERMO PROTECTOR SPRAY, LIQUID LAMELLAR FILLER-MASK, SILK (в разработке).
 B2B: дистрибуторы по Украине + салоны. Владелец: Павел (@Pavel_Kus). Операции: Максим.
 Трекер сертификации: https://kushnirpasha-lang.github.io/Claud/docs-tracker.html
