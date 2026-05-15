@@ -1,4 +1,4 @@
-name: TG Direct Send
+name: TG Send Test
 "on":
   push:
     branches:
@@ -10,23 +10,25 @@ jobs:
   send:
     runs-on: ubuntu-latest
     steps:
-      - name: Check server bot setup
+      - name: Send test message via bot
         uses: appleboy/ssh-action@v1.0.3
-        env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
-          GH_REPO: ${{ github.repository }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: GH_TOKEN,GH_REPO
           script_stop: false
           script: |
             export $(grep -v '^#' /opt/assistant/.env | xargs) 2>/dev/null || true
-            echo "=== bot.py message handler ==="
-            grep -n "chat_id\|chat\.id\|from_user\|message" /opt/assistant/bot.py | head -30
-            echo "=== any stored chat_ids ==="
-            grep -r "chat_id" /opt/assistant/*.py 2>/dev/null | grep -v "def\|#" | head -20
-            echo "=== getUpdates from server ==="
-            curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?limit=5&offset=-5"
-# trigger 9
+            CHAT_ID=$(cat /opt/assistant/chat_id.txt 2>/dev/null || echo "")
+            echo "chat_id from file: $CHAT_ID"
+            if [ -z "$CHAT_ID" ]; then
+              echo "❌ chat_id.txt пустой — Павел ещё не написал боту после деплоя"
+              exit 1
+            fi
+            TODAY=$(date +%Y-%m-%d)
+            RESULT=$(curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -d "chat_id=${CHAT_ID}" \
+              -d "text=ТЕСТ%0A${TODAY}")
+            echo "Result: $RESULT"
+            echo "$RESULT" | grep -q '"ok":true' && echo "✅ Сообщение доставлено" || echo "❌ Ошибка"
+# trigger 1
