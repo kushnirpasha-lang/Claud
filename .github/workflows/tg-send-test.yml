@@ -1,0 +1,34 @@
+name: Telegram — тестовое сообщение
+
+on:
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send test message
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          # Получаем chat_id из последнего апдейта
+          UPDATES=$(curl -s "https://api.telegram.org/bot${TG_TOKEN}/getUpdates?limit=5")
+          echo "Updates: $UPDATES"
+          CHAT_ID=$(echo "$UPDATES" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+results = data.get('result', [])
+for r in reversed(results):
+    cid = r.get('message', {}).get('chat', {}).get('id') or r.get('channel_post', {}).get('chat', {}).get('id')
+    if cid:
+        print(cid)
+        break
+" 2>/dev/null)
+          echo "Chat ID: $CHAT_ID"
+          if [ -z "$CHAT_ID" ]; then
+            echo "❌ chat_id не найден — нужно сначала написать боту хоть одно сообщение"
+            exit 1
+          fi
+          TEXT="ТЕСТ%0A2026-05-15"
+          RESULT=$(curl -s "https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${TEXT}")
+          echo "Result: $RESULT"
