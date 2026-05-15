@@ -3,10 +3,9 @@ import io
 import os
 from functools import partial
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update
 from telegram.ext import (
     Application,
-    CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
     MessageHandler,
@@ -14,9 +13,6 @@ from telegram.ext import (
 )
 
 import claude_client
-
-# {user_id: {"to": contact_name, "text": message_text}}
-_pending_sends: dict = {}
 
 CHAT_ID_FILE = "/opt/assistant/chat_id.txt"
 
@@ -83,7 +79,6 @@ def _transcribe_voice_sync(file_bytes: bytes) -> str:
     return result.text
 
 
-_SEND_KEYWORDS = ("отправь", "напиши", "передай", "скажи", "пошли", "send")
 _TRELLO_KEYWORDS = ("trello", "трелло", "доска", "карточк", "задач", "колонк", "добавь задачу",
                     "перемести", "покажи задачи", "что в работе", "что сделано")
 
@@ -92,8 +87,6 @@ def _quick_intent(text: str) -> str | None:
     tl = text.lower()
     if any(k in tl for k in _TRELLO_KEYWORDS):
         return "trello"
-    if any(k in tl for k in _SEND_KEYWORDS):
-        return "maybe_send"
     return None
 
 
@@ -207,22 +200,6 @@ async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text
         else:
             intent = await loop.run_in_executor(None, partial(_detect_intent, text))
 
-        if intent["type"] == "send_tg":
-            contact_name, msg_text = intent["to"], intent["text"]
-            _pending_sends[update.effective_user.id] = {"to": contact_name, "text": msg_text}
-            stop_event.set()
-            typing_task.cancel()
-            keyboard = InlineKeyboardMarkup([[
-                InlineKeyboardButton("✅ Отправить", callback_data="send_confirm"),
-                InlineKeyboardButton("❌ Отмена", callback_data="send_cancel"),
-            ]])
-            await update.message.reply_text(
-                f"📤 Готово отправить *{contact_name}*:\n\n_{msg_text}_",
-                parse_mode="Markdown",
-                reply_markup=keyboard,
-            )
-            return
-
         if intent["type"] == "trello":
             trello_reply = await loop.run_in_executor(None, partial(_handle_trello, uid, text))
             stop_event.set()
@@ -262,33 +239,6 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await update.message.reply_text("Не смог распознать голосовое. Попробуй ещё раз.")
 
 
-async def handle_send_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    uid = query.from_user.id
-    pending = _pending_sends.pop(uid, None)
-
-    if query.data == "send_confirm" and pending:
-        try:
-            import telethon_user
-            loop = asyncio.get_running_loop()
-            ok = await loop.run_in_executor(
-                None,
-                partial(telethon_user.send_to_contact_sync, pending["to"], pending["text"])
-            )
-            if ok:
-                await query.edit_message_text(
-                    f"✅ Сообщение отправлено *{pending['to']}*", parse_mode="Markdown"
-                )
-            else:
-                await query.edit_message_text(
-                    f"❌ Контакт *{pending['to']}* не найден в Telegram", parse_mode="Markdown"
-                )
-        except Exception as exc:
-            print(f"Send callback error: {exc}")
-            await query.edit_message_text("❌ Ошибка при отправке сообщения")
-    else:
-        await query.edit_message_text("❌ Отменено")
 
 
 def run() -> None:
@@ -301,7 +251,6 @@ def run() -> None:
     app.add_handler(CommandHandler("trello", cmd_trello))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
-    app.add_handler(CallbackQueryHandler(handle_send_callback, pattern="^send_"))
 
     print("Telegram bot started.")
     app.run_polling(drop_pending_updates=True)

@@ -12,35 +12,31 @@ client = TelegramClient(SESSION, API_ID, API_HASH)
 _loop = None
 
 
-async def send_to_contact(name: str, text: str) -> bool:
-    """Find contact by name and send message. Returns True if sent."""
-    name_lower = name.lower()
+async def send_to_saved(text: str) -> bool:
+    """Send message to Saved Messages (me). Only allowed destination."""
     try:
-        async for dialog in client.iter_dialogs():
-            if dialog.is_user and dialog.name and name_lower in dialog.name.lower():
-                await client.send_message(dialog.entity, text)
-                return True
+        await client.send_message('me', text)
+        return True
     except Exception as e:
-        print(f"send_to_contact error: {e}")
-    return False
+        print(f"send_to_saved error: {e}")
+        return False
 
 
-def send_to_contact_sync(name: str, text: str) -> bool:
-    """Thread-safe wrapper — call from bot thread into telethon event loop."""
+def send_to_saved_sync(text: str) -> bool:
     if _loop is None:
         return False
-    future = asyncio.run_coroutine_threadsafe(send_to_contact(name, text), _loop)
+    future = asyncio.run_coroutine_threadsafe(send_to_saved(text), _loop)
     try:
         return future.result(timeout=15)
     except Exception as e:
-        print(f"send_to_contact_sync error: {e}")
+        print(f"send_to_saved_sync error: {e}")
         return False
 
 
 async def run():
     await client.start()
     me = await client.get_me()
-    print(f"Telethon started as @{me.username} ({me.first_name}) — listen-only mode OFF")
+    print(f"Telethon started as @{me.username} ({me.first_name}) — Saved Messages only")
     await client.run_until_disconnected()
 
 
