@@ -240,10 +240,8 @@ async def _process_text(update: Update, context: ContextTypes.DEFAULT_TYPE, text
     except Exception as exc:
         stop_event.set()
         typing_task.cancel()
-        import traceback
-        err_text = traceback.format_exc()
-        print(f"Error for user {uid}: {err_text}")
-        await update.message.reply_text(f"⚠️ Debug error:\n{type(exc).__name__}: {exc}\n\nПопробуй ещё раз или /new")
+        print(f"Error for user {uid}: {exc}")
+        await update.message.reply_text("Что-то пошло не так. Попробуй ещё раз или /new")
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
