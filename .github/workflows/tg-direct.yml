@@ -9,62 +9,69 @@ name: TG Direct Send
 jobs:
   send:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.MY_PAT }}
-      GH_REPO: ${{ github.repository }}
     steps:
-      - name: Diagnose bot
+      - name: Diagnose and send
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}"
           python3 << 'PYEOF'
           import os, json, urllib.request, urllib.parse
 
           token = os.environ['TOKEN']
+          gh_token = os.environ.get('GH_TOKEN', '')
+          gh_repo = os.environ.get('GH_REPO', '')
 
-          def tg(method, params=''):
+          def tg_get(method, params=''):
             url = f'https://api.telegram.org/bot{token}/{method}{params}'
-            with urllib.request.urlopen(url) as r:
+            with urllib.request.urlopen(url, timeout=10) as r:
               return json.loads(r.read())
 
-          me = tg('getMe')
+          me = tg_get('getMe')
           username = me.get('result', {}).get('username', '?')
           bot_name = me.get('result', {}).get('first_name', '?')
 
-          wh = tg('getWebhookInfo')
-          webhook_url = wh.get('result', {}).get('url', 'нет')
+          wh = tg_get('getWebhookInfo')
+          webhook_url = wh.get('result', {}).get('url', 'none')
 
-          upd = tg('getUpdates', '?limit=5')
+          upd = tg_get('getUpdates', '?limit=5')
           updates = upd.get('result', [])
-          updates_count = len(updates)
           chat_id = ''
           if updates:
-            chat_id = str(updates[-1].get('message', {}).get('chat', {}).get('id', ''))
+            msg = updates[-1].get('message', {})
+            chat_id = str(msg.get('chat', {}).get('id', ''))
 
-          msg = f'TG Diagnostic:\nbot=@{username} ({bot_name})\nwebhook={webhook_url}\nupdates_count={updates_count}\nchat_id={chat_id}'
-          print(msg)
+          report = (
+            f'TG Diagnostic:\n'
+            f'bot=@{username} ({bot_name})\n'
+            f'webhook={webhook_url}\n'
+            f'updates_count={len(updates)}\n'
+            f'chat_id={chat_id}'
+          )
+          print(report)
 
-          gh_token = os.environ.get('GH_TOKEN', '')
-          gh_repo = os.environ.get('GH_REPO', '')
           if gh_token and gh_repo:
-            body = json.dumps({'body': msg}).encode()
+            body = json.dumps({'body': report}).encode()
             req = urllib.request.Request(
               f'https://api.github.com/repos/{gh_repo}/issues/1/comments',
               data=body,
               headers={'Authorization': f'Bearer {gh_token}', 'Content-Type': 'application/json'}
             )
             urllib.request.urlopen(req)
-            print('Posted to issue #1')
+            print('Posted to issue')
 
           if chat_id:
-            send_data = urllib.parse.urlencode({
+            data = urllib.parse.urlencode({
               'chat_id': chat_id,
-              'text': 'ТЕСТ\n2026-05-15\n(от бота @' + username + ')'
+              'text': f'ТЕСТ\n2026-05-15\nbot=@{username}'
             }).encode()
             req2 = urllib.request.Request(
               f'https://api.telegram.org/bot{token}/sendMessage',
-              data=send_data
+              data=data
             )
-            result = urllib.request.urlopen(req2).read()
-            print('Sent message:', result[:100])
+            print(urllib.request.urlopen(req2).read().decode())
+          else:
+            print('NO CHAT ID - message not sent')
           PYEOF
-# trigger 6
+# trigger 7
