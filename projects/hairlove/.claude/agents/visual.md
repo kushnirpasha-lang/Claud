@@ -81,7 +81,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 ```
 
 **Блок PRESERVE — обязательный первый абзац каждого промпта:**
-`"Keep the provided product bottle exactly as-is: do not alter the label design, label text, logo, font, label colors, or bottle shape. Only add environment, background, surface, and lighting around it."`
+`"Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, colors, brightness, or texture. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle."`
 
 Промпт пишется на английском (Nano Banana лучше работает на en). Длина 60-150 слов. Без слов "ультра", "масштабный", "роскошный".
 
@@ -89,14 +89,15 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 
 # Брендовые якоря (вставлять в КАЖДЫЙ промпт — без исключений)
 
-- "200ml glass dropper bottle with minimalist label reading HAiR LOVE"
-- **"label printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture, subtle luminous sheen, not glossy"** ← обязательно во ВСЕХ кадрах где виден флакон
 - "Italian premium editorial cosmetics photography"
 - Палитра из brandbook (минимум 2 цвета явно)
 - "Soft natural daylight"
 - "Generous white space"
 
-Если в кадре нет флакона (например, текстовый постер или макро-текстура без продукта) — якорь про Constellation Jade Raster можно опустить, но в комментарии Павлу пометить «без флакона — поэтому без бумаги».
+**Про этикетку в промпте — только PRESERVE, никакого описания:**
+Этикетка уже есть на исходном фото Павла. Нейросеть её видит. Описывать как она должна выглядеть = давать AI повод её изменить. Единственная инструкция про этикетку: **не трогать**.
+
+Справка (не для промптов): этикетка напечатана на Constellation Jade Raster (Fedrigoni) — перламутровое покрытие, тиснёный растровый узор. Это знание о продукте, не инструкция для генерации.
 
 # Что ты делаешь
 
