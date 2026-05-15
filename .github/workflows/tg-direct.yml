@@ -34,4 +34,4 @@ jobs:
               -H "Content-Type: application/json" \
               "https://api.github.com/repos/$GH_REPO/issues/1/comments" \
               -d "$PAYLOAD" || true
-# trigger 7
+# trigger 8
