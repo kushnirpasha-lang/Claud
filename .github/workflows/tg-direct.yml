@@ -31,4 +31,4 @@ jobs:
               -d "text=ТЕСТ%0A${TODAY}")
             echo "Result: $RESULT"
             echo "$RESULT" | grep -q '"ok":true' && echo "✅ Сообщение доставлено" || echo "❌ Ошибка"
-# trigger 1
+# trigger 2
