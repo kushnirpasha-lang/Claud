@@ -104,6 +104,11 @@
   .tag-urgent { background: #FFEBEE; color: var(--red); font-weight: 700; }
   .tag-files  { background: #E8F5E9; color: #2E7D32; }
   .tag-procare { background: #E8F5E9; color: #1E7A4A; font-weight: 700; }
+  .tag-cost    { background: #FFF3E0; color: #BF360C; font-weight: 700; }
+  .tag-status-confirmed  { background: #E8F5E9; color: #1B5E20; font-weight: 700; }
+  .tag-status-partial    { background: #FFF8E1; color: #E65100; font-weight: 700; }
+  .tag-status-pending    { background: #E3F2FD; color: #0D47A1; font-weight: 700; }
+  .tag-status-not-started{ background: #FFEBEE; color: #B71C1C; font-weight: 700; }
   .toggle-arrow { color: var(--gray-light); font-size: 10px; margin-top: 2px; flex-shrink: 0; }
 
   .doc-item-expand { display: none; padding: 0 14px 10px 44px; }
@@ -725,38 +730,51 @@ const PRODUCTS = [
 
 const DOCS = [
   { section:"Від виробника", items:[
-    { id:"d01", name:"Рецептура (формула) з % кожного інгредієнту", source:"mfg", sl:"Завод", urgent:true, procare:"yes",
-      desc:"Повна формула з точними % всіх інгредієнтів — основа для CPSR. Без неї токсиколог не почне роботу. Запитувати офіційно у відділі якості заводу." },
-    { id:"d02", name:"INCI-назви всіх інгредієнтів", source:"mfg", sl:"Завод", procare:"yes",
-      desc:"Міжнародні найменування за стандартом INCI. Потрібні для маркування та CPSR. Виробник зобов'язаний надати — це частина договору поставки." },
-    { id:"d03", name:"CoA — сертифікати якості на кожну сировину", source:"mfg", sl:"Завод", procare:"yes",
-      desc:"Certificate of Analysis від постачальника сировини на кожен інгредієнт. Підтверджують чистоту та безпеку. Частина може бути закритою." },
-    { id:"d04", name:"Технічні умови (ТУ) / специфікація на готовий продукт", source:"mfg", sl:"Завод", procare:"yes",
-      desc:"Фізико-хімічні параметри, методи контролю якості, термін придатності. Є частиною PIF." },
+    { id:"d01", name:"Рецептура (формула) з % кожного інгредієнту", source:"mfg", sl:"Завод / ProCare", urgent:true, procare:"yes",
+      status:"partial", cost:"",
+      desc:"Повна формула з точними % всіх інгредієнтів — основа для CPSR. Без неї токсиколог не почне роботу.\n\n📌 СТАТУС: ProCare надав Excel з 23 інгредієнтами (крем-спрей) і 32 (термозахист). Повна рецептура може бути захищена NDA — токсиколог отримає під підписом.\n📌 Філлер: рецептура не отримана — блокер нотифікації 3-го продукту.\n\n⚡ ДО 18.05: запросити повну рецептуру філлера у заводу." },
+    { id:"d02", name:"INCI-назви всіх інгредієнтів", source:"mfg", sl:"Завод / ProCare", procare:"yes",
+      status:"partial", cost:"",
+      desc:"Міжнародні найменування за стандартом INCI. Потрібні для маркування та CPSR.\n\n📌 СТАТУС:\n• Крем-спрей 20в1: 23 INCI від заводу (отримано в Excel). Етикетка: 28 інгредієнтів — 5 розходжень (NDA-захист або комерційна таємниця, уточнюємо)\n• Термозахист: 32 INCI (отримано, повний збіг з етикеткою) ✅\n• Філлер: ❌ INCI не отримано — нотифікувати неможливо\n\n⚡ ДО 18.05: запит на INCI філлера." },
+    { id:"d03", name:"CoA — сертифікати якості на кожну сировину", source:"mfg", sl:"Завод / ProCare", procare:"yes",
+      status:"pending", cost:"",
+      desc:"Certificate of Analysis від постачальника сировини на кожен інгредієнт. Підтверджують чистоту та безпеку. ProCare (COSMOS, ECOCERT сертифікація компонентів) зобов'язаний надати.\n\n📌 СТАТУС: Запит відправлено 11.05 (лист Павла заводу). Очікуємо відповідь. Частина може бути конфіденційною — токсиколог отримає під NDA." },
+    { id:"d04", name:"Технічні умови (ТУ) / специфікація на готовий продукт", source:"mfg", sl:"Завод / ProCare", procare:"yes",
+      status:"pending", cost:"",
+      desc:"Фізико-хімічні параметри, методи контролю якості, термін придатності. Є частиною PIF.\n\n📌 СТАТУС: Запит відправлено 11.05. Очікуємо відповідь від ProCare. ProCare надає як частину стандартного пакету контрактного виробництва." },
     { id:"d05", name:"Мікробіологічні випробування", source:"mfg", sl:"Завод або лабораторія", procare:"yes",
-      desc:"Підтвердження мікробіологічної безпеки. Якщо завод не робив — замовити в акредитованій лабораторії (biolab.com.ua). Без цього CPSR не підпишуть." },
+      status:"pending", cost:"",
+      desc:"Підтвердження мікробіологічної безпеки. Якщо завод не проводив — замовити в акредитованій лабораторії.\n\n📌 СТАТУС: Запит відправлено 11.05. Уточнити: чи є в ProCare протоколи мікробіології, чи потрібно замовляти окремо.\n\n⚠️ Якщо немає: biolab.com.ua — акредитована лабораторія для косметики. Без мікробіології токсиколог не підпише CPSR." },
     { id:"d06", name:"Тести на стабільність (stability testing)", source:"mfg", sl:"Завод або лабораторія", procare:"yes",
-      desc:"Стрес-тести: температурні перепади, UV, час. Підтверджують заявлений термін придатності." },
-    { id:"d07", name:"Опис виробничого процесу", source:"mfg", sl:"Завод", procare:"yes",
-      desc:"Коротке описання як виробляється продукт. Входить до PIF. Завод може надати в спрощеному вигляді для конфіденційності." },
-    { id:"d08", name:"Сертифікат GMP / ISO 22716 виробництва", source:"mfg", sl:"Завод", procare:"has",
-      desc:"ProCare вже має GMP (ISO 22716:2009, отримано у 2022 р.) — потрібно лише запросити копію сертифікату." },
+      status:"pending", cost:"",
+      desc:"Стрес-тести: температурні перепади, UV, час. Підтверджують заявлений термін придатності.\n\n📌 СТАТУС: Запит відправлено 11.05. Уточнити в ProCare наявність.\n\n⚠️ РИЗИК: стандартне тестування = 4–5 місяців. До 03.08 — не встигаємо. Варіант: прискорений тест (28 днів при 40°C) в акредитованій лабораторії. Задача Максима." },
+    { id:"d07", name:"Опис виробничого процесу", source:"mfg", sl:"Завод / ProCare", procare:"yes",
+      status:"pending", cost:"",
+      desc:"Коротке описання як виробляється продукт. Входить до PIF. ProCare може надати в спрощеному вигляді — конфіденційні деталі узагальнюються.\n\n📌 СТАТУС: Запит відправлено 11.05. Очікуємо відповідь." },
+    { id:"d08", name:"Сертифікат GMP / ISO 22716 виробництва", source:"mfg", sl:"ProCare (є!)", procare:"has",
+      status:"confirmed", cost:"",
+      desc:"✅ ПІДТВЕРДЖЕНО: ProCare має GMP ISO 22716:2009 (отримано у 2022 р.).\n\nПотрібно лише запросити копію сертифікату — це одна електронна пошта.\n\nGMP — ключовий аргумент для токсиколога при підписанні CPSR. Спрощує та здешевлює всю процедуру сертифікації." },
   ]},
   { section:"Замовити у сертифікаційної компанії", items:[
-    { id:"d09", name:"CPSR — Звіт безпеки продукту (токсиколог)", source:"cert", sl:"Токсиколог", urgent:true,
-      desc:"Cosmetic Product Safety Report. Складається кваліфікованим токсикологом. Від 200€ за продукт. Компанії: biolab.com.ua, vsg-consult.com.ua, inveran.com.ua, cratia.ua" },
-    { id:"d10", name:"PIF — Досьє продукту (Product Information File)", source:"cert", sl:"Сертиф. компанія", urgent:true,
-      desc:"Головний документ: CPSR, рецептура, випробування, опис виробництва, маркування. Складається разом з CPSR. Зберігається у Відповідальної особи." },
+    { id:"d09", name:"CPSR — Звіт безпеки продукту (токсиколог)", source:"cert", sl:"Beauty Partner (ProCare)", urgent:true,
+      status:"not-started", cost:"≈700–1000€ (3 продукти)",
+      desc:"Cosmetic Product Safety Report. Складається кваліфікованим токсикологом за методологією SCCS (ЄС). Без підписаного CPSR — нотифікація неможлива.\n\n💰 ВАРТІСТЬ (ТОВ «Бʼюті Партнер» — дочірня компанія ProCare):\n• Крем-спрей 20в1 (23–28 інгр): ~300€\n• Термозахист (32 інгр): ~400€\n• Ламелярна маска-філлер: не розраховано (немає INCI від заводу)\n\nАльтернативи: biolab.com.ua · vsg-consult.com.ua · inveran.com.ua · cratia.ua\n\n📌 СТАТУС: не розпочато. Блокер: потрібна повна рецептура від заводу." },
+    { id:"d10", name:"PIF — Досьє продукту (Product Information File)", source:"cert", sl:"Beauty Partner (ProCare)", urgent:true,
+      status:"not-started", cost:"300€ × 3 = 900€",
+      desc:"Головний документ сертифікації: включає CPSR, рецептуру, результати випробувань, опис виробництва, маркування. Зберігається у Відповідальної особи (ВО).\n\n💰 ВАРТІСТЬ (ТОВ «Бʼюті Партнер»): 300€ за продукт × 3 = 900€ разом.\nPIF складається у пакеті разом з CPSR — тому оплата Beauty Partner покриває обидва документи (d09 + d10 = єдиний пакет).\n\n📌 СТАТУС: не розпочато. Починається після отримання d01–d08 від заводу." },
   ]},
   { section:"Організаційні та маркування", items:[
-    { id:"d11", name:"Призначення Відповідальної особи (ВО)", source:"own", sl:"Оформити самим", urgent:true,
-      desc:"Обов'язкова вимога нового регламенту. ВО = виробник (резидент України) або уповноважений дистриб'ютор. Потрібне письмове уповноваження. Без ВО — нотифікація неможлива." },
-    { id:"d12", name:"Перевірка маркування етикеток (українська мова)", source:"own", sl:"Бренд + консультант",
-      desc:"Обов'язково: назва, дані ВО, термін придатності, умови зберігання, попередження, повний INCI-список, країна походження. Текст — українською мовою." },
+    { id:"d11", name:"Призначення Відповідальної особи (ВО)", source:"own", sl:"Beauty Partner (ProCare)", urgent:true,
+      status:"not-started", cost:"200€/рік (до 5 SKU)",
+      desc:"Обов'язкова вимога КМУ №65. ВО юридично відповідає за продукт на ринку, зберігає PIF, подає нотифікацію, взаємодіє з держорганами. Без ВО — нотифікація неможлива.\n\n💰 ВАРТІСТЬ (ТОВ «Бʼюті Партнер»): 200€/рік (до 5 SKU).\n\nВаріанти ВО:\n• ТОВ «Бʼюті Партнер» — готові виступити (рекомендовано, вже в контакті)\n• Dominanta або інша юр. особа виробника\n\n📌 СТАТУС: не розпочато. ⚠️ БЛОКЕР — без ВО не можна подавати нотифікацію." },
+    { id:"d12", name:"Перевірка маркування етикеток (українська мова)", source:"own", sl:"Бренд + Beauty Partner",
+      status:"partial", cost:"100€ за продукт",
+      desc:"Обов'язково: назва продукту, повні дані ВО, термін придатності, умови зберігання, попередження, повний INCI-список, країна походження — мовою ринку (українська).\n\n💰 ВАРТІСТЬ підготовки тексту маркування (Beauty Partner): 100€ за продукт × 3 = 300€.\n\n📌 СТАТУС ЧАСТКОВИЙ:\n• Крем-спрей: етикетка є ✅ (аналіз проведено 15.05)\n• Термозахист: етикетка є ✅ (аналіз проведено 15.05)\n• Філлер: ❌ без INCI — маркування неможливе\n\n⚠️ Примітка: актуальний INCI на маркуванні = INCI для нотифікації. Розбіжності заборонені." },
   ]},
   { section:"Державна нотифікація", items:[
-    { id:"d13", name:"Нотифікація в e-Cosmetics (МОЗ України)", source:"gov", sl:"Портал МОЗ", urgent:true,
-      desc:"Електронне повідомлення на порталі МОЗ. Подається ВО після готовності PIF та CPSR. Строк — 5 робочих днів. Портал e-Cosmetics ще тестується — слідкуй за оновленнями." },
+    { id:"d13", name:"Нотифікація в e-Cosmetics (МОЗ України)", source:"gov", sl:"Портал МОЗ / Beauty Partner", urgent:true,
+      status:"not-started", cost:"20€ за SKU",
+      desc:"Електронне повідомлення на порталі e-Cosmetics МОЗ України. Подається ВО після готовності PIF та CPSR. Строк обробки — 5 робочих днів. Дедлайн: 03.08.2026.\n\n💰 ВАРТІСТЬ (Beauty Partner): 20€ за SKU.\nМінімум: 3 продукти × 1 SKU = 60€.\nЯкщо реєструвати всі розміри (200 мл + 50 мл + 20 мл) = 9 SKU = 180€.\n\n📌 СТАТУС: не розпочато. Портал e-Cosmetics ще тестується (травень 2026). Слідкуй за оновленнями moz.gov.ua.\n\n📌 Реалістичний план: подача нотифікації можлива орієнтовно липень 2026 після підписання CPSR." },
   ]},
 ];
 
@@ -1246,8 +1264,11 @@ function renderColumn(prod) {
       const procareTag = item.procare === 'has'
         ? `<span class="tag tag-procare">&#10003; ProCare · GMP є</span>`
         : item.procare === 'yes'
-          ? `<span class="tag tag-procare">&#177; ProCare може надати</span>`
+          ? `<span class="tag tag-procare">&#177; ProCare надасть</span>`
           : '';
+      const STATUS_LABELS = { confirmed:'✅ Підтверджено', partial:'⚡ Частково', pending:'⏳ Очікуємо', 'not-started':'❌ Немає' };
+      const statusTag = item.status ? `<span class="tag tag-status-${item.status}">${STATUS_LABELS[item.status]||item.status}</span>` : '';
+      const costTag   = item.cost   ? `<span class="tag tag-cost">💰 ${item.cost}</span>` : '';
       const fChips = files.map((f,fi) => fileHtml(f, key, fi)).join('');
 
       h += `<div class="doc-item${isDone?' done':''}${isOpen?' open':''}" id="i_${key}">
@@ -1255,12 +1276,12 @@ function renderColumn(prod) {
           <div class="checkbox" onclick="event.stopPropagation();toggleDone('${key}')">${isDone?'&#10003;':''}</div>
           <div class="doc-item-body">
             <div class="doc-item-name">${item.name}</div>
-            <div class="doc-item-tags"><span class="tag ${SRC[item.source]}">${item.sl}</span>${urgTag}${procareTag}${fTag}</div>
+            <div class="doc-item-tags"><span class="tag ${SRC[item.source]}">${item.sl}</span>${urgTag}${statusTag}${procareTag}${costTag}${fTag}</div>
           </div>
           <div class="toggle-arrow">${isOpen?'&#9650;':'&#9660;'}</div>
         </div>
         <div class="doc-item-expand">
-          <div class="doc-item-desc">${item.desc}</div>
+          <div class="doc-item-desc" style="white-space:pre-line">${item.desc}</div>
           <div class="field-label">Коментар / статус</div>
           <textarea class="comment-input" data-key="${key}" placeholder="Статус, контакт, дата..."
             oninput="onComment('${key}',this.value)">${s.comment||''}</textarea>
