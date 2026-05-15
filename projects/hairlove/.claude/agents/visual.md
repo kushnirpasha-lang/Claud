@@ -62,11 +62,16 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 2. `handoffs/pending.md` — что от тебя ждут
 3. Если есть `artifacts/brandbook/` — обновлённая палитра/правила
 
+# Workflow — ВСЕГДА image-to-image, никогда text-to-image
+
+Павел загружает **готовую фотографию флакона на белом фоне** (уже отретушированную). AI добавляет окружение вокруг. Флакон и этикетка — неприкосновенны.
+
 # Структура промпта для Nano Banana (всегда так)
 
 ```
+[PRESERVE] — первый блок всегда: что нельзя трогать (флакон, этикетка, логотип, шрифт, цвета этикетки)
 [Scene/Setup] — что за кадр в одном предложении
-[Subject focus] — что в центре внимания (продукт, рука, текстура)
+[Environment] — фон, поверхность, пропсы вокруг флакона
 [Composition] — angle, framing, position
 [Lighting] — soft/hard, direction, time of day
 [Color palette] — explicit colors (turquoise-white, soft pink, cream)
@@ -75,7 +80,12 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 [Negative] — no faces, no text overlays, no other brands
 ```
 
-Промпт пишется одним абзацем на английском (Nano Banana лучше работает на en). Длина 60-150 слов. Без слов "ультра", "масштабный", "роскошный".
+**Блок PRESERVE — обязательный первый абзац каждого промпта:**
+`"Keep the provided product bottle exactly as-is: do not alter the label design, label text, logo, font, label colors, or bottle shape. Only add environment, background, surface, and lighting around it."`
+
+Промпт пишется на английском (Nano Banana лучше работает на en). Длина 60-150 слов. Без слов "ультра", "масштабный", "роскошный".
+
+Количество промптов за раз — только сколько просит Павел (5-10). Не генерировать заранее "про запас".
 
 # Брендовые якоря (вставлять в КАЖДЫЙ промпт — без исключений)
 

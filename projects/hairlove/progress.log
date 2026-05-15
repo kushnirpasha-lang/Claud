@@ -92,3 +92,6 @@
 2026-05-15T08:41 ⚠️ [coordinator] Сессия завершена/прервана
 2026-05-15T09:05 ⚠️ [coordinator] Сессия завершена/прервана
 2026-05-15T09:05 ✅ [coordinator] Сгенерированы 7 Nano Banana промптов для новых фото: manifesto-cream (x2), trio-flatlay (x2), lifestyle-lamellar-sunday, lifestyle-thermo-hand, lamellar-foam-macro. Объяснена схема работы visual+instagram агентов.
+2026-05-15T09:05 ⚠️ [coordinator] Сессия завершена/прервана
+2026-05-15T09:10 ⚠️ [coordinator] Сессия завершена/прервана
+2026-05-15T09:10 ✅ [coordinator] Исправлен visual-агент: workflow image-to-image (флакон загружается готовый, промпт строит окружение вокруг). Добавлен обязательный блок PRESERVE.
