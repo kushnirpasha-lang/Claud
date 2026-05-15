@@ -81,7 +81,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 ```
 
 **Блок PRESERVE — обязательный первый абзац каждого промпта:**
-`"Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, colors, brightness, or texture. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle."`
+`"Keep the provided product bottle exactly as-is. Do not alter the label in any way: no changes to label design, text, logo, font, or colors. The label is printed on Constellation Jade Raster paper — pearlescent finish with embossed raster texture — preserve this material appearance when adapting lighting to the new scene. Do not alter the bottle shape or glass. Only add environment, background, surface, props, and lighting around the bottle."`
 
 Промпт пишется на английском (Nano Banana лучше работает на en). Длина 60-150 слов. Без слов "ультра", "масштабный", "роскошный".
 
