@@ -10,7 +10,7 @@ jobs:
   send:
     runs-on: ubuntu-latest
     steps:
-      - name: Send test message via bot
+      - name: Send test message to Saved Messages via Telethon
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -19,16 +19,28 @@ jobs:
           script_stop: false
           script: |
             export $(grep -v '^#' /opt/assistant/.env | xargs) 2>/dev/null || true
-            CHAT_ID=$(cat /opt/assistant/chat_id.txt 2>/dev/null || echo "")
-            echo "chat_id from file: $CHAT_ID"
-            if [ -z "$CHAT_ID" ]; then
-              echo "❌ chat_id.txt пустой — Павел ещё не написал боту после деплоя"
-              exit 1
-            fi
             TODAY=$(date +%Y-%m-%d)
-            RESULT=$(curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-              -d "chat_id=${CHAT_ID}" \
-              -d "text=ТЕСТ%0A${TODAY}")
-            echo "Result: $RESULT"
-            echo "$RESULT" | grep -q '"ok":true' && echo "✅ Сообщение доставлено" || echo "❌ Ошибка"
-# trigger 2
+            cd /opt/assistant
+            venv/bin/python3 - <<'PYEOF'
+import asyncio, os, sys
+sys.path.insert(0, '/opt/assistant')
+from telethon import TelegramClient
+
+async def main():
+    c = TelegramClient('/opt/assistant/user_session',
+                       int(os.environ['TELEGRAM_API_ID']),
+                       os.environ['TELEGRAM_API_HASH'])
+    await c.connect()
+    if not await c.is_user_authorized():
+        print("❌ Telethon не авторизован")
+        await c.disconnect()
+        return
+    import datetime
+    today = datetime.date.today().isoformat()
+    await c.send_message('me', f'✅ ТЕСТ Telethon\n{today}\n\nСообщение в Избранное — бесплатно!')
+    await c.disconnect()
+    print("✅ Сообщение отправлено в Избранное")
+
+asyncio.run(main())
+PYEOF
+# trigger 3
