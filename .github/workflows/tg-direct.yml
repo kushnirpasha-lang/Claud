@@ -10,17 +10,16 @@ jobs:
   send:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Telegram message
+      - name: Diagnose bot
         run: |
           TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}"
-          UPDATES=$(curl -s "https://api.telegram.org/bot${TOKEN}/getUpdates?limit=20&offset=-20")
-          echo "$UPDATES" | head -c 500
-          CHAT_ID=$(echo "$UPDATES" | python3 -c "import sys,json; r=json.load(sys.stdin).get(\"result\",[]); print(r[-1][\"message\"][\"chat\"][\"id\"]) if r else print(\"\")" 2>/dev/null || echo "")
-          echo "CHAT_ID=$CHAT_ID"
-          if [ -n "$CHAT_ID" ]; then
-            curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
-              -H "Content-Type: application/json" \
-              -d "{\"chat_id\":$CHAT_ID,\"text\":\"TECT\\n2026-05-15\"}"
-          fi
-# trigger 2
+          echo "=== getMe ==="
+          curl -s "https://api.telegram.org/bot${TOKEN}/getMe"
+          echo ""
+          echo "=== getWebhookInfo ==="
+          curl -s "https://api.telegram.org/bot${TOKEN}/getWebhookInfo"
+          echo ""
+          echo "=== getUpdates ==="
+          curl -s "https://api.telegram.org/bot${TOKEN}/getUpdates?limit=5"
+# trigger 3
 
