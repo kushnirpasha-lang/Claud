@@ -89,3 +89,6 @@
 2026-05-15T08:33 ⚠️ [coordinator] Сессия завершена/прервана
 2026-05-15T08:40 ✅ [coordinator] SessionStart-хук теперь печатает реальное время (Киев+UTC) первой строкой — даты больше не путаются. Токен ghp_... удалён из allow-листа settings.local.json (в git его не было, gitignored). Рекомендован перевыпуск токена — засветился в чат-логах.
 2026-05-15T08:40 ⚠️ [coordinator] Сессия завершена/прервана
+2026-05-15T08:41 ⚠️ [coordinator] Сессия завершена/прервана
+2026-05-15T09:05 ⚠️ [coordinator] Сессия завершена/прервана
+2026-05-15T09:05 ✅ [coordinator] Сгенерированы 7 Nano Banana промптов для новых фото: manifesto-cream (x2), trio-flatlay (x2), lifestyle-lamellar-sunday, lifestyle-thermo-hand, lamellar-foam-macro. Объяснена схема работы visual+instagram агентов.
