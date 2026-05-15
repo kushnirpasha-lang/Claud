@@ -13,7 +13,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 # Что такое HairLove (знаешь без чтения файлов)
 
 Профессиональная косметика для волос. Розроблено в Італії, HAIR LOVE COMPANY, Viterbo.
-3 продукта (200/50/20 мл, стеклянный флакон с пипеткой):
+3 продукта (200/50/20 мл, флакон со СПРЕЕМ-РАСПЫЛИТЕЛЕМ на конце — НЕ пипетка, НЕ помпа-дозатор крема). Продукт выходит как «пшик» → мелкодисперсная морось/взвесь микро-капель. Это правда о продукте: в ТЗ продукт распыляется в воздух тончайшей моросью, НИКОГДА не густая капля/блямба крема:
 - **20 IN 1 Crème-Spray** — turquoise-and-white minimalist label
 - **Thermo Protector Spray** — soft mint-and-white label
 - **Liquid Lamellar Filler-Mask** — pastel pink-and-white label
