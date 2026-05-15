@@ -9,17 +9,21 @@ name: TG Direct Send
 jobs:
   send:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.MY_PAT }}
+      GH_REPO: ${{ github.repository }}
     steps:
-      - name: Diagnose bot
+      - name: Diagnose and report
         run: |
           TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}"
-          echo "=== getMe ==="
-          curl -s "https://api.telegram.org/bot${TOKEN}/getMe"
-          echo ""
-          echo "=== getWebhookInfo ==="
-          curl -s "https://api.telegram.org/bot${TOKEN}/getWebhookInfo"
-          echo ""
-          echo "=== getUpdates ==="
-          curl -s "https://api.telegram.org/bot${TOKEN}/getUpdates?limit=5"
-# trigger 3
+          ME=$(curl -s "https://api.telegram.org/bot${TOKEN}/getMe")
+          WEBHOOK=$(curl -s "https://api.telegram.org/bot${TOKEN}/getWebhookInfo")
+          UPDATES=$(curl -s "https://api.telegram.org/bot${TOKEN}/getUpdates?limit=5")
+          BODY="## TG Bot Diagnostic\n**getMe:** \`$ME\`\n**webhook:** \`$WEBHOOK\`\n**updates:** \`$UPDATES\`"
+          curl -s -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/$GH_REPO/issues/1/comments" \
+            -d "{\"body\": \"$BODY\"}"
+# trigger 4
 
