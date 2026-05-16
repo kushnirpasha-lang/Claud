@@ -42,6 +42,9 @@ PHOTOS_REL = "projects/hairlove/artifacts/instagram/photos"
 STATE_FILE = os.path.join(ASSISTANT_DIR, "ig_state.json")
 LOCK_FILE = os.path.join(ASSISTANT_DIR, "ig_post.lock")
 LOG_FILE = os.path.join(ASSISTANT_DIR, "ig_post.log")
+# Разовый флаг: если есть — следующий запуск постит, минуя проверку
+# «уже постили сегодня», и удаляет флаг (срабатывает один раз).
+FORCE_FLAG = os.path.join(ASSISTANT_DIR, "ig_force_once.flag")
 
 KYIV_TZ = timezone(timedelta(hours=3))         # Europe/Kiev (EEST, лето)
 
@@ -87,6 +90,10 @@ def run(cmd, cwd=None, check=True):
 
 def kyiv_today() -> str:
     return datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
+
+
+def kyiv_now() -> str:
+    return datetime.now(KYIV_TZ).strftime("%Y-%m-%d %H:%M")
 
 
 def load_state() -> dict:
@@ -281,8 +288,17 @@ def main() -> int:
         log(f"Очередь пройдена ({target}/{len(queue)}) — постить нечего")
         return 0
 
+    # Разовый force-флаг: обходит проверку «уже постили сегодня» один раз
+    force = os.path.exists(FORCE_FLAG)
+    if force:
+        log("FORCE-флаг найден — обхожу проверку 'уже постили сегодня' (разово)")
+        try:
+            os.remove(FORCE_FLAG)
+        except OSError:
+            pass
+
     # Идемпотентность по реальному состоянию аккаунта (A)
-    if already_posted_today():
+    if not force and already_posted_today():
         log("Сегодня уже постили (или сверка недоступна) — пропуск. "
             "Синхронизирую индекс если отстал.")
         if state_index > git_index:
@@ -306,8 +322,13 @@ def main() -> int:
         log(f"❌ Публикация не удалась: {e}")
         state.pop("attempting_index", None)
         write_state_atomic(state)
-        telegram_notify(f"❌ HAiR LOVE автопост НЕ опубліковано\n"
-                         f"Фото: {photo}\nПомилка: {e}")
+        telegram_notify(
+            f"❌ HAiR LOVE — пост НЕ опубліковано\n\n"
+            f"Фото: {photo}\n"
+            f"Пост: #{target + 1} з {len(queue)}\n"
+            f"Помилка: {e}\n\n"
+            f"🕗 {kyiv_now()} (Київ)"
+        )
         return 1
 
     # УСПЕХ — атомарно фиксируем состояние ПЕРЕД git push (ядро решения A)
@@ -324,9 +345,11 @@ def main() -> int:
     push_index(new_index, photo)
 
     telegram_notify(
-        f"✅ HAiR LOVE — пост опубліковано!\n"
-        f"Фото: {photo}\nПост #{new_index} з {len(queue)}\n"
-        f"Instagram: @hair_love_company"
+        f"✅ HAiR LOVE — пост опубліковано в Instagram\n\n"
+        f"Фото: {photo}\n"
+        f"Пост: #{new_index} з {len(queue)}\n"
+        f"Акаунт: @hair_love_company\n\n"
+        f"🕗 {kyiv_now()} (Київ)"
     )
     log("=== HAiR LOVE daily post DONE ===")
     return 0

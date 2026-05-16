@@ -44,23 +44,23 @@ systemctl list-timers hairlove-ig-post.timer --no-pager || true
 
 echo "=== Таймер установлен. Следующий запуск: 20:00 Europe/Kiev ==="
 
+# 4. Разовый force-флаг: следующий запуск таймера (сегодня 20:00 Kyiv)
+#    опубликует пост, минуя проверку «уже постили сегодня».
+#    Нужно потому, что верификационный пост #6 уже вышел сегодня в 16:05
+#    и обычная защита от дублей заблокировала бы запуск в 20:00.
+#    Флаг одноразовый — скрипт удаляет его при срабатывании.
+#    FORCE_NEXT_RUN=0 в env отключает (по умолчанию ставим).
+if [ "${FORCE_NEXT_RUN:-1}" = "1" ]; then
+  touch "$ASSISTANT_DIR/ig_force_once.flag"
+  echo "FORCE-флаг поставлен — таймер в 20:00 опубликует следующий пост"
+fi
+
 # 4a. Тест-пинг в Telegram — подтвердить что уведомления живые.
 set -a; . "$ENV_FILE"; set +a
 CHAT="${TELEGRAM_CHAT_ID:-@Pavel_Kus}"
 curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
   --data-urlencode "chat_id=$CHAT" \
-  --data-urlencode "text=✅ HAiR LOVE — деплой ок. Таймер 20:00 Kyiv активен. Telegram-уведомления работают. Наступний пост сьогодні вже є (#6), завтра в 20:00." \
+  --data-urlencode "text=✅ HAiR LOVE — деплой ок. Таймер 20:00 Kyiv активен. Telegram працює. Сьогодні о 20:00 вийде наступний пост — прийде підтвердження з назвою файлу, номером і часом." \
   > /dev/null || true
 
-# 4. Немедленный проверочный пост (Павел просил сразу убедиться).
-#    Безопасно: ig_daily_post.py сам сверяется с IG API и не сделает
-#    второй пост за киевские сутки, даже если потом сработает таймер.
-if [ "${RUN_NOW:-1}" = "1" ]; then
-  echo "=== Немедленный проверочный пост ==="
-  set -a; . "$ENV_FILE"; set +a
-  "$ASSISTANT_DIR/venv/bin/python" "$ASSISTANT_DIR/ig_daily_post.py" || {
-    echo "Немедленный пост завершился с ошибкой — см. лог $ASSISTANT_DIR/ig_post.log"
-    exit 1
-  }
-fi
-echo "=== Готово ==="
+echo "=== Готово. Пост выйдет сегодня в 20:00 Europe/Kiev через таймер ==="

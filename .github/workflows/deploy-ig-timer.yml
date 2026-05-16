@@ -15,8 +15,8 @@ on:
       - '.github/workflows/deploy-ig-timer.yml'
   workflow_dispatch:
     inputs:
-      run_now:
-        description: 'Сделать проверочный пост сразу (1=да, 0=нет)'
+      force_next_run:
+        description: 'Force-флаг: таймер постит в ближайший запуск минуя дедуп (1=да, 0=нет)'
         default: '1'
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
           target: /opt/assistant
           strip_components: 1
 
-      - name: Install timer and run verification post
+      - name: Install timer and arm tonight's post
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -57,7 +57,7 @@ jobs:
 
             chmod +x /opt/assistant/install_ig_timer.sh
             export GH_TOKEN="${{ secrets.MY_PAT }}"
-            RUN_NOW="${{ github.event.inputs.run_now || '1' }}" \
+            FORCE_NEXT_RUN="${{ github.event.inputs.force_next_run || '1' }}" \
               bash /opt/assistant/install_ig_timer.sh
 
             echo "--- ig_post.log (tail) ---"
