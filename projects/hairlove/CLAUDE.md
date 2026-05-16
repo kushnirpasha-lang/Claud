@@ -20,6 +20,7 @@
 | instagram | контент и соцсети | artifacts/instagram/ |
 | copy | тексты и копирайтинг | artifacts/copy/ |
 | text-editor | финальная вычитка | — |
+| humanizer | антиИИ-проход перед публикацией (Instagram, сайт, КП) | — |
 | brandbook | визуальная и вербальная идентичность | artifacts/brandbook/ |
 
 ## База знаний

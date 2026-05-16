@@ -72,6 +72,8 @@
                                │
                           [text-editor]
                                │
+                          [humanizer]  ← публичные тексты
+                               │
            ┌───────────────────┼───────────────────┐
            ▼                   ▼                   ▼
         [site]            [instagram]           [growth]
@@ -91,7 +93,8 @@
 | **strategy** | planning, competitors | site, instagram, ads, growth, brandbook |
 | **brandbook** | strategy | site, instagram, copy, ads |
 | **copy** | strategy, brandbook | text-editor → site, instagram, ads |
-| **text-editor** | copy | site, instagram, ads |
+| **text-editor** | copy | humanizer (публичные тексты) |
+| **humanizer** | text-editor | site, instagram, ads |
 | **site** | strategy, brandbook, copy | ads, growth |
 | **instagram** | strategy, brandbook, copy | growth |
 | **ads** | site, competitors, strategy | growth |
@@ -107,7 +110,8 @@
 2. `strategy` → выбор сегмента и направления
 3. `ads` → разработка кампании и текстов
 4. `text-editor` → вычитка креативов
-5. ✅ готово к публикации
+5. `humanizer` → антиИИ-проход перед публикацией
+6. ✅ готово к публикации
 
 ---
 
@@ -119,7 +123,8 @@
 2. `instagram` → идея и контент-план
 3. `copy` → финальные тексты
 4. `text-editor` → вычитка
-5. ✅ готово
+5. `humanizer` → антиИИ-проход перед публикацией
+6. ✅ готово
 
 *(опционально на шаге 1 — competitors для отстройки)*
 
@@ -133,7 +138,8 @@
 2. `site` → структура и черновики
 3. `copy` → финальные тексты
 4. `text-editor` → вычитка
-5. ✅ готово
+5. `humanizer` → антиИИ-проход перед публикацией
+6. ✅ готово
 
 ---
 
@@ -144,9 +150,9 @@
 1. `competitors` → анализ активности за прошлый месяц
 2. `strategy` → направление месяца
 3. Параллельно:
-   - `ads` → кампании (+ text-editor)
-   - `instagram` → `copy` → `text-editor`
-   - `site` → `copy` → `text-editor`
+   - `ads` → кампании → `text-editor` → `humanizer`
+   - `instagram` → `copy` → `text-editor` → `humanizer`
+   - `site` → `copy` → `text-editor` → `humanizer`
 4. `coordinator` → сводка в `artifacts/_summary/`
 5. ✅ готово
 
@@ -164,6 +170,7 @@
    - точка входа → site
    - коммуникация → copy
 4. `text-editor` (если итогом был текст)
+5. `humanizer` (если текст идёт в публикацию)
 
 ---
 
