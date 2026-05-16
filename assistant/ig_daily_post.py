@@ -109,18 +109,13 @@ def write_state_atomic(state: dict) -> None:
 
 def telegram_notify(text: str) -> None:
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
+    # TELEGRAM_CHAT_ID в .env — надёжнее всего.
+    # Если не задан — используем @Pavel_Kus (работает, если он писал боту).
+    # getUpdates НЕ используем: бот делает long polling и потребляет все updates.
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "") or "@Pavel_Kus"
     if not token:
         return
     try:
-        if not chat_id:
-            r = requests.get(
-                f"https://api.telegram.org/bot{token}/getUpdates",
-                params={"limit": 1}, timeout=10,
-            )
-            res = r.json().get("result", [])
-            if res:
-                chat_id = str(res[-1]["message"]["chat"]["id"])
         if chat_id:
             requests.get(
                 f"https://api.telegram.org/bot{token}/sendMessage",
