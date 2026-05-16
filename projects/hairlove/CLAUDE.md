@@ -8,7 +8,7 @@
 Команды: `/full-cycle`, `/handoff`, `/status`
 
 ## Агенты
-Канон-ростер: 14. Состав и модели — единый источник `routes.md` (обязан совпадать).
+Канон-ростер: 15. Состав и модели — единый источник `routes.md` (обязан совпадать).
 
 | Агент | Роль | Модель | Артефакты |
 |-------|------|--------|-----------|
@@ -23,6 +23,7 @@
 | growth | рост и органика | `claude-opus-4-7` | — |
 | ads | реклама и кампании (НЕ активен) | `claude-opus-4-7` | artifacts/ads/ |
 | documents | юрист-регуляторщик: сертификация, договоры, КП | `claude-opus-4-7` | artifacts/documents/ |
+| analytics | анализ продаж, карта дистрибьюторов, B2B-паттерны | `claude-opus-4-7` | artifacts/analytics/ |
 | text-editor | финальная вычитка | `claude-sonnet-4-6` | — |
 | site | сайт, вёрстка, деплой | `claude-sonnet-4-6` | artifacts/site/ |
 | humanizer | антиИИ-проход перед публикацией (Instagram, сайт, КП) | `claude-sonnet-4-6` | — |

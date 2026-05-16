@@ -118,7 +118,7 @@ Instagram `@hair_love_company`: подписчики/охват/вовлечён
 
 ## АГЕНТЫ КОМАНДЫ
 
-**Канон-ростер: 14 субагентов** в `projects/hairlove/.claude/agents/`. Единственный источник истины по составу и маршрутам — `projects/hairlove/routes.md` (этот список обязан совпадать с ним).
+**Канон-ростер: 15 субагентов** в `projects/hairlove/.claude/agents/`. Единственный источник истины по составу и маршрутам — `projects/hairlove/routes.md` (этот список обязан совпадать с ним).
 
 | Агент | Роль | Модель |
 |---|---|---|
@@ -133,6 +133,7 @@ Instagram `@hair_love_company`: подписчики/охват/вовлечён
 | `growth` | модель роста, outreach | `claude-opus-4-7` |
 | `ads` | таргетинг, кампании (НЕ активен) | `claude-opus-4-7` |
 | `documents` | юрист-регуляторщик: сертификация, договоры, КП | `claude-opus-4-7` |
+| `analytics` | анализ продаж, карта дистрибьюторов, B2B-паттерны | `claude-opus-4-7` |
 | `text-editor` | финальная вычитка | `claude-sonnet-4-6` |
 | `site` | вёрстка, деплой, технич. фиксы | `claude-sonnet-4-6` |
 | `humanizer` | антиИИ-проход перед публикацией | `claude-sonnet-4-6` |
@@ -157,8 +158,11 @@ projects/hairlove/artifacts/copy/
 projects/hairlove/artifacts/ads/
 projects/hairlove/artifacts/site/
 projects/hairlove/artifacts/planning/
+projects/hairlove/artifacts/analytics/
 projects/hairlove/artifacts/_summary/
 ```
+
+⚠️ `artifacts/analytics/` — только обезличенные агрегаты. Сырые данные с PII (имена, история покупок) → VPS `/opt/hairlove-data/sales/` или только в разговоре, никогда не в git.
 
 ---
 

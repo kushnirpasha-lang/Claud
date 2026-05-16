@@ -5,7 +5,7 @@
 
 ---
 
-## КАНОН-РОСТЕР АГЕНТОВ (14) + МОДЕЛИ
+## КАНОН-РОСТЕР АГЕНТОВ (15) + МОДЕЛИ
 
 Зафиксировано Павлом 2026-05-16. Модель прописана в frontmatter каждого `.claude/agents/<имя>.md`.
 
@@ -22,6 +22,7 @@
 | **growth** | модель роста, outreach-механика | `claude-opus-4-7` |
 | **ads** | таргетинг, кампании (НЕ активен) | `claude-opus-4-7` |
 | **documents** | юрист-регуляторщик: сертификация МОЗ/MOH, договоры, КП | `claude-opus-4-7` |
+| **analytics** | анализ продаж, карта дистрибьюторов, B2B-паттерны | `claude-opus-4-7` |
 | **text-editor** | финальная вычитка готового | `claude-sonnet-4-6` |
 | **site** | вёрстка, деплой, технич. фиксы | `claude-sonnet-4-6` |
 | **humanizer** | антиИИ-проход перед публикацией | `claude-sonnet-4-6` |
@@ -63,8 +64,23 @@
 | **site** | strategy, brandbook, copy | ads, growth |
 | **instagram** | strategy, brandbook, copy, visual | growth |
 | **ads** | site, competitors, strategy | growth |
-| **growth** | site, instagram, ads | coordinator |
+| **growth** | site, instagram, ads, analytics | coordinator |
 | **documents** | strategy, copy (тексты КП/договоров) | coordinator (юр-артефакты, статусы сертификации) |
+| **analytics** | coordinator (данные от Павла) | growth, copy, strategy |
+
+---
+
+## МАРШРУТ: Анализ продаж / B2B-данные
+
+**Когда использовать:** Павел даёт данные продаж (Одесса: клиенты/история; дистрибьюторы по Украине), нужен анализ, паттерны, карта городов.
+**Важно:** сырые данные с именами — только в разговоре или VPS `/opt/hairlove-data/sales/`. В git только обезличенные отчёты.
+**Цепочка:**
+1. `analytics` → принимает данные, анализирует, пишет агрегированный отчёт в `artifacts/analytics/`
+2. Далее по инсайту:
+   - рекомендации по городам → `growth`
+   - скрипты для нового сегмента → `copy`
+   - стратегическое решение → `strategy`
+3. ✅ отчёт в `artifacts/analytics/`
 
 ---
 
