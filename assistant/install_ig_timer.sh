@@ -44,6 +44,14 @@ systemctl list-timers hairlove-ig-post.timer --no-pager || true
 
 echo "=== Таймер установлен. Следующий запуск: 20:00 Europe/Kiev ==="
 
+# 4a. Тест-пинг в Telegram — подтвердить что уведомления живые.
+set -a; . "$ENV_FILE"; set +a
+CHAT="${TELEGRAM_CHAT_ID:-@Pavel_Kus}"
+curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+  --data-urlencode "chat_id=$CHAT" \
+  --data-urlencode "text=✅ HAiR LOVE — деплой ок. Таймер 20:00 Kyiv активен. Telegram-уведомления работают. Наступний пост сьогодні вже є (#6), завтра в 20:00." \
+  > /dev/null || true
+
 # 4. Немедленный проверочный пост (Павел просил сразу убедиться).
 #    Безопасно: ig_daily_post.py сам сверяется с IG API и не сделает
 #    второй пост за киевские сутки, даже если потом сработает таймер.
