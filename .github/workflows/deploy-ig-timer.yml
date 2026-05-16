@@ -1,0 +1,64 @@
+name: Deploy HAiR LOVE IG timer to VPS
+
+# VPS-native атомарный постинг (решения аудита 2026-05-16: A+B+C+D).
+# Заменяет ненадёжный GitHub cron ig-daily-post.yml.
+# SSH-секреты — единая пара SSH_HOST + SSH_PRIVATE_KEY (решение C).
+
+on:
+  push:
+    branches: [claude/hairlove]
+    paths:
+      - 'assistant/ig_daily_post.py'
+      - 'assistant/hairlove-ig-post.service'
+      - 'assistant/hairlove-ig-post.timer'
+      - 'assistant/install_ig_timer.sh'
+      - '.github/workflows/deploy-ig-timer.yml'
+  workflow_dispatch:
+    inputs:
+      run_now:
+        description: 'Сделать проверочный пост сразу (1=да, 0=нет)'
+        default: '1'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "assistant/ig_daily_post.py,assistant/hairlove-ig-post.service,assistant/hairlove-ig-post.timer,assistant/install_ig_timer.sh"
+          target: /opt/assistant
+          strip_components: 1
+
+      - name: Install timer and run verification post
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 10m
+          script: |
+            set -e
+            ENV=/opt/assistant/.env
+
+            # Прописываем нужные ключи в .env (идемпотентно)
+            sed -i '/^INSTAGRAM_ACCESS_TOKEN=/d' "$ENV"
+            echo "INSTAGRAM_ACCESS_TOKEN=${{ secrets.INSTAGRAM_ACCESS_TOKEN }}" >> "$ENV"
+            sed -i '/^INSTAGRAM_USER_ID=/d' "$ENV"
+            echo "INSTAGRAM_USER_ID=${{ secrets.INSTAGRAM_USER_ID }}" >> "$ENV"
+            sed -i '/^GH_TOKEN=/d' "$ENV"
+            echo "GH_TOKEN=${{ secrets.MY_PAT }}" >> "$ENV"
+            grep -q "^TELEGRAM_BOT_TOKEN=" "$ENV" || echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> "$ENV"
+
+            chmod +x /opt/assistant/install_ig_timer.sh
+            export GH_TOKEN="${{ secrets.MY_PAT }}"
+            RUN_NOW="${{ github.event.inputs.run_now || '1' }}" \
+              bash /opt/assistant/install_ig_timer.sh
+
+            echo "--- ig_post.log (tail) ---"
+            tail -n 30 /opt/assistant/ig_post.log || true

@@ -1,0 +1,12 @@
+[Unit]
+Description=HAiR LOVE — таймер ежедневного поста (20:00 Europe/Kiev)
+
+[Timer]
+# Детерминированно в 20:00 по Киеву каждый день.
+# Persistent=true — если VPS был выключен в 20:00, запустит при старте.
+OnCalendar=*-*-* 20:00:00 Europe/Kiev
+Persistent=true
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

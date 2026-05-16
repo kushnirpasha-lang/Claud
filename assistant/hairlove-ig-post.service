@@ -1,0 +1,13 @@
+[Unit]
+Description=HAiR LOVE — ежедневный пост в Instagram (атомарный, VPS-native)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/assistant
+EnvironmentFile=/opt/assistant/.env
+ExecStart=/opt/assistant/venv/bin/python /opt/assistant/ig_daily_post.py
+StandardOutput=journal
+StandardError=journal
