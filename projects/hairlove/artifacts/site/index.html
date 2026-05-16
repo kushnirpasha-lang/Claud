@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HairLove — Професійна косметика для волосся. Розроблено в Італії.</title>
   <meta name="description" content="HairLove — професійна косметика для волосся, натхнена Італією. B2B програма для дистриб'юторів та салонів." />
+
+  <!-- OG / Social -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://kushnirpasha-lang.github.io/Claud/" />
+  <meta property="og:title"       content="HairLove — Професійна косметика для волосся" />
+  <meta property="og:description" content="Крем-спрей 20в1 та термозахист — B2B програма для дистриб'юторів, салонів та майстрів по всій Україні." />
+  <meta property="og:image"       content="https://kushnirpasha-lang.github.io/Claud/og-cover.jpg" />
+  <meta property="og:locale"      content="uk_UA" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <meta name="twitter:title"      content="HairLove — Професійна косметика для волосся" />
+  <meta name="twitter:description" content="Крем-спрей 20в1 та термозахист — B2B програма для дистриб'юторів, салонів та майстрів." />
+  <meta name="twitter:image"      content="https://kushnirpasha-lang.github.io/Claud/og-cover.jpg" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -832,10 +845,10 @@
   <div class="container">
     <div class="section-label" data-ua="Продукти" data-ru="Продукты" data-en="Products">Продукти</div>
     <h2 class="section-title"
-        data-ua="Три флагмани. Один стандарт — Розроблено в Італії."
-        data-ru="Три флагмана. Один стандарт — Розроблено в Італії."
-        data-en="Three flagships. One standard — Розроблено в Італії.">
-      Три флагмани. Один стандарт — Розроблено в Італії.
+        data-ua="Два флагмани. Один стандарт — Розроблено в Італії."
+        data-ru="Два флагмана. Один стандарт — Разработано в Италии."
+        data-en="Two flagships. One standard — Designed in Italy.">
+      Два флагмани. Один стандарт — Розроблено в Італії.
     </h2>
     <p class="section-sub"
        data-ua="Кожен продукт розроблений в Італії з кератином, оліями та протеїнами для реального результату."
@@ -895,8 +908,10 @@
         </div>
       </div>
 
-      <!-- Product 3 -->
-      <div class="product-card product-card--white">
+      <!-- Product 3 — coming soon -->
+      <div class="product-card product-card--white" style="opacity:.7; position:relative; overflow:hidden;">
+        <div style="position:absolute;top:16px;right:16px;background:#3ABFBF;color:#fff;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px;"
+             data-ua="Скоро" data-ru="Скоро" data-en="Coming soon">Скоро</div>
         <div class="product-card__num">03</div>
         <div class="product-card__ph">pH 5.0–6.0</div>
         <h3 class="product-card__name">LIQUID LAMELLAR<br>FILLER-MASK</h3>
@@ -1135,11 +1150,10 @@
             <td><span class="price">260 ₴</span></td>
             <td><span class="price">520 ₴</span></td>
           </tr>
-          <tr>
-            <td data-ua="Ламелярна маска 200 мл" data-ru="Ламелярная маска 200 мл" data-en="Lamellar Filler-Mask 200 ml">Ламелярна маска 200 мл</td>
-            <td><span class="price price--main">220.5 ₴</span></td>
-            <td><span class="price">315 ₴</span></td>
-            <td><span class="price">630 ₴</span></td>
+          <tr style="opacity:.5;">
+            <td data-ua="Ламелярна маска 200 мл — скоро" data-ru="Ламелярная маска 200 мл — скоро" data-en="Lamellar Filler-Mask 200 ml — coming soon">Ламелярна маска 200 мл — <em>скоро</em></td>
+            <td colspan="3" style="text-align:center;font-size:13px;color:var(--gray);"
+                data-ua="Проходить випробування" data-ru="Проходит испытания" data-en="In testing">Проходить випробування</td>
           </tr>
         </tbody>
       </table>
@@ -1192,7 +1206,9 @@
       </div>
 
       <div>
-        <form class="contact-form" id="contact-form" onsubmit="handleSubmit(event)">
+        <form class="contact-form" id="contact-form"
+              action="https://formspree.io/f/meenvegv" method="POST"
+              onsubmit="handleSubmit(event)">
           <div class="form-group">
             <label class="form-label" for="fname"
                    data-ua="Ім'я" data-ru="Имя" data-en="Name">Ім'я</label>
@@ -1268,7 +1284,7 @@
         <ul>
           <li><a href="#products">20 IN 1 Cream-Spray</a></li>
           <li><a href="#products">Thermo Protector Spray</a></li>
-          <li><a href="#products">Liquid Lamellar Filler-Mask</a></li>
+          <li><a href="#products" style="opacity:.5;" data-ua="Ламелярна маска (скоро)" data-ru="Ламелярная маска (скоро)" data-en="Lamellar Mask (coming soon)">Liquid Lamellar Filler-Mask (скоро)</a></li>
         </ul>
       </div>
 
@@ -1284,7 +1300,7 @@
     </div>
 
     <div class="footer__bottom">
-      <p class="footer__copy">© 2024 HairLove. Розроблено в Італії.</p>
+      <p class="footer__copy">© 2026 HairLove. Розроблено в Італії.</p>
       <div class="footer__social">
         <a href="https://instagram.com/hair_love_company" target="_blank" rel="noopener">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
