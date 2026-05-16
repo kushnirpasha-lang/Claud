@@ -1,8 +1,8 @@
 name: Deploy agents dashboard to VPS
 
-# Деплоит ТОЛЬКО статический дашборд агентов (assistant/static/agents.html).
-# Безопасно: статический файл, web.py отдаёт его на каждом запросе,
-# рестарт сервиса не нужен, на работающего бота не влияет.
+# Деплоит дашборд: agents.html (статика) + web.py (Flask-маршруты).
+# /agents и /dashboard оба ведут на один дашборд.
+# После копирования web.py перезапускает сервис assistant.
 # SSH-секреты — единая пара SSH_HOST + SSH_PRIVATE_KEY.
 
 on:
@@ -10,6 +10,7 @@ on:
     branches: [claude/hairlove]
     paths:
       - 'assistant/static/agents.html'
+      - 'assistant/web.py'
       - '.github/workflows/deploy-dashboard.yml'
   workflow_dispatch:
 
@@ -19,22 +20,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Copy dashboard to VPS
+      - name: Copy files to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "assistant/static/agents.html"
+          source: "assistant/static/agents.html,assistant/web.py"
           target: /opt/assistant
           strip_components: 1
 
-      - name: Verify
+      - name: Restart service and verify
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            ls -la /opt/assistant/static/agents.html
-            grep -c "ntip" /opt/assistant/static/agents.html && echo "OK: новый дашборд с тултипами развёрнут"
+            systemctl restart assistant
+            sleep 2
+            systemctl status assistant --no-pager | head -6
+            grep -c "ntip" /opt/assistant/static/agents.html && echo "OK: дашборд с тултипами на /agents и /dashboard"

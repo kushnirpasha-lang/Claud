@@ -83,6 +83,7 @@ def new_chat():
 # ── Агентный дашборд: эндпоинты ──────────────────────────────────────────────
 
 @app.route("/agents")
+@app.route("/dashboard")
 def agents_dashboard():
     return send_from_directory("static", "agents.html")
 
