@@ -6,7 +6,7 @@ set -euo pipefail
 
 ASSISTANT_DIR=/opt/assistant
 CONTENT_DIR=/opt/hairlove-content
-CONTENT_BRANCH=claude/obshak
+CONTENT_BRANCH=claude/hairlove   # КАНОН: контент консолидирован сюда (obshak выведен 2026-05-16)
 REPO=kushnirpasha-lang/Claud
 ENV_FILE="$ASSISTANT_DIR/.env"
 
@@ -22,13 +22,24 @@ if [ -n "$TOKEN" ]; then
 else
   AUTH_URL="https://github.com/${REPO}.git"
 fi
+# Миграция веток (2026-05-16): если старый клон НЕ на канон-ветке —
+# сносим и клонируем заново. Дёшево: тут только очередь/индекс,
+# фото отдаются через raw-URL, не из локального клона.
+if [ -d "$CONTENT_DIR/.git" ]; then
+  CUR=$(git -C "$CONTENT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+  if [ "$CUR" != "$CONTENT_BRANCH" ]; then
+    echo "Старый клон на '$CUR' ≠ '$CONTENT_BRANCH' — пере-клонирую"
+    rm -rf "$CONTENT_DIR"
+  fi
+fi
 if [ ! -d "$CONTENT_DIR/.git" ]; then
   echo "Клонирую $CONTENT_BRANCH → $CONTENT_DIR"
   git clone --branch "$CONTENT_BRANCH" --single-branch "$AUTH_URL" "$CONTENT_DIR"
 else
   git -C "$CONTENT_DIR" remote set-url origin "$AUTH_URL"
   git -C "$CONTENT_DIR" fetch origin "$CONTENT_BRANCH"
-  git -C "$CONTENT_DIR" reset --hard "origin/$CONTENT_BRANCH"
+  git -C "$CONTENT_DIR" checkout -B "$CONTENT_BRANCH" FETCH_HEAD
+  git -C "$CONTENT_DIR" reset --hard FETCH_HEAD
 fi
 git -C "$CONTENT_DIR" config user.email "bot@hairlove.studio"
 git -C "$CONTENT_DIR" config user.name "HAiR LOVE Bot"

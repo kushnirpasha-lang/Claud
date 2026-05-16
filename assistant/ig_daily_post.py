@@ -31,8 +31,8 @@ import requests
 # --- Конфигурация --------------------------------------------------------
 
 ASSISTANT_DIR = "/opt/assistant"
-CONTENT_DIR = "/opt/hairlove-content"          # отдельный клон репо на ветке obshak
-CONTENT_BRANCH = "claude/obshak"
+CONTENT_DIR = "/opt/hairlove-content"          # клон канон-ветки HairLove
+CONTENT_BRANCH = "claude/hairlove"             # КАНОН: код+контент+очередь+индекс в одной ветке (консолидация 2026-05-16, obshak выведен из пайплайна)
 REPO = "kushnirpasha-lang/Claud"
 
 QUEUE_REL = "projects/hairlove/artifacts/instagram/posting-queue.json"
@@ -145,13 +145,16 @@ def sync_content_repo() -> None:
              auth, CONTENT_DIR])
     run(["git", "remote", "set-url", "origin", auth], cwd=CONTENT_DIR)
     run(["git", "fetch", "origin", CONTENT_BRANCH], cwd=CONTENT_DIR)
-    run(["git", "reset", "--hard", f"origin/{CONTENT_BRANCH}"], cwd=CONTENT_DIR)
+    # checkout -B + reset FETCH_HEAD: устойчиво независимо от имени локальной
+    # ветки и single-branch-конфига старого клона (важно при миграции веток).
+    run(["git", "checkout", "-B", CONTENT_BRANCH, "FETCH_HEAD"], cwd=CONTENT_DIR)
+    run(["git", "reset", "--hard", "FETCH_HEAD"], cwd=CONTENT_DIR)
     run(["git", "config", "user.email", "bot@hairlove.studio"], cwd=CONTENT_DIR)
     run(["git", "config", "user.name", "HAiR LOVE Bot"], cwd=CONTENT_DIR)
 
 
 def push_index(new_index: int, photo: str) -> bool:
-    """Двигает posting-index.txt в obshak. Не критично: state уже записан."""
+    """Двигает posting-index.txt в канон-ветку. Не критично: state уже записан."""
     idx_path = os.path.join(CONTENT_DIR, INDEX_REL)
     try:
         with open(idx_path, "w", encoding="utf-8") as f:
