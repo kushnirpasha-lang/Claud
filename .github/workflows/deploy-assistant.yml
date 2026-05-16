@@ -15,9 +15,9 @@ jobs:
       - name: Copy files and restart via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 188.166.67.237
+          host: ${{ secrets.SSH_HOST }}
           username: root
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /opt/assistant
             git fetch origin main
