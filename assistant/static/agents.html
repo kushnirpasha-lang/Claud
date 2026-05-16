@@ -176,6 +176,24 @@ header {
 .c-desc { font-size:10.5px; color:var(--muted); line-height:1.4; margin-bottom:6px; min-height:28px; }
 .c-ts   { font-size:9px; color:var(--dim); margin-bottom:6px; }
 
+/* Hover tooltip — роль агента */
+.ntip {
+  position:absolute; left:50%; bottom:calc(100% + 10px);
+  transform:translateX(-50%) translateY(-5px);
+  background:var(--text); color:var(--surface);
+  font-size:11px; line-height:1.5; font-weight:500; text-align:left;
+  padding:10px 13px; border-radius:10px; width:236px;
+  box-shadow:var(--shh); opacity:0; pointer-events:none;
+  transition:opacity .16s, transform .16s; z-index:40;
+}
+.ntip b { font-size:11.5px; font-weight:700; display:block; margin-bottom:3px; }
+.ntip::after {
+  content:''; position:absolute; left:50%; bottom:-5px;
+  transform:translateX(-50%) rotate(45deg);
+  width:10px; height:10px; background:var(--text);
+}
+.node:hover .ntip { opacity:1; transform:translateX(-50%) translateY(0); }
+
 /* Hub */
 .node.hub .card {
   width:162px;
@@ -392,20 +410,43 @@ header {
 const PRJ = 'hairlove';
 
 const AG = [
-  { k:'strategy',    n:'Стратегия',  cmd:'/hairlove-strategy',   ico:'🎯', d:'Дорожная карта.',           px:22, py:16, def:'working' },
-  { k:'copy',        n:'Тексты',     cmd:'/hairlove-texts',       ico:'✍️', d:'Контент для всех каналов.', px: 7, py:37, def:'active'  },
-  { k:'site',        n:'Сайт',       cmd:'/hairlove-site',        ico:'🌐', d:'B2B-витрина.',               px:38, py:29, def:'next'    },
-  { k:'competitors', n:'Конкуренты', cmd:'/hairlove-competitors', ico:'🔍', d:'Анализ рынка.',              px: 7, py:63, def:'wait'    },
-  { k:'ads',         n:'Реклама',    cmd:'/hairlove-ads',         ico:'📣', d:'Meta Ads, таргетинг.',      px:38, py:71, def:'stage'   },
-  { k:'instagram',   n:'Instagram',  cmd:'/hairlove-insta',       ico:'📸', d:'Публикация постов.',         px:22, py:84, def:'active'  },
+  { k:'coordinator', n:'Координатор', cmd:'/hairlove',    ico:'🧭', d:'Диспетчер задач.',     def:'working',
+    role:'Принимает твою задачу, решает кого из агентов запустить и в каком порядке. Через него идёт всё. Сам ничего не пишет.' },
+  { k:'strategy',    n:'Стратегия',   cmd:'/hairlove-strategy', ico:'🎯', d:'Решения, дорожная карта.', def:'next',
+    role:'Принимает решения: куда движемся, на чём фокус, что важнее. Строит дорожную карту проекта.' },
+  { k:'competitors', n:'Конкуренты',  cmd:'/hairlove-competitors', ico:'🔍', d:'Анализ рынка.', def:'wait',
+    role:'Смотрит конкурентов (deeply, K18, Olaplex): цены, что постят, как продают. Даёт данные для стратегии.' },
+  { k:'planning',    n:'Планирование', cmd:'planning',    ico:'🗂️', d:'План по шагам.', def:'wait',
+    role:'Берёт размытую задачу и превращает в чёткий план: что именно делать по шагам.' },
+  { k:'brandbook',   n:'Брендбук',    cmd:'brandbook',    ico:'🎨', d:'Правила бренда.', def:'wait',
+    role:'Правила бренда: цвета, шрифты, как говорим, какие слова запрещены.' },
+  { k:'visual',      n:'Визуал',      cmd:'visual',       ico:'🖼️', d:'Промпты для фото.', def:'wait',
+    role:'Пишет промпты для генерации фото — для Instagram, сайта, КП.' },
+  { k:'copy',        n:'Тексты',      cmd:'/hairlove-texts', ico:'✍️', d:'Продающие тексты.', def:'next',
+    role:'Пишет продающие тексты: посты, КП, скрипты для салонов и дистрибьюторов.' },
+  { k:'instagram',   n:'Instagram',   cmd:'/hairlove-insta', ico:'📸', d:'Контент-план.', def:'active',
+    role:'Контент-план: какие посты, о чём, в каком порядке. Автопостинг живёт на VPS, 20:00 Киев.' },
+  { k:'growth',      n:'Рост',        cmd:'growth',       ico:'📈', d:'Органика, дистрибьюторы.', def:'wait',
+    role:'Где взять рост без рекламы: партнёрства, новые дистрибьюторы по городам, органика.' },
+  { k:'ads',         n:'Реклама',     cmd:'/hairlove-ads', ico:'📣', d:'Таргетинг (выкл.).', def:'stage',
+    role:'Реклама и таргетинг. Выключен — включаем только после сайта (Этап 2).' },
+  { k:'documents',   n:'Документы',   cmd:'documents',    ico:'⚖️', d:'Юрист, сертификация.', def:'active',
+    role:'Юрист-регуляторщик: сертификация МОЗ/MOH, договоры, оферта, КП. Сейчас приоритет №1 — дедлайн 03.08.' },
+  { k:'analytics',   n:'Аналитика',   cmd:'analytics',    ico:'📊', d:'Анализ продаж.', def:'next',
+    role:'Анализ твоих продаж: что продаётся, кто покупает повторно, сильные города. Сырые данные с именами — не в git.' },
+  { k:'text-editor', n:'Редактор',    cmd:'text-editor',  ico:'📝', d:'Финальная вычитка.', def:'wait',
+    role:'Финальная вычитка готового текста: ошибки, гладкость, читаемость.' },
+  { k:'site',        n:'Сайт',        cmd:'/hairlove-site', ico:'🌐', d:'Вёрстка, деплой.', def:'wait',
+    role:'Технарь: вёрстка сайта (B2B-витрина), деплой, технические фиксы.' },
+  { k:'humanizer',   n:'Гуманайзер',  cmd:'humanizer',    ico:'🫧', d:'АнтиИИ-проход.', def:'wait',
+    role:'Убирает «запах ИИ» — чтобы текст звучал по-живому, перед публикацией.' },
 ];
-const HUB  = { px:22, py:50 };
-const OWN  = { px:64, py:50 };
-const PH   = [{ px:81, py:32 }, { px:81, py:68 }];
+const HUB  = { px:50, py:52 };
+const OWN  = { px:50, py:6  };
 const WFLOWS = [
   { f:'copy', t:'instagram', c:'var(--lb)' }, { f:'copy', t:'site', c:'var(--lb)' },
   { f:'competitors', t:'strategy', c:'var(--lo)' },
-  { f:'ads', t:'instagram', c:'var(--lr)' }, { f:'ads', t:'site', c:'var(--lr)' },
+  { f:'analytics', t:'growth', c:'var(--lr)' },
 ];
 const BMAP = {
   active:  ['b-active',  'Активен'],
@@ -477,6 +518,14 @@ function render(){
   const W=cvs.clientWidth,H=cvs.clientHeight;
   const xy=p=>({x:p.px/100*W,y:p.py/100*H});
 
+  /* Раскладываем агентов кольцом вокруг хаба */
+  const N=AG.length;
+  AG.forEach((a,i)=>{
+    const ang=(-90 + 360/N*i + 360/N/2) * Math.PI/180;
+    a.px = HUB.px + 42*Math.cos(ang);
+    a.py = HUB.py + 36*Math.sin(ang);
+  });
+
   /* Hub ↔ agents (gray) */
   AG.forEach((a,i)=>{
     const h=xy(HUB),pt=xy(a);
@@ -500,7 +549,8 @@ function render(){
     el.className='node';
     el.style.left=pt.x+'px'; el.style.top=pt.y+'px';
     const ts=aTs[a.k]?`<div class="c-ts">${aTs[a.k]}</div>`:'';
-    el.innerHTML=`<div class="card">
+    el.innerHTML=`<div class="ntip"><b>${a.n}</b>${esc(a.role)}</div>
+    <div class="card">
       <span class="c-ico">${a.ico}</span>
       <div class="c-name">${a.n}</div>
       <span class="c-cmd" title="Нажми чтобы скопировать" onclick="copyCmd(event,'${a.cmd}')">${a.cmd}</span>
@@ -537,19 +587,6 @@ function render(){
    </div>`;
    el.addEventListener('click',()=>openP({t:'owner'}));
    cvs.appendChild(el);}
-
-  /* Placeholders */
-  PH.forEach(pos=>{
-    const pt=xy(pos),el=document.createElement('div');
-    el.className='node ph';
-    el.style.left=pt.x+'px'; el.style.top=pt.y+'px';
-    el.innerHTML=`<div class="card">
-      <span class="c-ico">📦</span>
-      <div class="c-name">Новое направление</div>
-      <span class="badge b-soon">Скоро</span>
-    </div>`;
-    cvs.appendChild(el);
-  });
 }
 
 /* Bottom bar */
@@ -586,9 +623,9 @@ async function drawP(){
     const a=AG.find(x=>x.k===panCtx.k);if(!a)return;
     T.innerHTML=`${a.ico} ${a.n}`;
     const evs=await get(`/api/agents/events?project=${PRJ}&agent=${a.k}&limit=50`)||[];
-    B.innerHTML=`<div class="psec"><h4>Агент</h4>
-      <code style="background:var(--acc-s);color:var(--accent);padding:2px 8px;border-radius:6px;font-size:11px;font-family:'SF Mono',ui-monospace,monospace">${a.cmd}</code>
-      <p style="margin-top:8px">${a.d}</p></div>
+    B.innerHTML=`<div class="psec"><h4>Вызов</h4>
+      <code style="background:var(--acc-s);color:var(--accent);padding:2px 8px;border-radius:6px;font-size:11px;font-family:'SF Mono',ui-monospace,monospace">${a.cmd}</code></div>
+      <div class="psec"><h4>За что отвечает</h4><p>${esc(a.role)}</p></div>
       <div class="psec"><button class="achip" onclick="openP({t:'project'})">← HairLove</button></div>
       <div class="psec"><h4>События (${evs.length})</h4>
       <div class="evs">${evs.length?[...evs].reverse().map(fe).join(''):'<div class="no-ev">агент ещё не работал</div>'}</div></div>`;

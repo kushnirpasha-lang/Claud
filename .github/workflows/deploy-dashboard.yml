@@ -1,0 +1,40 @@
+name: Deploy agents dashboard to VPS
+
+# Деплоит ТОЛЬКО статический дашборд агентов (assistant/static/agents.html).
+# Безопасно: статический файл, web.py отдаёт его на каждом запросе,
+# рестарт сервиса не нужен, на работающего бота не влияет.
+# SSH-секреты — единая пара SSH_HOST + SSH_PRIVATE_KEY.
+
+on:
+  push:
+    branches: [claude/hairlove]
+    paths:
+      - 'assistant/static/agents.html'
+      - '.github/workflows/deploy-dashboard.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy dashboard to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "assistant/static/agents.html"
+          target: /opt/assistant
+          strip_components: 1
+
+      - name: Verify
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            ls -la /opt/assistant/static/agents.html
+            grep -c "ntip" /opt/assistant/static/agents.html && echo "OK: новый дашборд с тултипами развёрнут"
