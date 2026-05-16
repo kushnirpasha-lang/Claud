@@ -1,4 +1,5 @@
 ---
+model: claude-sonnet-4-6
 name: site
 description: Агент сайта. Использовать когда нужно создать или обновить лендинг, страницы сайта, структуру и тексты для веба. Работает после strategy, передаёт copy для финальных текстов.
 tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch
@@ -38,6 +39,8 @@ tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch
 - Не верстаю (только тексты и структура)
 - Не принимаю стратегические решения
 - Не правлю knowledge/
+
+- Если скрипт `событие.sh` недоступен — только пишу в `progress.log`, не падаю
 
 # Формат progress.log
 ```

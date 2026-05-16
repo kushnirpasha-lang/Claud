@@ -8,20 +8,24 @@
 Команды: `/full-cycle`, `/handoff`, `/status`
 
 ## Агенты
-| Агент | Роль | Артефакты |
-|-------|------|-----------|
-| coordinator | маршрутизация и контроль | — |
-| planning | постановка задач и планирование | artifacts/planning/ |
-| competitors | анализ рынка и конкурентов | artifacts/competitors/ |
-| strategy | стратегические решения | artifacts/strategy/ |
-| site | сайт и лендинги | artifacts/site/ |
-| ads | реклама и кампании | artifacts/ads/ |
-| growth | рост и органика | — |
-| instagram | контент и соцсети | artifacts/instagram/ |
-| copy | тексты и копирайтинг | artifacts/copy/ |
-| text-editor | финальная вычитка | — |
-| humanizer | антиИИ-проход перед публикацией (Instagram, сайт, КП) | — |
-| brandbook | визуальная и вербальная идентичность | artifacts/brandbook/ |
+Канон-ростер: 14. Состав и модели — единый источник `routes.md` (обязан совпадать).
+
+| Агент | Роль | Модель | Артефакты |
+|-------|------|--------|-----------|
+| coordinator | маршрутизация и контроль | `claude-opus-4-7` | — |
+| planning | постановка задач и планирование | `claude-opus-4-7` | artifacts/planning/ |
+| competitors | анализ рынка и конкурентов | `claude-opus-4-7` | artifacts/competitors/ |
+| strategy | стратегические решения | `claude-opus-4-7` | artifacts/strategy/ |
+| brandbook | визуальная и вербальная идентичность | `claude-opus-4-7` | artifacts/brandbook/ |
+| visual | ТЗ и промпты на изображения | `claude-opus-4-7` | artifacts/visual/ |
+| copy | тексты и копирайтинг | `claude-opus-4-7` | artifacts/copy/ |
+| instagram | контент и соцсети | `claude-opus-4-7` | artifacts/instagram/ |
+| growth | рост и органика | `claude-opus-4-7` | — |
+| ads | реклама и кампании (НЕ активен) | `claude-opus-4-7` | artifacts/ads/ |
+| documents | юрист-регуляторщик: сертификация, договоры, КП | `claude-opus-4-7` | artifacts/documents/ |
+| text-editor | финальная вычитка | `claude-sonnet-4-6` | — |
+| site | сайт, вёрстка, деплой | `claude-sonnet-4-6` | artifacts/site/ |
+| humanizer | антиИИ-проход перед публикацией (Instagram, сайт, КП) | `claude-sonnet-4-6` | — |
 
 ## База знаний
 Читать перед любой задачей: `knowledge/`

@@ -1,4 +1,5 @@
 ---
+model: claude-opus-4-7
 name: instagram
 description: Агент Instagram и соцсетей. Использовать когда нужен контент-план, серия постов, рилс, идеи для сторис. Работает после strategy, передаёт тексты в copy.
 tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch
@@ -38,6 +39,8 @@ tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch
 - Не пишу финальные тексты (это copy)
 - Не верстаю визуал
 - Не правлю knowledge/
+
+- Если скрипт `событие.sh` недоступен — только пишу в `progress.log`, не падаю
 
 # Формат progress.log
 ```

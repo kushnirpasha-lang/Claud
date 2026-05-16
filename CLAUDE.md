@@ -118,18 +118,26 @@ Instagram `@hair_love_company`: подписчики/охват/вовлечён
 
 ## АГЕНТЫ КОМАНДЫ
 
-| Slash-команда | Роль |
-|---|---|
-| `/hairlove` | Оркестратор — точка входа, маршрутизация |
-| `/hairlove-strategy` | Стратегия, дорожная карта, решения |
-| `/hairlove-texts` | Тексты для всех каналов |
-| `/hairlove-insta` | Instagram, публикация, контент-план |
-| `/hairlove-site` | Сайт, B2B витрина |
-| `/hairlove-competitors` | Анализ конкурентов и рынка |
-| `/hairlove-ads` | Meta Ads, Google Ads, таргетинг |
+**Канон-ростер: 14 субагентов** в `projects/hairlove/.claude/agents/`. Единственный источник истины по составу и маршрутам — `projects/hairlove/routes.md` (этот список обязан совпадать с ним).
 
-Субагенты в `projects/hairlove/.claude/agents/`:
-`coordinator`, `planning`, `competitors`, `strategy`, `site`, `ads`, `growth`, `instagram`, `copy`, `text-editor`
+| Агент | Роль | Модель |
+|---|---|---|
+| `coordinator` | маршрутизация, контроль, память | `claude-opus-4-7` |
+| `strategy` | стратегия, дорожная карта, решения | `claude-opus-4-7` |
+| `competitors` | анализ рынка, конкуренты, тренды | `claude-opus-4-7` |
+| `planning` | постановка задач, планирование | `claude-opus-4-7` |
+| `brandbook` | визуальная/вербальная идентичность | `claude-opus-4-7` |
+| `visual` | ТЗ и промпты на изображения | `claude-opus-4-7` |
+| `copy` | продающие тексты, КП, скрипты | `claude-opus-4-7` |
+| `instagram` | контент-план, стратегия контента | `claude-opus-4-7` |
+| `growth` | модель роста, outreach | `claude-opus-4-7` |
+| `ads` | таргетинг, кампании (НЕ активен) | `claude-opus-4-7` |
+| `documents` | юрист-регуляторщик: сертификация, договоры, КП | `claude-opus-4-7` |
+| `text-editor` | финальная вычитка | `claude-sonnet-4-6` |
+| `site` | вёрстка, деплой, технич. фиксы | `claude-sonnet-4-6` |
+| `humanizer` | антиИИ-проход перед публикацией | `claude-sonnet-4-6` |
+
+Slash-команды (точки входа, существуют): `/hairlove` (оркестратор), `/hairlove-strategy`, `/hairlove-texts`, `/hairlove-insta`, `/hairlove-site`, `/hairlove-competitors`, `/hairlove-ads`.
 
 ---
 
